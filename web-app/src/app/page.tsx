@@ -1,3 +1,4 @@
+import Canvas from '@/components/Canvas'
 import styles from './page.module.css'
 
 export default function Home() {
@@ -10,7 +11,7 @@ export default function Home() {
       </div>
 
       <div className={styles.center}>
-        <iframe src="http://localhost:8080" width={'850px'} height={'650px'}></iframe>
+        <Canvas/>
       </div>
     </main>
   )
