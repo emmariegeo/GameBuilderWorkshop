@@ -1,8 +1,8 @@
 import { Box, CssBaseline, AppBar, Toolbar, IconButton, Typography, Button, Divider, ListItemButton, ListItem, List, ListItemText, Drawer } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 
-export default function Navigation({ children }) {
+export default function Navigation(props: { children: ReactNode }) {
     const drawerWidth = 240;
     const navItems = ['Help'];
 
@@ -76,9 +76,9 @@ export default function Navigation({ children }) {
                     {drawer}
                 </Drawer>
             </nav>
-            <Box component="main" sx={{ p: 3 }}>
+            <Box component="main" sx={{ p: 3, width:'100%'}}>
                 <Toolbar />
-                {children}
+                {props.children}
             </Box>
         </Box >
     )
