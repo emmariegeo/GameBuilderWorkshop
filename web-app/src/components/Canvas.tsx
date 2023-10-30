@@ -7,7 +7,6 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 export default function Canvas() {
   const [canvasMode, setCanvasMode] = React.useState('edit');
-
   const handleCanvasMode = (
     event: React.MouseEvent<HTMLElement>,
     newCanvasMode: string | null,
@@ -32,7 +31,7 @@ export default function Canvas() {
         </ToggleButton>
       </ToggleButtonGroup>
       <div className="iframe-container">
-        <iframe src={`http://localhost:8080?mode=${canvasMode}`} className="responsive-iframe" />
+        <iframe src={`/game?mode=${canvasMode}&bg=${window.sessionStorage.getItem('background')}`} className="responsive-iframe" />
       </div></>
   )
 }

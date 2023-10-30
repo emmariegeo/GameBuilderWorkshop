@@ -1,10 +1,6 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-import Button from '@mui/material/Button';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { Divider } from '@mui/material';
+import { Box, Button, Divider, ImageList, ImageListItem, SwipeableDrawer, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { data } from '@/../../assets/assets.ts';
 
 type Anchor = 'bottom'
 
@@ -13,15 +9,17 @@ export default function AssetsDrawer() {
         bottom: false,
     });
 
-    const [alignment, setAlignment] = React.useState('web');
+    const [assetType, setAssetType] = React.useState("backgrounds");
 
+    // switch between asset type displayed
     const handleChange = (
         event: React.MouseEvent<HTMLElement>,
-        newAlignment: string,
+        newAssetType: string,
     ) => {
-        setAlignment(newAlignment);
+        setAssetType(newAssetType);
     };
 
+    // toggle asset drawer
     const toggleDrawer =
         (anchor: Anchor, open: boolean) =>
             (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -37,6 +35,14 @@ export default function AssetsDrawer() {
                 setState({ ...state, [anchor]: open });
             };
 
+    const assets: { [index: string]: { [id: string]: { img?: string, title?: string } } } = data;
+
+    // update background
+    const updateBackground = (newBackground: string) =>
+        (event: React.KeyboardEvent | React.MouseEvent) => {
+            sessionStorage.setItem("background", newBackground);
+        }
+
     const content = (anchor: Anchor) => (
         <Box
             sx={{ width: 'auto' }}
@@ -44,7 +50,7 @@ export default function AssetsDrawer() {
         >
             <ToggleButtonGroup
                 color="primary"
-                value={alignment}
+                value={assetType}
                 exclusive
                 onChange={handleChange}
                 aria-label="Asset Types"
@@ -57,25 +63,36 @@ export default function AssetsDrawer() {
                 <ToggleButton value="audio">Audio</ToggleButton>
             </ToggleButtonGroup>
             <Divider />
-            Stuff here
+            <ImageList sx={{ width: 1200, height: 600 }} cols={6} rowHeight={200}>
+                {Object.entries(assets[assetType]).map(item => (
+                    <Button onClick={updateBackground(item[0])} sx={{ width: 164, height: 164 }} key={item[0]}>
+                        <ImageListItem>
+                            <img
+                                srcSet={`${item[1].img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                                src={`${item[1].img}?w=164&h=164&fit=crop&auto=format`}
+                                alt={item[1].title}
+                                loading="lazy"
+                            />
+                        </ImageListItem>
+                    </Button>
+                ))}
+            </ImageList>
         </Box>
     );
 
     return (
         <div>
-            {(['bottom'] as const).map((anchor) => (
-                <React.Fragment key={anchor}>
-                    <Button onClick={toggleDrawer(anchor, true)}>{anchor}</Button>
-                    <SwipeableDrawer
-                        anchor={anchor}
-                        open={state[anchor]}
-                        onClose={toggleDrawer(anchor, false)}
-                        onOpen={toggleDrawer(anchor, true)}
-                    >
-                        {content(anchor)}
-                    </SwipeableDrawer>
-                </React.Fragment>
-            ))}
+            <React.Fragment key={'assets'}>
+                <Button onClick={toggleDrawer('bottom', true)}>{'assets'}</Button>
+                <SwipeableDrawer
+                    anchor={'bottom'}
+                    open={state['bottom']}
+                    onClose={toggleDrawer('bottom', false)}
+                    onOpen={toggleDrawer('bottom', true)}
+                >
+                    {content('bottom')}
+                </SwipeableDrawer>
+            </React.Fragment>
         </div>
     );
 }

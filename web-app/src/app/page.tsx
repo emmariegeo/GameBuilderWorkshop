@@ -2,17 +2,12 @@
 import Canvas from '@/components/Canvas'
 import styles from './page.module.css'
 import Navigation from '@/components/Navigation'
-import { Container, Grid, Stack, Typography, Box, ButtonGroup, Button } from '@mui/material'
+import { Container, Grid } from '@mui/material'
 import Toolbox from '@/components/Toolbox'
 import OptionsMenu from '@/components/OptionsMenu'
 import AssetsDrawer from '@/components/AssetsDrawer'
 
 export default function Home() {
-  const buttons = [
-    <Button key="one">One</Button>,
-    <Button key="two">Two</Button>,
-    <Button key="three">Three</Button>,
-  ];
   return (
     <Container >
       <Navigation>
