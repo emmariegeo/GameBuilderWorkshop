@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Box, Button, Divider, ImageList, ImageListItem, SwipeableDrawer, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import { data } from '@/../../assets/assets.ts';
+import { data } from '../data/assets.ts';
 
 type Anchor = 'bottom'
 

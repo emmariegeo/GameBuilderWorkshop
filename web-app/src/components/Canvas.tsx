@@ -4,6 +4,12 @@ import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import dynamic from "next/dynamic";
+
+const PhaserGame = dynamic(() => import("./PhaserGame").then((m) => m.default), {
+  ssr: false,
+  loading: () => <p>Loading game...</p>,
+});
 
 export default function Canvas() {
   const [canvasMode, setCanvasMode] = React.useState('edit');
@@ -31,7 +37,7 @@ export default function Canvas() {
         </ToggleButton>
       </ToggleButtonGroup>
       <div className="iframe-container">
-        <iframe src={`/game?mode=${canvasMode}&bg=${window.sessionStorage.getItem('background')}`} className="responsive-iframe" />
+        <PhaserGame />
       </div></>
   )
 }

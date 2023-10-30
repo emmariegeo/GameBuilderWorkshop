@@ -1,6 +1,5 @@
 "use client"
 import Canvas from '@/components/Canvas'
-import styles from './page.module.css'
 import Navigation from '@/components/Navigation'
 import { Container, Grid } from '@mui/material'
 import Toolbox from '@/components/Toolbox'
