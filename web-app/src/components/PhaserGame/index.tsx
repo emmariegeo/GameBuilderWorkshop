@@ -1,14 +1,26 @@
 /** @type {import("../typings/phaser")} */
 import * as Phaser from 'phaser';
-import React from 'react';
 
 // Import scene
 import Edit from './scenes/Edit';
+import { Component } from 'react';
 
-export default class PhaserGame extends React.Component {
+type Props = {
+    mode: string;
+}
+
+export default class PhaserGame extends Component<{}, Props> {
+    constructor(props: any) {
+        super(props);
+        this.state = {
+            mode: 'edit'
+        };
+    }
+
     componentDidMount() {
         const config = {
-            type: Phaser.AUTO,
+            type: Phaser.CANVAS,
+            parent: 'phaser-game',
             width: 800,
             height: 600,
             physics: {
@@ -19,7 +31,7 @@ export default class PhaserGame extends React.Component {
                 },
             },
             scale: {
-                parent: "iframe-container",
+                parent: 'phaser-game',
                 autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
             },
             scene: [Edit],
@@ -33,4 +45,3 @@ export default class PhaserGame extends React.Component {
         return <div id="phaser-game" />;
     }
 }
-

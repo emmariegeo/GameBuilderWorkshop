@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Box, Button, Divider, ImageList, ImageListItem, SwipeableDrawer, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { data } from '../data/assets.ts';
+import { updateBackground, useAppDispatch, useAppSelector } from '@/store.ts';
 
 type Anchor = 'bottom'
 
@@ -18,6 +19,9 @@ export default function AssetsDrawer() {
     ) => {
         setAssetType(newAssetType);
     };
+
+    const background = useAppSelector(state => state.background);
+    const dispatch = useAppDispatch();
 
     // toggle asset drawer
     const toggleDrawer =
@@ -38,9 +42,9 @@ export default function AssetsDrawer() {
     const assets: { [index: string]: { [id: string]: { img?: string, title?: string } } } = data;
 
     // update background
-    const updateBackground = (newBackground: string) =>
+    const changeBackground = (newBackground: string) =>
         (event: React.KeyboardEvent | React.MouseEvent) => {
-            sessionStorage.setItem("background", newBackground);
+            dispatch(updateBackground(newBackground));
         }
 
     const content = (anchor: Anchor) => (
@@ -65,7 +69,7 @@ export default function AssetsDrawer() {
             <Divider />
             <ImageList sx={{ width: 1200, height: 600 }} cols={6} rowHeight={200}>
                 {Object.entries(assets[assetType]).map(item => (
-                    <Button onClick={updateBackground(item[0])} sx={{ width: 164, height: 164 }} key={item[0]}>
+                    <Button onClick={changeBackground(item[0])} sx={{ width: 164, height: 164 }} key={item[0]}>
                         <ImageListItem>
                             <img
                                 srcSet={`${item[1].img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}

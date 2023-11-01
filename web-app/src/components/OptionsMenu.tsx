@@ -6,14 +6,12 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
-let PLACEHOLDER_IMG = "";
-
 export default function OptionsMenu() {
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardMedia
         sx={{ height: 140 }}
-        image="/static/images/cards/contemplative-reptile.jpg"
+        image="assets/libs.png"
         title="green iguana"
       />
       <CardContent>
