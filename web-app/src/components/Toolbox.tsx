@@ -17,33 +17,33 @@ export default function Toolbox() {
   };
 
   return (
-        <ToggleButtonGroup
-        orientation="vertical"
-        value={view}
-        exclusive
-        onChange={handleChange}
-      >
-        <ToggleButton value="select" aria-label="select">
-          <NearMeOutlined />
-        </ToggleButton>
-        <ToggleButton value="delete" aria-label="delete">
-          <DeleteOutlined />
-        </ToggleButton>
-        <ToggleButton value="fill" aria-label="fill">
-          <FormatColorFillOutlined />
-        </ToggleButton>
-        <ToggleButton value="resize" aria-label="resize">
-          <AspectRatioOutlined />
-        </ToggleButton>
-        <ToggleButton value="rotate" aria-label="rotate">
-          <RotateLeftOutlined />
-        </ToggleButton>
-        <ToggleButton value="flip" aria-label="flip">
-          <FlipOutlined />
-        </ToggleButton>
-        <ToggleButton value="duplicate" aria-label="duplicate">
-          <ContentCopyOutlined />
-        </ToggleButton>
-      </ToggleButtonGroup>
-    )
-  }
+    <ToggleButtonGroup
+      orientation="vertical"
+      value={view}
+      exclusive
+      onChange={handleChange}
+    >
+      <ToggleButton value="select" aria-label="select">
+        <NearMeOutlined />
+      </ToggleButton>
+      <ToggleButton value="delete" aria-label="delete">
+        <DeleteOutlined />
+      </ToggleButton>
+      <ToggleButton value="fill" aria-label="fill">
+        <FormatColorFillOutlined />
+      </ToggleButton>
+      <ToggleButton value="resize" aria-label="resize">
+        <AspectRatioOutlined />
+      </ToggleButton>
+      <ToggleButton value="rotate" aria-label="rotate">
+        <RotateLeftOutlined />
+      </ToggleButton>
+      <ToggleButton value="flip" aria-label="flip">
+        <FlipOutlined />
+      </ToggleButton>
+      <ToggleButton value="duplicate" aria-label="duplicate">
+        <ContentCopyOutlined />
+      </ToggleButton>
+    </ToggleButtonGroup>
+  )
+}
