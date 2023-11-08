@@ -9,9 +9,12 @@ const PhaserGame = dynamic(() => import("./PhaserGame").then((m) => m.default), 
 });
 
 const Canvas = () => {
-  const mode = useAppSelector(state => state.mode);
+  // canvas mode from store
+  const mode = useAppSelector(state => state.options.mode);
+  // dispatch to store
   const dispatch = useAppDispatch();
 
+  // Handle canvas mode on toggle
   const handleCanvasMode = async (
     event: React.MouseEvent<HTMLElement>,
     newCanvasMode: string | null,

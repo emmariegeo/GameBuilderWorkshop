@@ -1,5 +1,5 @@
 interface Map {
-    [key: string]: { [id: string]: { img: string, title?: string } }
+    [key: string]: { [id: string]: { img: string, title: string, width?:number, height?:number, frames?: {}} }
 }
 
 export const data: Map = {
@@ -50,15 +50,33 @@ export const data: Map = {
         },
     },
     sprites: {
-        bg1: {
-            "img": "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e",
-            "title": "bg1"
+        s1: {
+            "img": "assets/sprites/dude.png",
+            "title": "dude",
+            "width": 32,
+            "height": 48,
+            "frames": {
+                left: [0,3],
+                turn: [4],
+                right: [5,8]
+            }
+        },
+        s2: {
+            "img": "assets/sprites/pinkman.png",
+            "title": "pinkman",
+            "width": 32,
+            "height": 32,
+            "frames": {
+                left: [0,3],
+                turn: [4],
+                right: [5,8]
+            }
         }
     },
     items: {
         bg1: {
-            "img": "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e",
-            "title": "bg1"
+            "img": "assets/sprites/pinkman.png",
+            "title": "pinkman"
         }
     },
     obstacles: {

@@ -8,40 +8,48 @@ import AspectRatioOutlined from '@mui/icons-material/AspectRatioOutlined';
 import RotateLeftOutlined from '@mui/icons-material/RotateLeftOutlined';
 import FlipOutlined from '@mui/icons-material/FlipOutlined';
 import ContentCopyOutlined from '@mui/icons-material/ContentCopyOutlined';
+import { Tool } from '@/data/types';
+import { switchTool, useAppDispatch, useAppSelector } from '@/store';
 
 export default function Toolbox() {
-  const [view, setView] = React.useState('list');
+  const tool = useAppSelector(state => state.options.tool);
+  const dispatch = useAppDispatch();
 
-  const handleChange = (event: React.MouseEvent<HTMLElement>, nextView: string) => {
-    setView(nextView);
+  const handleChangeTool = async (
+    event: React.MouseEvent<HTMLElement>,
+    newTool: Tool | null,
+  ) => {
+    if (newTool !== null) {
+      dispatch(switchTool(newTool));
+    }
   };
 
   return (
     <ToggleButtonGroup
       orientation="vertical"
-      value={view}
+      value={tool}
       exclusive
-      onChange={handleChange}
+      onChange={handleChangeTool}
     >
-      <ToggleButton value="select" aria-label="select">
+      <ToggleButton value={Tool.Select} aria-label="select">
         <NearMeOutlined />
       </ToggleButton>
-      <ToggleButton value="delete" aria-label="delete">
+      <ToggleButton value={Tool.Delete} aria-label="delete">
         <DeleteOutlined />
       </ToggleButton>
-      <ToggleButton value="fill" aria-label="fill">
+      <ToggleButton value={Tool.Fill} aria-label="fill">
         <FormatColorFillOutlined />
       </ToggleButton>
-      <ToggleButton value="resize" aria-label="resize">
+      <ToggleButton value={Tool.Resize} aria-label="resize">
         <AspectRatioOutlined />
       </ToggleButton>
-      <ToggleButton value="rotate" aria-label="rotate">
+      <ToggleButton value={Tool.Rotate} aria-label="rotate">
         <RotateLeftOutlined />
       </ToggleButton>
-      <ToggleButton value="flip" aria-label="flip">
+      <ToggleButton value={Tool.Flip} aria-label="flip">
         <FlipOutlined />
       </ToggleButton>
-      <ToggleButton value="duplicate" aria-label="duplicate">
+      <ToggleButton value={Tool.Duplicate} aria-label="duplicate">
         <ContentCopyOutlined />
       </ToggleButton>
     </ToggleButtonGroup>

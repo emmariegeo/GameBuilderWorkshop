@@ -1,18 +1,22 @@
 import * as React from 'react';
 import { Box, Button, Divider, ImageList, ImageListItem, SwipeableDrawer, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { data } from '../data/assets.ts';
-import { updateBackground, useAppDispatch, useAppSelector } from '@/store.ts';
+import { entityAdded, updateBackground, useAppDispatch, useAppSelector } from '@/store.ts';
+import { Entity, EntityType } from '@/data/types.ts';
+import { v4 as uuid } from 'uuid';
 
 type Anchor = 'bottom'
 
 export default function AssetsDrawer() {
+    // Drawer state
     const [state, setState] = React.useState({
         bottom: false,
     });
 
+    // Currently shown type of asset, default to backgrounds
     const [assetType, setAssetType] = React.useState("backgrounds");
 
-    // switch between asset type displayed
+    // Switch between asset type displayed
     const handleChange = (
         event: React.MouseEvent<HTMLElement>,
         newAssetType: string,
@@ -20,10 +24,12 @@ export default function AssetsDrawer() {
         setAssetType(newAssetType);
     };
 
-    const background = useAppSelector(state => state.background);
+    // Get current background from store
+    const background = useAppSelector(state => state.options.background);
+    // Dispatch to store
     const dispatch = useAppDispatch();
 
-    // toggle asset drawer
+    // Toggle asset drawer
     const toggleDrawer =
         (anchor: Anchor, open: boolean) =>
             (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -38,15 +44,25 @@ export default function AssetsDrawer() {
 
                 setState({ ...state, [anchor]: open });
             };
-
+    // Asset data from external file
     const assets: { [index: string]: { [id: string]: { img?: string, title?: string } } } = data;
 
-    // update background
-    const changeBackground = (newBackground: string) =>
-        (event: React.KeyboardEvent | React.MouseEvent) => {
-            dispatch(updateBackground(newBackground));
-        }
+    // Dispatch to store: Update background
+    const changeBackground = (newBackground: string) => {
+        dispatch(updateBackground(newBackground));
+    }
 
+    // When an asset is clicked
+    const handleAssetClick = (itemKey: string) => (event: React.KeyboardEvent | React.MouseEvent) => {
+        if (assetType == "backgrounds") {
+            changeBackground(itemKey);
+        } else if (assetType == "sprites") {
+            let playerSample: Entity = { id: itemKey+uuid(), x: 100, y: 450, z: 1, width: data['sprites'][itemKey].width !== undefined ? data['sprites'][itemKey].width : 32, height: data['sprites'][itemKey].height !== undefined ? data['sprites'][itemKey].height : 32, scale: 1, orientation: 0, spriteUrl: data['sprites'][itemKey].img, physics: 'arcade', type: EntityType.Player, loaded: false }
+            dispatch(entityAdded(playerSample));
+        }
+    }
+
+    // Drawer content
     const content = (anchor: Anchor) => (
         <Box
             sx={{ width: 'auto' }}
@@ -69,7 +85,7 @@ export default function AssetsDrawer() {
             <Divider />
             <ImageList sx={{ width: 1200, height: 600 }} cols={6} rowHeight={200}>
                 {Object.entries(assets[assetType]).map(item => (
-                    <Button onClick={changeBackground(item[0])} sx={{ width: 164, height: 164 }} key={item[0]}>
+                    <Button onClick={handleAssetClick(item[0])} sx={{ width: 164, height: 164 }} key={item[0]}>
                         <ImageListItem>
                             <img
                                 srcSet={`${item[1].img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
