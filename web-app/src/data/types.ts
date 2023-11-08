@@ -6,7 +6,7 @@ export enum EntityType {
 }
 
 /**
- * Entity class is used to manage game object data
+ * Entity type is used to manage game object data
  */
 export type Entity = {
     id: string;
@@ -21,6 +21,15 @@ export type Entity = {
     physics: string;
     type: EntityType;
     loaded: boolean;
+}
+
+/**
+ * EntityGroup
+ */
+export type EntityGroup = {
+    id: string;
+    entityIds: string[];
+    physics: string;
 }
 
 /**

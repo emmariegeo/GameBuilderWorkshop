@@ -10,7 +10,7 @@ const PhaserGame = dynamic(() => import("./PhaserGame").then((m) => m.default), 
 
 const Canvas = () => {
   // canvas mode from store
-  const mode = useAppSelector(state => state.options.mode);
+  const mode = useAppSelector(state => state.canvas.mode);
   // dispatch to store
   const dispatch = useAppDispatch();
 

@@ -25,7 +25,7 @@ export default function AssetsDrawer() {
     };
 
     // Get current background from store
-    const background = useAppSelector(state => state.options.background);
+    const background = useAppSelector(state => state.canvas.background);
     // Dispatch to store
     const dispatch = useAppDispatch();
 

@@ -2,7 +2,7 @@
 import * as Phaser from 'phaser';
 import { entityAdded, entityDeleted, allEntities, store, entityLoaded, select, entityUpdated } from '../../../store';
 import { data as assets } from '../../../data/assets.ts';
-import { Entity, EntityType } from '@/data/types.ts';
+import { Entity, EntityType, Tool } from '@/data/types.ts';
 import { Dictionary } from '@reduxjs/toolkit';
 
 let PLAYER_X = 100;
@@ -22,6 +22,7 @@ export default class Edit extends Phaser.Scene {
     playerEntity: any;
     selected: Phaser.GameObjects.Image;
     mode: any;
+    tool: Tool;
     constructor() {
         super('Edit');
         this.background = assets['backgrounds']['bg1'];
@@ -29,6 +30,7 @@ export default class Edit extends Phaser.Scene {
         this.gameEntities = {};
         this.playerEntity = playerSample;
         this.selected = this.player;
+        this.tool = Tool.Select;
     }
 
     preload() {
@@ -70,6 +72,8 @@ export default class Edit extends Phaser.Scene {
         this.setAnimations('player');
         // Graphics
         this.selectedGraphics = this.add.graphics();
+        // Set editor behavior based on current tool
+        this.setTool(this.tool);
     }
 
     // Set the canvas mode 
@@ -78,11 +82,7 @@ export default class Edit extends Phaser.Scene {
             this.mode = newMode;
             // Pause physics for editing
             this.physics.pause();
-            this.player.setInteractive();
-            // TODO: Generalize to loop through game objects
-            this.platforms.getChildren().forEach((child) => child.setInteractive());
-            this.input.setDraggable(this.player);
-            this.input.setDraggable(this.platforms.getChildren());
+            this.setTool(this.tool);
         } else if (newMode == 'play') {
             this.mode = newMode;
             // Resume physics to play
@@ -97,7 +97,36 @@ export default class Edit extends Phaser.Scene {
         }
     }
 
-    // Set the background
+    /**
+     * Set editor behavior based on the current tool selected.
+     * @param newTool Tool
+     */
+    setTool(newTool: Tool) {
+        this.tool = newTool;
+        switch (newTool) {
+            case Tool.Select:
+                this.player.setInteractive();
+                // TODO: Generalize to loop through game objects
+                this.platforms.getChildren().forEach((child) => child.setInteractive());
+                this.input.setDraggable(this.player);
+                this.input.setDraggable(this.platforms.getChildren());
+                break;
+            default:
+                this.player.setInteractive();
+                // Clear selected graphics
+                this.selectedGraphics.clear();
+                // TODO: Generalize to loop through game objects
+                this.platforms.getChildren().forEach((child) => child.setInteractive());
+                this.input.setDraggable(this.player, false);
+                this.input.setDraggable(this.platforms.getChildren(), false);
+                break;
+        }
+    }
+
+    /**
+     * Set the new background
+     * @param newBackground string referring to background asset ket
+     */
     setBackground(newBackground: string) {
         // Confirm that background exists in assets
         if (newBackground in assets["backgrounds"]) {
@@ -127,13 +156,16 @@ export default class Edit extends Phaser.Scene {
     // When changes are made to the store, update game
     onStoreChange() {
         const state = store.getState();
-        if (state.options.mode == 'edit') {
+        if (state.canvas.mode == 'edit') {
             this.setMode('edit');
-        } else if (state.options.mode == 'play') {
+        } else if (state.canvas.mode == 'play') {
             this.setMode('play');
         }
-        if (state.options.background !== this.background) {
-            this.setBackground(state.options.background.toString());
+        if (state.canvas.background !== this.background) {
+            this.setBackground(state.canvas.background.toString());
+        }
+        if (state.canvas.tool !== this.tool) {
+            this.setTool(state.canvas.tool);
         }
         if (state.entities.entities !== this.gameEntities) {
             // We only want to load entities that are unloaded
@@ -193,7 +225,7 @@ export default class Edit extends Phaser.Scene {
                 });
                 loader.start();
             }
-            this.player.setData('id',object.id);
+            this.player.setData('id', object.id);
         }
     }
 
@@ -253,12 +285,6 @@ export default class Edit extends Phaser.Scene {
     }
 
     update() {
-        // Drag objects in edit mode
-        this.input.on('drag', (pointer: any, gameObject: { x: any; y: any; }, dragX: number, dragY: number) => {
-            gameObject.x = dragX;
-            gameObject.y = dragY;
-            this.platforms.refresh()
-        });
 
         // Player movement with arrow controls
         if (this.mode !== 'edit') {
@@ -278,6 +304,14 @@ export default class Edit extends Phaser.Scene {
                 this.player.setVelocityY(-830);
             }
         } else {
+            // Drag objects in edit mode
+            if (this.tool == Tool.Select) {
+                this.input.on('drag', (pointer: any, gameObject: { x: any; y: any; }, dragX: number, dragY: number) => {
+                    gameObject.x = dragX;
+                    gameObject.y = dragY;
+                    this.platforms.refresh()
+                });
+            }
             // Select game object on click
             this.input.on('gameobjectdown', (pointer: any, gameObject: Phaser.GameObjects.Image) => {
                 this.selected = gameObject;

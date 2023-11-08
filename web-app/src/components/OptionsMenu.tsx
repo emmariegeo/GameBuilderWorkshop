@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector, entityById } from '@/store';
 
 export default function OptionsMenu() {
   // Get the selected entity by its id using the currently selected from store
-  const selectedEntity = entityById(useAppSelector(state => state.options.selected));
+  const selectedEntity = entityById(useAppSelector(state => state.canvas.selected));
 
   return (
     <Card sx={{ maxWidth: 345 }}>

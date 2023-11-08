@@ -37,8 +37,8 @@ const entitiesSlice = createSlice({
 });
 
 // REDUCER
-const optionsSlice = createSlice({
-  name: 'options',
+const canvasSlice = createSlice({
+  name: 'canvas',
   initialState,
   reducers: {
     switchMode(state: any, action: PayloadAction<string>) {
@@ -65,7 +65,7 @@ export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 const reducer = combineReducers({
-  options: optionsSlice.reducer,
+  canvas: canvasSlice.reducer,
   entities: entitiesSlice.reducer,
 })
 
@@ -78,5 +78,5 @@ export const store = configureStore({ reducer: reducer });
 export const allEntities = entitiesSelectors.selectAll(store.getState())
 export const entityById = (id: string) => { return entitiesSelectors.selectById(store.getState(), id)};
 
-export const { switchMode, updateBackground, switchTool, select } = optionsSlice.actions;
+export const { switchMode, updateBackground, switchTool, select } = canvasSlice.actions;
 export const { entityAdded, entityLoaded, entityUpdated,entityDeleted } = entitiesSlice.actions;

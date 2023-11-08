@@ -12,7 +12,7 @@ import { Tool } from '@/data/types';
 import { switchTool, useAppDispatch, useAppSelector } from '@/store';
 
 export default function Toolbox() {
-  const tool = useAppSelector(state => state.options.tool);
+  const tool = useAppSelector(state => state.canvas.tool);
   const dispatch = useAppDispatch();
 
   const handleChangeTool = async (
