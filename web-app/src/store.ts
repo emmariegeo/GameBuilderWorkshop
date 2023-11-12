@@ -20,14 +20,16 @@ const entitiesSlice = createSlice({
   reducers: {
     // Can pass adapter functions directly as case reducers.  Because we're passing this
     // as a value, `createSlice` will auto-generate the `entityAdded` action type / creator
-    entityAdded: entitiesAdapter.addOne,
+    entityAdded: entitiesAdapter.setOne,
     entityDeleted: entitiesAdapter.removeOne,
     entityUpdated: entitiesAdapter.updateOne,
     entityLoaded(state, action) {
       if (action.payload.loaded == false) {
         entitiesAdapter.updateOne(state, { id: action.payload.id, changes: { loaded: false } })
-        action.payload.loaded = true
       }
+    },
+    entityUpdateXYZ(state, action: { payload: {id: string, position: { x: number, y: number, z: number }}}) {
+      entitiesAdapter.updateOne(state, { id: action.payload.id, changes: { x: action.payload.position.x, y: action.payload.position.y, z: action.payload.position.z, } })
     },
     entitiesReceived(state, action) {
       // Or, call them as "mutating" helpers in a case reducer
@@ -79,4 +81,4 @@ export const allEntities = entitiesSelectors.selectAll(store.getState())
 export const entityById = (id: string) => { return entitiesSelectors.selectById(store.getState(), id)};
 
 export const { switchMode, updateBackground, switchTool, select } = canvasSlice.actions;
-export const { entityAdded, entityLoaded, entityUpdated,entityDeleted } = entitiesSlice.actions;
+export const { entityAdded, entityLoaded, entityUpdated, entityDeleted, entityUpdateXYZ } = entitiesSlice.actions;

@@ -4,6 +4,7 @@ import * as Phaser from 'phaser';
 // Import scene
 import Edit from './scenes/Edit';
 import { Component } from 'react';
+import Play from './scenes/Play';
 
 type Props = {
     mode: string;
@@ -34,7 +35,7 @@ export default class PhaserGame extends Component<{}, Props> {
                 parent: 'phaser-game',
                 autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
             },
-            scene: [Edit],
+            scene: [Edit, Play],
         };
         new Phaser.Game(config);
     }

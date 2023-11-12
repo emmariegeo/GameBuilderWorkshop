@@ -5,12 +5,21 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { useAppDispatch, useAppSelector, entityById } from '@/store';
+import { entityById, store } from '@/store';
+import { useState } from 'react';
 
-export default function OptionsMenu() {
+export default function OptionsMenu(this: any) {
   // Get the selected entity by its id using the currently selected from store
-  const selectedEntity = entityById(useAppSelector(state => state.canvas.selected));
+  let [selectedEntity, setSelectedEntity] = useState(entityById(''));
 
+  const onStoreChange = () => {
+    const state = store.getState();
+    // When the store changes, reretrieve the entity to check for data changes
+    setSelectedEntity(entityById(state.canvas.selected));
+  }
+
+  // Subscribing to store so we can handle updates
+  store.subscribe(onStoreChange.bind(this))
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardMedia
