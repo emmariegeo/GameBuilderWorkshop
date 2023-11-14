@@ -166,13 +166,11 @@ export default class Play extends Phaser.Scene {
                         'player',
                         this.physics.add.sprite(object.x, object.y, `PLAY_${object.title}`)
                     );
-                    this.gameObjects
-                        .get('player')
-                        .setBodySize(object.width, object.height, true);
-                    this.gameObjects.get('player').setInteractive();
-                    this.gameObjects.get('player').setCollideWorldBounds(true);
-                    this.gameObjects.get('player').setData('id', 'player');
-                    this.gameObjects.get('player').setBounce(0.2);
+                    this.gameObjects.get('player')?.setBodySize(object.width, object.height, true);
+                    this.gameObjects.get('player')?.setInteractive();
+                    this.gameObjects.get('player')?.setCollideWorldBounds(true);
+                    this.gameObjects.get('player')?.setData('id', 'player');
+                    this.gameObjects.get('player')?.setBounce(0.2);
                     this.physics.add.collider(this.gameObjects.get('player'), this.platforms);
                     this.setAnimations(`PLAY_${object.title}`);
                 });
@@ -225,19 +223,19 @@ export default class Play extends Phaser.Scene {
         // Player movement with arrow controls
         if (this.gameObjects.has('player')) {
             if (this.cursors.left.isDown) {
-                this.gameObjects.get('player').setVelocityX(-160);
-                this.gameObjects.get('player').anims.play('left', true);
+                this.gameObjects.get('player')?.setVelocityX(-160);
+                this.gameObjects.get('player')?.anims.play('left', true);
             }
             else if (this.cursors.right.isDown) {
-                this.gameObjects.get('player').setVelocityX(160);
-                this.gameObjects.get('player').anims.play('right', true);
+                this.gameObjects.get('player')?.setVelocityX(160);
+                this.gameObjects.get('player')?.anims.play('right', true);
             }
             else {
-                this.gameObjects.get('player').setVelocityX(0);
-                this.gameObjects.get('player').anims.play('turn');
+                this.gameObjects.get('player')?.setVelocityX(0);
+                this.gameObjects.get('player')?.anims.play('turn');
             }
-            if (this.cursors.up.isDown && this.gameObjects.get('player').body.touching.down) {
-                this.gameObjects.get('player').setVelocityY(-830);
+            if (this.cursors.up.isDown && this.gameObjects.get('player')?.body?.touching.down) {
+                this.gameObjects.get('player')?.setVelocityY(-830);
             }
         }
     }

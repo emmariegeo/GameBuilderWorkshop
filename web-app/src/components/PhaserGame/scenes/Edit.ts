@@ -219,6 +219,7 @@ export default class Edit extends Phaser.Scene {
 
   // Update game object position (x,y,z) values in store
   updateGameObjectPosition(id: string, x: number, y: number, z: number) {
+    console.log('updating game object position for entity with id ',id);
     store.dispatch(
       entityUpdateXYZ({
         id: id,
@@ -248,14 +249,11 @@ export default class Edit extends Phaser.Scene {
       // We check if the texture has been previously loaded
       if (
         this.gameObjects.has('player') &&
-        this.gameObjects.get('player').texture.key !== `EDIT_${object.spriteUrl}`
+        this.gameObjects.get('player')?.texture.key !== `EDIT_${object.title}`
       ) {
         if (this.textures.exists(`EDIT_${object.title}`)) {
-          this.gameObjects.get('player').setTexture(`EDIT_${object.title}`);
-          this.gameObjects
-            .get('player')
-            .setBodySize(object.width, object.height, true);
-          this.setAnimations(`EDIT_${object.title}`);
+          this.gameObjects.get('player')?.setTexture(`EDIT_${object.title}`);
+          this.gameObjects.get('player')?.setBodySize(object.width, object.height, true);
         } else {
           // We wait to switch the player sprite texture
           let loader = new Phaser.Loader.LoaderPlugin(this);
@@ -266,128 +264,90 @@ export default class Edit extends Phaser.Scene {
           loader.once(Phaser.Loader.Events.COMPLETE, () => {
             // texture loaded, so replace
             this.gameObjects.get('player')?.setTexture(`EDIT_${object.title}`);
-            this.gameObjects
-              .get('player')
-              .setBodySize(object.width, object.height, true);
-            // We set the entity's "loaded" property to true
-            this.setAnimations(`EDIT_${object.title}`);
+            this.gameObjects.get('player')?.setBodySize(object.width, object.height, true);
           });
-          console.log('LOADED TEXTURE WITH KEY: ', `EDIT_${object.title}`, 'GET TEXTURE: ', this.textures.get(`EDIT_${object.title}`))
           loader.start();
         }
         this.gameObjects.get('player')?.setData('id', object.id);
+      } else if (!this.gameObjects.has('player')) {
+        if (this.textures.exists(`EDIT_${object.title}`)) {
+          this.gameObjects.set(
+            'player',
+            this.physics.add.sprite(object.x, object.y, `EDIT_${object.title}`)
+          );
+          this.gameObjects.get('player')?.setBodySize(object.width, object.height, true);
+          this.gameObjects.get('player')?.setData('id', object.id);
+        } else {
+          // We wait to switch the player sprite texture
+          let loader = new Phaser.Loader.LoaderPlugin(this);
+          loader.spritesheet(`EDIT_${object.title}`, object.spriteUrl, {
+            frameWidth: object.width,
+            frameHeight: object.height,
+          });
+          loader.once(Phaser.Loader.Events.COMPLETE, () => {
+            this.gameObjects.set(
+              'player',
+              this.physics.add.sprite(object.x, object.y, `EDIT_${object.title}`)
+            );
+            this.gameObjects.get('player')?.setBodySize(object.width, object.height, true);
+            this.gameObjects.get('player')?.setData('id', object.id);
+          });
+          loader.start();
+        }
       }
-    } else if (!this.gameObjects.has('player')) {
-      // We wait to switch the player sprite texture
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.spritesheet(`PLAY_${object.title}`, object.spriteUrl, {
-        frameWidth: object.width,
-        frameHeight: object.height,
-      });
-      loader.once(Phaser.Loader.Events.COMPLETE, () => {
-        this.gameObjects.set(
-          'player',
-          this.physics.add.sprite(object.x, object.y, `PLAY_${object.title}`)
-        );
-        this.gameObjects
-          .get('player')
-          .setBodySize(object.width, object.height, true);
-        console.log('added player to objects', this.gameObjects.get('player'))
-        this.setAnimations(`EDIT_${object.title}`);
-      });
-      loader.start();
     }
     entityLoaded(object);
-  
-}
-
-// Select a game object and highlight, make interactive
-selectObject(object: Phaser.GameObjects.Image) {
-  if (object.getData('id')) {
-    store.dispatch(select(object.getData('id')));
   }
-}
 
-// ---- END METHODS FOR INTERACTING WITH STORE ----
-
-// Display a given game object
-createGameObject(object: Entity) {
-  if (object.type == EntityType.Player) {
-    this.gameObjects.set(
-      'player',
-      this.physics.add.sprite(object.x, object.y, 'player')
-    );
-    this.loadGameObject(object);
-    // Player physics properties
-    if (this.gameObjects.has('player')) {
-      this.gameObjects.get('player').setInteractive();
-      this.gameObjects.get('player').setCollideWorldBounds(true);
-      this.gameObjects.get('player').setData('id', 'player');
-      this.gameObjects.get('player').setCollideWorldBounds(true);
-      this.gameObjects.get('player').setBounce(0.2);
+  // Select a game object and highlight, make interactive
+  selectObject(object: Phaser.GameObjects.Image) {
+    if (object.getData('id')) {
+      store.dispatch(select(object.getData('id')));
     }
   }
-  this.updateGameObject(object);
-}
 
-setAnimations(key: string) {
-  // Player Animations
-  this.anims.remove("left");
-  this.anims.create({
-    key: "left",
-    frames: this.anims.generateFrameNumbers(key, { start: 0, end: 3 }),
-    frameRate: 10,
-    repeat: -1,
-  });
-  this.anims.remove("turn");
-  this.anims.create({
-    key: "turn",
-    frames: [{ key: key, frame: 4 }],
-    frameRate: 20,
-  });
-  this.anims.remove("right");
-  this.anims.create({
-    key: "right",
-    frames: this.anims.generateFrameNumbers(key, { start: 5, end: 8 }),
-    frameRate: 10,
-    repeat: -1,
-  });
-}
+  // ---- END METHODS FOR INTERACTING WITH STORE ----
 
-// Canvas resize
-resize(
-  gameSize: { width: any; height: any },
-  baseSize: any,
-  displaySize: any,
-  resolution: any
-) {
-  const width = gameSize.width;
-  const height = gameSize.height;
+  // Display a given game object
+  createGameObject(object: Entity) {
+    if (object.type == EntityType.Player) {
+      this.loadGameObject(object);
+    }
+  }
 
-  this.cameras.resize(width, height);
-}
+  // Canvas resize
+  resize(
+    gameSize: { width: any; height: any },
+    baseSize: any,
+    displaySize: any,
+    resolution: any
+  ) {
+    const width = gameSize.width;
+    const height = gameSize.height;
 
-update() {
-  // Drag objects in edit mode
-  if (this.tool == Tool.Select) {
-    this.input.on(
-      "drag",
-      (
-        pointer: any,
-        gameObject: Phaser.GameObjects.Image,
-        dragX: number,
-        dragY: number
-      ) => {
-        gameObject.x = dragX;
-        gameObject.y = dragY;
-        this.platforms.refresh();
-      }
-    );
-    // update object position on mouse click release (or when drag is complete)
-    this.input.on(
-      "gameobjectup",
-      (pointer: any, gameObject: Phaser.GameObjects.Image) => {
-        if (this.mode == "edit") {
+    this.cameras.resize(width, height);
+  }
+
+  update() {
+    // Drag objects in edit mode
+    if (this.tool == Tool.Select) {
+      this.input.on(
+        "drag",
+        (
+          pointer: any,
+          gameObject: Phaser.GameObjects.Image,
+          dragX: number,
+          dragY: number
+        ) => {
+          gameObject.x = dragX;
+          gameObject.y = dragY;
+          this.platforms.refresh();
+        }
+      );
+      // update object position on mouse click release (or when drag is complete)
+      this.input.on(
+        "gameobjectup",
+        (pointer: any, gameObject: Phaser.GameObjects.Image) => {
           this.updateGameObjectPosition(
             gameObject.getData('id'),
             gameObject.x,
@@ -395,17 +355,16 @@ update() {
             1
           );
         }
+      );
+    }
+    // Select game object on click
+    this.input.on(
+      "gameobjectdown",
+      (pointer: any, gameObject: Phaser.GameObjects.Image) => {
+        this.selected = gameObject;
+        this.selectObject(gameObject);
       }
     );
+    this.selected && this.showBounds(this.selected);
   }
-  // Select game object on click
-  this.input.on(
-    "gameobjectdown",
-    (pointer: any, gameObject: Phaser.GameObjects.Image) => {
-      this.selected = gameObject;
-      this.selectObject(gameObject);
-    }
-  );
-  this.selected && this.showBounds(this.selected);
-}
 }
