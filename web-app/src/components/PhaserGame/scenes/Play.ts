@@ -30,7 +30,6 @@ export default class Play extends Phaser.Scene {
     preload() {
         this.load.image('bg', this.background['img']);
         this.load.image('ground', '../assets/platform.png');
-        this.load.spritesheet('player', 'assets/sprites/dude.png', { frameWidth: 32, frameHeight: 48 });
     }
 
     create() {
@@ -45,25 +44,11 @@ export default class Play extends Phaser.Scene {
         // Input Events
         this.cursors = this.input.keyboard.createCursorKeys();
 
-        this.gameEntities = initialState.entities.entities;
+        // Making shallow copy of entities dictionary from the store
+        this.gameEntities = { ...initialState.entities.entities };
 
         this.bg = this.add.image(this.scale.width / 4, this.scale.height / 4, 'bg');
         // We want to create a game object for each entry in gameEntities
-        Object.entries(this.gameEntities)
-            .forEach(([, entity]) => {
-                if (entity) {
-                    // If object has been created, reload it
-                    if (this.gameObjects.has(entity.id)) {
-                        this.loadGameObject(entity);
-                        console.log('Already created, loading', entity);
-                    } else {
-                        // If object has not been created in scene, create it.
-                        this.createGameObject(entity);
-                        this.loadGameObject(entity);
-                        console.log('Created and loaded', entity);
-                    }
-                }
-            });
         // The platforms group contains the ground and the 2 ledges we can jump on
         this.platforms = this.physics.add.staticGroup();
         // Here we create the ground.
@@ -75,13 +60,9 @@ export default class Play extends Phaser.Scene {
         this.platforms.create(750, 220, 'ground');
 
         this.scale.on('resize', this.resize, this);
-        if (this.gameObjects.has('player')) {
-            this.gameObjects.get('player').setInteractive();
-            this.gameObjects.get('player').setCollideWorldBounds(true);
-            // Collide the player and the stars with the platforms
-            this.physics.add.collider(this.gameObjects.get('player'), this.platforms);
-            this.setAnimations('player');
-        }
+        Object.entries(this.gameEntities).forEach((entry) => {
+            entry[1] && this.createGameObject(entry[1]);
+        });
     }
 
     // Set the canvas mode 
@@ -121,6 +102,23 @@ export default class Play extends Phaser.Scene {
             if (state.canvas.mode !== this.mode) {
                 this.setMode(state.canvas.mode)
             }
+            if (state.entities.entities !== this.gameEntities) {
+                // We only want to load entities that are unloaded
+                Object.entries(state.entities.entities)
+                    .forEach(([, entity]) => {
+                        if (entity) {
+                            // If object has been created, reload it
+                            if (this.gameObjects.has(entity.id)) {
+                                this.loadGameObject(entity);
+                            } else {
+                                // If object has not been created in scene, create it.
+                                this.createGameObject(entity);
+                            }
+                            // Set entity id and value in gameEntities, used to track changes with entities in store.
+                            this.gameEntities[entity.id] = entity;
+                        }
+                    });
+            }
         }
     }
     // Load a given game object
@@ -130,53 +128,64 @@ export default class Play extends Phaser.Scene {
             // We check if the texture has been previously loaded
             if (
                 this.gameObjects.has('player') &&
-                this.gameObjects.get('player').texture.key !== object.spriteUrl
+                this.gameObjects.get('player').texture.key !== `PLAY_${object.title}`
             ) {
-                if (this.textures.exists(object.id)) {
-                    this.gameObjects.get('player').setTexture(object.spriteUrl);
+                if (this.textures.exists(`PLAY_${object.title}`)) {
+                    this.gameObjects.get('player').setTexture(`PLAY_${object.title}`);
                     this.gameObjects
                         .get('player')
                         .setBodySize(object.width, object.height, true);
+                    this.setAnimations(`PLAY_${object.title}`);
                 } else {
                     // We wait to switch the player sprite texture
                     let loader = new Phaser.Loader.LoaderPlugin(this);
-                    loader.spritesheet(object.spriteUrl, object.spriteUrl, {
+                    loader.spritesheet(`PLAY_${object.title}`, object.spriteUrl, {
                         frameWidth: object.width,
                         frameHeight: object.height,
                     });
                     loader.once(Phaser.Loader.Events.COMPLETE, () => {
                         // texture loaded, so replace
-                        this.gameObjects.get('player').setTexture(object.spriteUrl);
+                        this.gameObjects.get('player').setTexture(`PLAY_${object.title}`);
                         this.gameObjects
                             .get('player')
                             .setBodySize(object.width, object.height, true);
-                        this.setAnimations(object.id);
+                        this.setAnimations(`PLAY_${object.title}`);
                     });
                     loader.start();
                 }
                 this.gameObjects.get('player').setData('id', object.id);
+            } else if (!this.gameObjects.has('player')) {
+                // We wait to switch the player sprite texture
+                let loader = new Phaser.Loader.LoaderPlugin(this);
+                loader.spritesheet(`PLAY_${object.title}`, object.spriteUrl, {
+                    frameWidth: object.width,
+                    frameHeight: object.height,
+                });
+                loader.once(Phaser.Loader.Events.COMPLETE, () => {
+                    this.gameObjects.set(
+                        'player',
+                        this.physics.add.sprite(object.x, object.y, `PLAY_${object.title}`)
+                    );
+                    this.gameObjects
+                        .get('player')
+                        .setBodySize(object.width, object.height, true);
+                    this.gameObjects.get('player').setInteractive();
+                    this.gameObjects.get('player').setCollideWorldBounds(true);
+                    this.gameObjects.get('player').setData('id', 'player');
+                    this.gameObjects.get('player').setBounce(0.2);
+                    this.physics.add.collider(this.gameObjects.get('player'), this.platforms);
+                    this.setAnimations(`PLAY_${object.title}`);
+                });
+                loader.start();
             }
         }
     }
 
     // ---- END METHODS FOR INTERACTING WITH STORE ----
-
     // Display a given game object
     createGameObject(object: Entity) {
         if (object.type == EntityType.Player) {
-            this.gameObjects.set(
-                'player',
-                this.physics.add.sprite(object.x, object.y, 'player')
-            );
-            this.loadGameObject(object);
-            // Player physics properties
-            if (this.gameObjects.has('player')) {
-                this.gameObjects.get('player').setInteractive();
-                this.gameObjects.get('player').setCollideWorldBounds(true);
-                this.gameObjects.get('player').setData('id', 'player');
-                this.gameObjects.get('player').setCollideWorldBounds(true);
-                this.gameObjects.get('player').setBounce(0.2);
-            }
+            this.loadGameObject(object)
         }
     }
 

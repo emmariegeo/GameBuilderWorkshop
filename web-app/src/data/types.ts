@@ -13,6 +13,7 @@ export type Entity = {
     x: number;
     y: number;
     z: number;
+    title: string;
     width: number;
     height: number;
     scale: number;

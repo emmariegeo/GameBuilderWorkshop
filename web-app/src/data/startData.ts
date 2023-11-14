@@ -1,10 +1,11 @@
 import { Entity, EntityType } from "./types";
 
 export const playerSample: Entity = {
-    id: "player",
+    id: 'player',
     x: 100,
     y: 450,
     z: 1,
+    title: 'pinkman',
     width: 32,
     height: 32,
     scale: 1,

@@ -2,7 +2,7 @@ import { PayloadAction, configureStore, createSlice, createEntityAdapter, combin
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { Entity, EntityType, Tool } from "./data/types";
 
-let player: Entity = { id: 'player', x: 100, y: 450, z: 1, width: 32, height: 32, scale: 1, orientation: 0, spriteUrl: '../assets/sprites/pinkman.png', physics: 'arcade', type: EntityType.Player, loaded: false }
+let player: Entity = { id: 'player', x: 100, y: 450, z: 1, width: 32, height: 32, scale: 1, orientation: 0, title: '', spriteUrl: '../assets/sprites/pinkman.png', physics: 'arcade', type: EntityType.Player, loaded: false }
 
 const initialState: { mode: string, background: string, tool: Tool, selected: string } = {
   mode: 'edit', background: 'bg1', tool: Tool.Select, selected: ''
@@ -24,6 +24,11 @@ const entitiesSlice = createSlice({
     entityDeleted: entitiesAdapter.removeOne,
     entityUpdated: entitiesAdapter.updateOne,
     entityLoaded(state, action) {
+      if (action.payload.loaded == false) {
+        entitiesAdapter.updateOne(state, { id: action.payload.id, changes: { loaded: true } })
+      }
+    },
+    entityUnloaded(state, action) {
       if (action.payload.loaded == false) {
         entitiesAdapter.updateOne(state, { id: action.payload.id, changes: { loaded: false } })
       }
