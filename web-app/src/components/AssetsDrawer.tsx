@@ -56,8 +56,7 @@ export default function AssetsDrawer() {
         if (assetType == "backgrounds") {
             changeBackground(itemKey);
         } else if (assetType == "sprites") {
-            // itemKey+uuid()
-            let playerSample: Entity = { id: 'player', x: 100, y: 450, z: 1, title: data['sprites'][itemKey].title !== undefined ? data['sprites'][itemKey].title : 'sprite', width: data['sprites'][itemKey].width !== undefined ? data['sprites'][itemKey].width : 32, height: data['sprites'][itemKey].height !== undefined ? data['sprites'][itemKey].height : 32, scale: 1, orientation: 0, spriteUrl: data['sprites'][itemKey].img, physics: 'arcade', type: EntityType.Player, loaded: false }
+            let playerSample: Entity = { id: 'player', x: 100, y: 450, z: 1, title: data['sprites'][itemKey].title ?? 'sprite', width: data['sprites'][itemKey].width ?? 32, height: data['sprites'][itemKey].height ?? 32, scale: 1, orientation: 0, spriteUrl: data['sprites'][itemKey].img, physics: 'arcade', type: EntityType.Player, loaded: false }
             dispatch(entityAdded(playerSample));
         }
     }
