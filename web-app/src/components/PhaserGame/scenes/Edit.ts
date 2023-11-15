@@ -16,7 +16,7 @@ import { Dictionary } from "@reduxjs/toolkit";
 
 export default class Edit extends Phaser.Scene {
   bg!: Phaser.GameObjects.Image;
-  cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  cursors!: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
   player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   platforms!: Phaser.Physics.Arcade.StaticGroup;
   background: any;
@@ -58,7 +58,7 @@ export default class Edit extends Phaser.Scene {
     this.tool = initialState.canvas.tool;
 
     // Input Events
-    this.cursors = this.input.keyboard.createCursorKeys();
+    this.cursors = this.input?.keyboard?.createCursorKeys();
 
     // Making shallow copy of entities dictionary from the store
     this.gameEntities = { ...initialState.entities.entities };
@@ -98,6 +98,17 @@ export default class Edit extends Phaser.Scene {
   }
 
   /**
+   * Get game object cast to respective type
+   */
+  getGameObject(key: string) {
+    let object = this.gameObjects.get(key);
+    switch (this.gameEntities[key]?.type) {
+      case (EntityType.Player):
+        return object as Phaser.Physics.Arcade.Sprite;
+    }
+  }
+
+  /**
    * Set editor behavior based on the current tool selected.
    * @param newTool Tool
    */
@@ -106,9 +117,9 @@ export default class Edit extends Phaser.Scene {
     switch (newTool) {
       case Tool.Select:
         if (this.gameObjects.has('player')) {
-          this.gameObjects.get('player').setInteractive();
-          // TODO: Generalize to loop through game objects
-          this.input.setDraggable(this.gameObjects.get('player'));
+          let player = this.getGameObject('player');
+          player?.setInteractive();
+          player && this.input.setDraggable(player);
         }
         if (this.platforms) {
           this.platforms
@@ -249,11 +260,11 @@ export default class Edit extends Phaser.Scene {
       // We check if the texture has been previously loaded
       if (
         this.gameObjects.has('player') &&
-        this.gameObjects.get('player')?.texture.key !== `EDIT_${object.title}`
+        this.getGameObject('player')?.texture.key !== `EDIT_${object.title}`
       ) {
         if (this.textures.exists(`EDIT_${object.title}`)) {
-          this.gameObjects.get('player')?.setTexture(`EDIT_${object.title}`);
-          this.gameObjects.get('player')?.setBodySize(object.width, object.height, true);
+          this.getGameObject('player')?.setTexture(`EDIT_${object.title}`);
+          this.getGameObject('player')?.setBodySize(object.width, object.height, true);
         } else {
           // We wait to switch the player sprite texture
           let loader = new Phaser.Loader.LoaderPlugin(this);
@@ -263,8 +274,8 @@ export default class Edit extends Phaser.Scene {
           });
           loader.once(Phaser.Loader.Events.COMPLETE, () => {
             // texture loaded, so replace
-            this.gameObjects.get('player')?.setTexture(`EDIT_${object.title}`);
-            this.gameObjects.get('player')?.setBodySize(object.width, object.height, true);
+            this.getGameObject('player')?.setTexture(`EDIT_${object.title}`);
+            this.getGameObject('player')?.setBodySize(object.width, object.height, true);
           });
           loader.start();
         }
@@ -275,8 +286,8 @@ export default class Edit extends Phaser.Scene {
             'player',
             this.physics.add.sprite(object.x, object.y, `EDIT_${object.title}`)
           );
-          this.gameObjects.get('player')?.setBodySize(object.width, object.height, true);
-          this.gameObjects.get('player')?.setData('id', object.id);
+          this.getGameObject('player')?.setBodySize(object.width, object.height, true);
+          this.getGameObject('player')?.setData('id', object.id);
         } else {
           // We wait to switch the player sprite texture
           let loader = new Phaser.Loader.LoaderPlugin(this);
@@ -289,8 +300,8 @@ export default class Edit extends Phaser.Scene {
               'player',
               this.physics.add.sprite(object.x, object.y, `EDIT_${object.title}`)
             );
-            this.gameObjects.get('player')?.setBodySize(object.width, object.height, true);
-            this.gameObjects.get('player')?.setData('id', object.id);
+            this.getGameObject('player')?.setBodySize(object.width, object.height, true);
+            this.getGameObject('player')?.setData('id', object.id);
           });
           loader.start();
         }

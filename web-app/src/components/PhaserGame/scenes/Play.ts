@@ -7,7 +7,7 @@ import { Dictionary } from '@reduxjs/toolkit';
 
 export default class Play extends Phaser.Scene {
     bg!: Phaser.GameObjects.Image;
-    cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+    cursors!: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
     player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     platforms!: Phaser.Physics.Arcade.StaticGroup;
     background: any;
@@ -42,7 +42,7 @@ export default class Play extends Phaser.Scene {
         this.background = initialState.canvas.background;
 
         // Input Events
-        this.cursors = this.input.keyboard.createCursorKeys();
+        this.cursors = this.input.keyboard?.createCursorKeys();
 
         // Making shallow copy of entities dictionary from the store
         this.gameEntities = { ...initialState.entities.entities };
@@ -63,6 +63,17 @@ export default class Play extends Phaser.Scene {
         Object.entries(this.gameEntities).forEach((entry) => {
             entry[1] && this.createGameObject(entry[1]);
         });
+    }
+
+    /**
+ * Get game object cast to respective type
+ */
+    getGameObject(key: string) {
+        let object = this.gameObjects.get(key);
+        switch (this.gameEntities[key]?.type) {
+            case (EntityType.Player):
+                return object as Phaser.Physics.Arcade.Sprite;
+        }
     }
 
     // Set the canvas mode 
@@ -128,13 +139,11 @@ export default class Play extends Phaser.Scene {
             // We check if the texture has been previously loaded
             if (
                 this.gameObjects.has('player') &&
-                this.gameObjects.get('player').texture.key !== `PLAY_${object.title}`
+                this.getGameObject('player')?.texture.key !== `PLAY_${object.title}`
             ) {
                 if (this.textures.exists(`PLAY_${object.title}`)) {
-                    this.gameObjects.get('player').setTexture(`PLAY_${object.title}`);
-                    this.gameObjects
-                        .get('player')
-                        .setBodySize(object.width, object.height, true);
+                    this.getGameObject('player')?.setTexture(`PLAY_${object.title}`);
+                    this.getGameObject('player')?.setBodySize(object.width, object.height, true);
                     this.setAnimations(`PLAY_${object.title}`);
                 } else {
                     // We wait to switch the player sprite texture
@@ -145,15 +154,13 @@ export default class Play extends Phaser.Scene {
                     });
                     loader.once(Phaser.Loader.Events.COMPLETE, () => {
                         // texture loaded, so replace
-                        this.gameObjects.get('player').setTexture(`PLAY_${object.title}`);
-                        this.gameObjects
-                            .get('player')
-                            .setBodySize(object.width, object.height, true);
+                        this.getGameObject('player')?.setTexture(`PLAY_${object.title}`);
+                        this.getGameObject('player')?.setBodySize(object.width, object.height, true);
                         this.setAnimations(`PLAY_${object.title}`);
                     });
                     loader.start();
                 }
-                this.gameObjects.get('player').setData('id', object.id);
+                this.getGameObject('player')?.setData('id', object.id);
             } else if (!this.gameObjects.has('player')) {
                 // We wait to switch the player sprite texture
                 let loader = new Phaser.Loader.LoaderPlugin(this);
@@ -166,12 +173,13 @@ export default class Play extends Phaser.Scene {
                         'player',
                         this.physics.add.sprite(object.x, object.y, `PLAY_${object.title}`)
                     );
-                    this.gameObjects.get('player')?.setBodySize(object.width, object.height, true);
-                    this.gameObjects.get('player')?.setInteractive();
-                    this.gameObjects.get('player')?.setCollideWorldBounds(true);
-                    this.gameObjects.get('player')?.setData('id', 'player');
-                    this.gameObjects.get('player')?.setBounce(0.2);
-                    this.physics.add.collider(this.gameObjects.get('player'), this.platforms);
+                    this.getGameObject('player')?.setBodySize(object.width, object.height, true);
+                    this.getGameObject('player')?.setInteractive();
+                    this.getGameObject('player')?.setCollideWorldBounds(true);
+                    this.getGameObject('player')?.setData('id', 'player');
+                    this.getGameObject('player')?.setBounce(0.2);
+                    let player = this.getGameObject('player');
+                    player && this.physics.add.collider(player, this.platforms);
                     this.setAnimations(`PLAY_${object.title}`);
                 });
                 loader.start();
@@ -222,20 +230,20 @@ export default class Play extends Phaser.Scene {
     update() {
         // Player movement with arrow controls
         if (this.gameObjects.has('player')) {
-            if (this.cursors.left.isDown) {
-                this.gameObjects.get('player')?.setVelocityX(-160);
-                this.gameObjects.get('player')?.anims.play('left', true);
+            if (this.cursors?.left.isDown) {
+                this.getGameObject('player')?.setVelocityX(-160);
+                this.getGameObject('player')?.anims.play('left', true);
             }
-            else if (this.cursors.right.isDown) {
-                this.gameObjects.get('player')?.setVelocityX(160);
-                this.gameObjects.get('player')?.anims.play('right', true);
+            else if (this.cursors?.right.isDown) {
+                this.getGameObject('player')?.setVelocityX(160);
+                this.getGameObject('player')?.anims.play('right', true);
             }
             else {
-                this.gameObjects.get('player')?.setVelocityX(0);
-                this.gameObjects.get('player')?.anims.play('turn');
+                this.getGameObject('player')?.setVelocityX(0);
+                this.getGameObject('player')?.anims.play('turn');
             }
-            if (this.cursors.up.isDown && this.gameObjects.get('player')?.body?.touching.down) {
-                this.gameObjects.get('player')?.setVelocityY(-830);
+            if (this.cursors?.up.isDown && this.getGameObject('player')?.body?.touching.down) {
+                this.getGameObject('player')?.setVelocityY(-830);
             }
         }
     }
