@@ -2,7 +2,8 @@ export enum EntityType {
     Player = "PLAYER",
     Enemy = "ENEMY",
     Obstacle = "OBSTACLE",
-    Item = "ITEM"
+    Item = "ITEM",
+    Platform = "PLATFORM",
 }
 
 /**

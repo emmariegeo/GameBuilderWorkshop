@@ -13,13 +13,13 @@ import {
 import { data as assets } from "../../../data/assets.ts";
 import { Entity, EntityType, Tool } from "@/data/types.ts";
 import { Dictionary } from "@reduxjs/toolkit";
+import BaseScene from "./BaseScene.ts";
 
-export default class Edit extends Phaser.Scene {
+export default class Edit extends BaseScene {
   bg!: Phaser.GameObjects.Image;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
   player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   platforms!: Phaser.Physics.Arcade.StaticGroup;
-  background: any;
   selectedGraphics!: Phaser.GameObjects.Graphics;
   gameEntities!: Dictionary<Entity>;
   gameObjects!: Map<string, Phaser.GameObjects.GameObject>;
@@ -29,22 +29,17 @@ export default class Edit extends Phaser.Scene {
   mode: any;
   tool!: Tool;
   constructor() {
-    super({ key: "Edit" });
+    super('Edit');
     this.gameEntities = {};
   }
 
   init() {
-    this.background = assets["backgrounds"]["bg1"];
+    this.background = assets['backgrounds']['bg1'];
     this.gameEntityIDs = [];
-    this.gameEntities = {};
     this.gameObjects = new Map();
+    this.gameEntities = {};
     this.selected = this.player;
     this.tool = Tool.Select;
-  }
-
-  preload() {
-    this.load.image("bg", this.background["img"]);
-    this.load.image("ground", "../assets/platform.png");
   }
 
   create() {
@@ -63,11 +58,16 @@ export default class Edit extends Phaser.Scene {
     // Making shallow copy of entities dictionary from the store
     this.gameEntities = { ...initialState.entities.entities };
 
+    // Instantiating bg object
     this.bg = this.add.image(this.scale.width / 4, this.scale.height / 4, "bg");
+    // Setting with existing background value
+    this.setBackground(this.background);
+
     // We want to create a game object for each entry in gameEntities
     Object.entries(this.gameEntities).forEach((entry) => {
       entry[1] && this.createGameObject(entry[1]);
     });
+
     // The platforms group contains the ground and the 2 ledges we can jump on
     this.platforms = this.physics.add.staticGroup();
     // Here we create the ground.
@@ -98,17 +98,6 @@ export default class Edit extends Phaser.Scene {
   }
 
   /**
-   * Get game object cast to respective type
-   */
-  getGameObject(key: string) {
-    let object = this.gameObjects.get(key);
-    switch (this.gameEntities[key]?.type) {
-      case (EntityType.Player):
-        return object as Phaser.Physics.Arcade.Sprite;
-    }
-  }
-
-  /**
    * Set editor behavior based on the current tool selected.
    * @param newTool Tool
    */
@@ -130,25 +119,6 @@ export default class Edit extends Phaser.Scene {
         break;
       default:
         break;
-    }
-  }
-
-  /**
-   * Set the new background
-   * @param newBackground string referring to background asset ket
-   */
-  setBackground(newBackground: string) {
-    // Confirm that background exists in assets
-    if (newBackground in assets["backgrounds"]) {
-      this.background = newBackground;
-      // We wait to set the background image to the new texture until the image has been loaded in.
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.image(newBackground, assets["backgrounds"][newBackground]["img"]);
-      loader.once(Phaser.Loader.Events.COMPLETE, () => {
-        // texture loaded, so replace
-        this.bg.setTexture(newBackground);
-      });
-      loader.start();
     }
   }
 
@@ -230,7 +200,7 @@ export default class Edit extends Phaser.Scene {
 
   // Update game object position (x,y,z) values in store
   updateGameObjectPosition(id: string, x: number, y: number, z: number) {
-    console.log('updating game object position for entity with id ',id);
+    console.log('updating game object position for entity with id ', id);
     store.dispatch(
       entityUpdateXYZ({
         id: id,

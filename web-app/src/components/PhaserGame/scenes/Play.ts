@@ -4,8 +4,9 @@ import { store, entityLoaded, entityById, entityAdded } from '../../../store';
 import { data as assets } from '../../../data/assets.ts';
 import { Entity, EntityType } from '@/data/types.ts';
 import { Dictionary } from '@reduxjs/toolkit';
+import BaseScene from './BaseScene.ts';
 
-export default class Play extends Phaser.Scene {
+export default class Play extends BaseScene {
     bg!: Phaser.GameObjects.Image;
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
     player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
@@ -17,7 +18,7 @@ export default class Play extends Phaser.Scene {
     mode: any;
     gameObjects!: Map<string, Phaser.GameObjects.GameObject>;
     constructor() {
-        super({ key: 'Play' });
+        super('Play');
     }
 
     init() {
@@ -48,6 +49,7 @@ export default class Play extends Phaser.Scene {
         this.gameEntities = { ...initialState.entities.entities };
 
         this.bg = this.add.image(this.scale.width / 4, this.scale.height / 4, 'bg');
+        this.setBackground(this.background);
         // We want to create a game object for each entry in gameEntities
         // The platforms group contains the ground and the 2 ledges we can jump on
         this.platforms = this.physics.add.staticGroup();
@@ -65,42 +67,12 @@ export default class Play extends Phaser.Scene {
         });
     }
 
-    /**
- * Get game object cast to respective type
- */
-    getGameObject(key: string) {
-        let object = this.gameObjects.get(key);
-        switch (this.gameEntities[key]?.type) {
-            case (EntityType.Player):
-                return object as Phaser.Physics.Arcade.Sprite;
-        }
-    }
-
     // Set the canvas mode 
     setMode(newMode: string) {
         if (newMode == 'edit') {
             this.scene.start('Edit');
         } else {
             this.mode = 'play';
-        }
-    }
-
-    /**
-     * Set the new background
-     * @param newBackground string referring to background asset ket
-     */
-    setBackground(newBackground: string) {
-        // Confirm that background exists in assets
-        if (newBackground in assets["backgrounds"]) {
-            this.background = newBackground;
-            // We wait to set the background image to the new texture until the image has been loaded in.
-            let loader = new Phaser.Loader.LoaderPlugin(this);
-            loader.image(newBackground, assets['backgrounds'][newBackground]['img']);
-            loader.once(Phaser.Loader.Events.COMPLETE, () => {
-                // texture loaded, so replace
-                this.bg.setTexture(newBackground)
-            });
-            loader.start();
         }
     }
 
@@ -190,8 +162,11 @@ export default class Play extends Phaser.Scene {
     // ---- END METHODS FOR INTERACTING WITH STORE ----
     // Display a given game object
     createGameObject(object: Entity) {
-        if (object.type == EntityType.Player) {
-            this.loadGameObject(object)
+        switch (object.type) {
+            case (EntityType.Player):
+                this.loadGameObject(object)
+            case (EntityType.Platform):
+                this.loadGameObject(object);
         }
     }
 
