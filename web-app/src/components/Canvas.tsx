@@ -1,8 +1,8 @@
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import dynamic from "next/dynamic";
-import { switchMode, useAppSelector, useAppDispatch, entityAdded } from '@/store';
-import { playerSample } from '@/data/startData';
+import { switchMode, useAppSelector, useAppDispatch, entityAdded, entitiesAdded } from '@/store';
+import { startData } from '@/data/startData';
 import { Button } from '@mui/material';
 
 const PhaserGame = dynamic(() => import("./PhaserGame").then((m) => m.default), {
@@ -29,7 +29,7 @@ const Canvas = () => {
     const handleNewGame = async (
       event: React.MouseEvent<HTMLElement>,
     ) => {
-      dispatch(entityAdded(playerSample));
+      dispatch(entitiesAdded(startData));
     };
 
   return (

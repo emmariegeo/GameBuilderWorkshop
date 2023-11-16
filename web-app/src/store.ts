@@ -2,8 +2,6 @@ import { PayloadAction, configureStore, createSlice, createEntityAdapter, combin
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { Entity, EntityType, Tool } from "./data/types";
 
-let player: Entity = { id: 'player', x: 100, y: 450, z: 1, width: 32, height: 32, scale: 1, orientation: 0, title: '', spriteUrl: '../assets/sprites/pinkman.png', physics: 'arcade', type: EntityType.Player, loaded: false }
-
 const initialState: { mode: string, background: string, tool: Tool, selected: string } = {
   mode: 'edit', background: 'bg1', tool: Tool.Select, selected: ''
 };
@@ -36,10 +34,7 @@ const entitiesSlice = createSlice({
     entityUpdateXYZ(state, action: { payload: {id: string, position: { x: number, y: number, z: number }}}) {
       entitiesAdapter.updateOne(state, { id: action.payload.id, changes: { x: action.payload.position.x, y: action.payload.position.y, z: action.payload.position.z, } })
     },
-    entitiesReceived(state, action) {
-      // Or, call them as "mutating" helpers in a case reducer
-      entitiesAdapter.setAll(state, action.payload.entities)
-    },
+    entitiesAdded: entitiesAdapter.setAll,
   },
 });
 
@@ -86,4 +81,4 @@ export const allEntities = entitiesSelectors.selectAll(store.getState())
 export const entityById = (id: string) => { return entitiesSelectors.selectById(store.getState(), id)};
 
 export const { switchMode, updateBackground, switchTool, select } = canvasSlice.actions;
-export const { entityAdded, entityLoaded, entityUpdated, entityDeleted, entityUpdateXYZ } = entitiesSlice.actions;
+export const { entityAdded, entitiesAdded, entityLoaded, entityUpdated, entityDeleted, entityUpdateXYZ } = entitiesSlice.actions;

@@ -26,18 +26,21 @@ export default class BaseScene extends Phaser.Scene {
 
     preload() {
         this.load.image('bg', this.background['img']);
-        this.load.image('ground', '../assets/platform.png');
+        this.load.image('ground', '../assets/platforms/platform.png');
     }
 
     /**
     * Return game object cast to respective type
     */
+    getSpriteObject(key: string) {
+        let object = this.gameObjects.get(key);
+        
+        return object as Phaser.Physics.Arcade.Sprite;
+    }
+
     getGameObject(key: string) {
         let object = this.gameObjects.get(key);
-        switch (this.gameEntities[key]?.type) {
-            case (EntityType.Player):
-                return object as Phaser.Physics.Arcade.Sprite;
-        }
+        return object;
     }
 
     /**

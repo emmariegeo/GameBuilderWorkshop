@@ -1,6 +1,6 @@
 /** @type {import("../typings/phaser")} */
 import * as Phaser from 'phaser';
-import { store, entityLoaded, entityById, entityAdded } from '../../../store';
+import { store } from '../../../store';
 import { data as assets } from '../../../data/assets.ts';
 import { Entity, EntityType } from '@/data/types.ts';
 import { Dictionary } from '@reduxjs/toolkit';
@@ -53,17 +53,10 @@ export default class Play extends BaseScene {
         // We want to create a game object for each entry in gameEntities
         // The platforms group contains the ground and the 2 ledges we can jump on
         this.platforms = this.physics.add.staticGroup();
-        // Here we create the ground.
-        // Scale it to fit the width of the game (the original sprite is 400x32 in size)
-        this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-        // Now let's create some ledges
-        this.platforms.create(600, 400, 'ground');
-        this.platforms.create(50, 250, 'ground');
-        this.platforms.create(750, 220, 'ground');
 
         this.scale.on('resize', this.resize, this);
         Object.entries(this.gameEntities).forEach((entry) => {
-            entry[1] && this.createGameObject(entry[1]);
+            entry[1] && !entry[1].loaded && this.createGameObject(entry[1]);
         });
     }
 
@@ -87,7 +80,9 @@ export default class Play extends BaseScene {
             }
             if (state.entities.entities !== this.gameEntities) {
                 // We only want to load entities that are unloaded
-                Object.entries(state.entities.entities)
+                Object.entries(state.entities.entities).filter(([, entity]) => {
+                    if (entity) return !entity.loaded;
+                })
                     .forEach(([, entity]) => {
                         if (entity) {
                             // If object has been created, reload it
@@ -106,68 +101,143 @@ export default class Play extends BaseScene {
     }
     // Load a given game object
     loadGameObject(object: Entity) {
-        if (object.type == EntityType.Player) {
-            // We only will have one player, so we will swap the sprite texture
-            // We check if the texture has been previously loaded
-            if (
-                this.gameObjects.has('player') &&
-                this.getGameObject('player')?.texture.key !== `PLAY_${object.title}`
-            ) {
-                if (this.textures.exists(`PLAY_${object.title}`)) {
-                    this.getGameObject('player')?.setTexture(`PLAY_${object.title}`);
-                    this.getGameObject('player')?.setBodySize(object.width, object.height, true);
-                    this.setAnimations(`PLAY_${object.title}`);
-                } else {
-                    // We wait to switch the player sprite texture
-                    let loader = new Phaser.Loader.LoaderPlugin(this);
-                    loader.spritesheet(`PLAY_${object.title}`, object.spriteUrl, {
-                        frameWidth: object.width,
-                        frameHeight: object.height,
-                    });
-                    loader.once(Phaser.Loader.Events.COMPLETE, () => {
-                        // texture loaded, so replace
-                        this.getGameObject('player')?.setTexture(`PLAY_${object.title}`);
-                        this.getGameObject('player')?.setBodySize(object.width, object.height, true);
+        switch (object.type) {
+            case (EntityType.Player):
+                // We only will have one player, so we will swap the sprite texture
+                // We check if the texture has been previously loaded
+                if (
+                    this.gameObjects.has('player') &&
+                    this.getSpriteObject('player')?.texture.key !== `PLAY_${object.title}`
+                ) {
+                    if (this.textures.exists(`PLAY_${object.title}`)) {
+                        this.gameObjects.get('player')?.setData('id', 'player');
+                        this.getSpriteObject('player')?.setTexture(`PLAY_${object.title}`);
+                        this.getSpriteObject('player')?.setBodySize(object.width, object.height, true);
                         this.setAnimations(`PLAY_${object.title}`);
-                    });
-                    loader.start();
+                        this.getSpriteObject('player')?.refreshBody();
+                    } else {
+                        // We wait to switch the player sprite texture
+                        let loader = new Phaser.Loader.LoaderPlugin(this);
+                        loader.spritesheet(`PLAY_${object.title}`, object.spriteUrl, {
+                            frameWidth: object.width,
+                            frameHeight: object.height,
+                        });
+                        loader.once(Phaser.Loader.Events.COMPLETE, () => {
+                            // texture loaded, so replace
+                            this.gameObjects.get('player')?.setData('id', 'player');
+                            this.getSpriteObject('player')?.setTexture(`PLAY_${object.title}`);
+                            this.getSpriteObject('player')?.setBodySize(object.width, object.height, true);
+                            this.setAnimations(`PLAY_${object.title}`);
+                            this.getSpriteObject('player')?.refreshBody();
+                        });
+                        loader.start();
+                    }
+                } else if (!this.gameObjects.has('player')) {
+                    if (this.textures.exists(`PLAY_${object.title}`)) {
+                        this.gameObjects.set(
+                            'player',
+                            this.physics.add.sprite(object.x, object.y, `PLAY_${object.title}`)
+                        );
+                        console.log(this.gameObjects.has('player'), this.gameObjects.get('player'))
+                        this.setAnimations(`PLAY_${object.title}`);
+                        this.getSpriteObject('player')?.setInteractive();
+                        this.getSpriteObject('player')?.setCollideWorldBounds(true);
+                        this.getSpriteObject('player')?.setBounce(0.2);
+                        this.getSpriteObject('player')?.refreshBody();
+                        let player = this.getSpriteObject('player');
+                        player && this.physics.add.collider(player, this.platforms);
+                        this.gameObjects.get('player')?.setData('id', 'player');
+                    } else {
+                        // We wait to switch the player sprite texture
+                        let loader = new Phaser.Loader.LoaderPlugin(this);
+                        loader.spritesheet(`PLAY_${object.title}`, object.spriteUrl, {
+                            frameWidth: object.width,
+                            frameHeight: object.height,
+                        });
+                        loader.once(Phaser.Loader.Events.COMPLETE, () => {
+                            this.gameObjects.set(
+                                'player',
+                                this.physics.add.sprite(object.x, object.y, `PLAY_${object.title}`)
+                            );
+                            this.gameObjects.get('player')?.setData('id', 'player');
+                            this.getSpriteObject('player')?.setInteractive();
+                            this.getSpriteObject('player')?.setCollideWorldBounds(true);
+                            this.getSpriteObject('player')?.setBounce(0.2);
+                            let player = this.getSpriteObject('player');
+                            this.setAnimations(`PLAY_${object.title}`);
+                            this.getSpriteObject('player')?.refreshBody();
+                            player && this.physics.add.collider(player, this.platforms);
+                        });
+                        loader.start();
+                    }
                 }
-                this.getGameObject('player')?.setData('id', object.id);
-            } else if (!this.gameObjects.has('player')) {
-                // We wait to switch the player sprite texture
-                let loader = new Phaser.Loader.LoaderPlugin(this);
-                loader.spritesheet(`PLAY_${object.title}`, object.spriteUrl, {
-                    frameWidth: object.width,
-                    frameHeight: object.height,
-                });
-                loader.once(Phaser.Loader.Events.COMPLETE, () => {
-                    this.gameObjects.set(
-                        'player',
-                        this.physics.add.sprite(object.x, object.y, `PLAY_${object.title}`)
-                    );
-                    this.getGameObject('player')?.setBodySize(object.width, object.height, true);
-                    this.getGameObject('player')?.setInteractive();
-                    this.getGameObject('player')?.setCollideWorldBounds(true);
-                    this.getGameObject('player')?.setData('id', 'player');
-                    this.getGameObject('player')?.setBounce(0.2);
-                    let player = this.getGameObject('player');
-                    player && this.physics.add.collider(player, this.platforms);
-                    this.setAnimations(`PLAY_${object.title}`);
-                });
-                loader.start();
-            }
+                break;
+            case (EntityType.Platform):
+                // Game Object exists but has the incorrect texture
+                if (
+                    this.gameObjects.has(object.id) &&
+                    this.getSpriteObject(object.id)?.texture.key !== `PLAY_${object.title}`
+                ) {
+                    // If the correct texture exists, update the object texture
+                    if (this.textures.exists(`PLAY_${object.title}`)) {
+                        let platform = this.getGameObject(object.id);
+                        platform && this.platforms.remove(platform, true);
+                        this.getSpriteObject(object.id)?.setTexture(`PLAY_${object.title}`).setScale(object.scale);
+                        this.getGameObject(object.id)?.setData('id', object.id);
+                        this.getSpriteObject(object.id)?.setBodySize(object.width, object.height, true);
+                        platform = this.getGameObject(object.id);
+                        platform && this.platforms.add(platform);
+                        this.platforms.refresh();
+                    } else {
+                        // If not, we wait to switch the object texture
+                        let loader = new Phaser.Loader.LoaderPlugin(this);
+                        loader.image(`PLAY_${object.title}`, object.spriteUrl);
+                        loader.once(Phaser.Loader.Events.COMPLETE, () => {
+                            // texture loaded, so replace
+                            let platform = this.getGameObject(object.id);
+                            platform && this.platforms.remove(platform, true);
+                            this.getSpriteObject(object.id)?.setTexture(`PLAY_${object.title}`);
+                            this.getGameObject(object.id)?.setData('id', object.id);
+                            this.getSpriteObject(object.id)?.setBodySize(object.width, object.height, true);
+                            platform = this.getGameObject(object.id);
+                            platform && this.platforms.add(platform);
+                            this.platforms.refresh();
+                        });
+                        loader.start();
+                    }
+                    // Game Object does not exist
+                } else if (!this.gameObjects.has(object.id)) {
+                    if (this.textures.exists(`PLAY_${object.title}`)) {
+                        this.gameObjects.set(object.id, this.physics.add.staticImage(object.x, object.y, `PLAY_${object.title}`).setScale(object.scale));
+                        this.getGameObject(object.id)?.setData('id', object.id);
+                        let platform = this.getGameObject(object.id);
+                        platform && this.platforms.add(platform);
+                        this.platforms.refresh();
+                    } else {
+                        // We wait to switch the platform texture
+                        let loader = new Phaser.Loader.LoaderPlugin(this);
+                        loader.image(`PLAY_${object.title}`, object.spriteUrl);
+                        loader.once(Phaser.Loader.Events.COMPLETE, () => {
+                            // texture loaded, so replace
+                            this.gameObjects.set(object.id, this.physics.add.staticImage(object.x, object.y, `PLAY_${object.title}`).setScale(object.scale));
+                            this.getGameObject(object.id)?.setData('id', object.id);
+                            let platform = this.getGameObject(object.id);
+                            platform && this.platforms.add(platform);
+                            this.platforms.refresh();
+                        });
+                        loader.start();
+                    }
+                }
+                break;
+            default:
+                break;
         }
     }
 
     // ---- END METHODS FOR INTERACTING WITH STORE ----
     // Display a given game object
     createGameObject(object: Entity) {
-        switch (object.type) {
-            case (EntityType.Player):
-                this.loadGameObject(object)
-            case (EntityType.Platform):
-                this.loadGameObject(object);
-        }
+        this.loadGameObject(object);
     }
 
     setAnimations(key: string) {
@@ -206,19 +276,19 @@ export default class Play extends BaseScene {
         // Player movement with arrow controls
         if (this.gameObjects.has('player')) {
             if (this.cursors?.left.isDown) {
-                this.getGameObject('player')?.setVelocityX(-160);
-                this.getGameObject('player')?.anims.play('left', true);
+                this.getSpriteObject('player')?.setVelocityX(-160);
+                this.getSpriteObject('player')?.anims.play('left', true);
             }
             else if (this.cursors?.right.isDown) {
-                this.getGameObject('player')?.setVelocityX(160);
-                this.getGameObject('player')?.anims.play('right', true);
+                this.getSpriteObject('player')?.setVelocityX(160);
+                this.getSpriteObject('player')?.anims.play('right', true);
             }
             else {
-                this.getGameObject('player')?.setVelocityX(0);
-                this.getGameObject('player')?.anims.play('turn');
+                this.getSpriteObject('player')?.setVelocityX(0);
+                this.getSpriteObject('player')?.anims.play('turn');
             }
-            if (this.cursors?.up.isDown && this.getGameObject('player')?.body?.touching.down) {
-                this.getGameObject('player')?.setVelocityY(-830);
+            if (this.cursors?.up.isDown && this.getSpriteObject('player')?.body?.touching.down) {
+                this.getSpriteObject('player')?.setVelocityY(-830);
             }
         }
     }
