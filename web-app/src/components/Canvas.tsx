@@ -1,9 +1,10 @@
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import dynamic from "next/dynamic";
-import { switchMode, useAppSelector, useAppDispatch, entityAdded, entitiesAdded } from '@/store';
+import { switchMode, useAppSelector, useAppDispatch, entityAdded, entitiesAdded, dialogOpened, entityDeleted, allEntities } from '@/store';
 import { startData } from '@/data/startData';
-import { Button } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogTitle } from '@mui/material';
+import { useState } from 'react';
 
 const PhaserGame = dynamic(() => import("./PhaserGame").then((m) => m.default), {
   ssr: false,
@@ -11,8 +12,11 @@ const PhaserGame = dynamic(() => import("./PhaserGame").then((m) => m.default), 
 });
 
 const Canvas = () => {
-  // canvas mode from store
+  // canvas mode and dialog state from store
   const mode = useAppSelector(state => state.canvas.mode);
+  const dialogOpen = useAppSelector(state => state.canvas.dialogOpen);
+  const selected = useAppSelector(state => state.canvas.selected);
+
   // dispatch to store
   const dispatch = useAppDispatch();
 
@@ -26,14 +30,38 @@ const Canvas = () => {
     }
   };
 
-    const handleNewGame = async (
-      event: React.MouseEvent<HTMLElement>,
-    ) => {
-      dispatch(entitiesAdded(startData));
-    };
+  const handleNewGame = async (
+    event: React.MouseEvent<HTMLElement>,
+  ) => {
+    dispatch(entitiesAdded(startData));
+  };
+
+  const handleClose = () => {
+    dispatch(dialogOpened(false));
+  };
+
+  const handleDeleteObject = () => {
+    dispatch(dialogOpened(false));
+    dispatch(entityDeleted(selected));
+  };
 
   return (
-    <>
+    <><Dialog
+      open={dialogOpen}
+      onClose={handleClose}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle id="alert-dialog-title">
+        {"Delete game object?"}
+      </DialogTitle>
+      <DialogActions>
+        <Button onClick={handleDeleteObject} autoFocus>Delete</Button>
+        <Button onClick={handleClose} >
+          Cancel
+        </Button>
+      </DialogActions>
+    </Dialog>
       <ToggleButtonGroup
         value={mode}
         exclusive

@@ -2,8 +2,8 @@ import { PayloadAction, configureStore, createSlice, createEntityAdapter, combin
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { Entity, EntityType, Tool } from "./data/types";
 
-const initialState: { mode: string, background: string, tool: Tool, selected: string } = {
-  mode: 'edit', background: 'bg1', tool: Tool.Select, selected: ''
+const initialState: { mode: string, background: string, tool: Tool, selected: string, dialogOpen: boolean } = {
+  mode: 'edit', background: 'bg1', tool: Tool.Select, selected: '', dialogOpen: false
 };
 
 // Normalizing game object data
@@ -14,12 +14,22 @@ const entitiesAdapter = createEntityAdapter<Entity>({
 // REDUCER for Entities
 const entitiesSlice = createSlice({
   name: 'entities',
-  initialState: entitiesAdapter.getInitialState(),
+  initialState: entitiesAdapter.getInitialState({ deletion: 'idle' }),
   reducers: {
     // Can pass adapter functions directly as case reducers.  Because we're passing this
     // as a value, `createSlice` will auto-generate the `entityAdded` action type / creator
     entityAdded: entitiesAdapter.setOne,
-    entityDeleted: entitiesAdapter.removeOne,
+    entityDeleted(state, action) {
+      if (state.deletion === 'idle') {
+        state.deletion = 'pending';
+      }
+      entitiesAdapter.removeOne(state, action.payload)
+    },
+    deleteSuccess(state) {
+      if (state.deletion === 'pending') {
+        state.deletion = 'idle';
+      }
+    },
     entityUpdated: entitiesAdapter.updateOne,
     entityLoaded(state, action) {
       if (action.payload.loaded == false) {
@@ -31,7 +41,7 @@ const entitiesSlice = createSlice({
         entitiesAdapter.updateOne(state, { id: action.payload.id, changes: { loaded: false } })
       }
     },
-    entityUpdateXYZ(state, action: { payload: {id: string, position: { x: number, y: number, z: number }}}) {
+    entityUpdateXYZ(state, action: { payload: { id: string, position: { x: number, y: number, z: number } } }) {
       entitiesAdapter.updateOne(state, { id: action.payload.id, changes: { x: action.payload.position.x, y: action.payload.position.y, z: action.payload.position.z, } })
     },
     entitiesAdded: entitiesAdapter.setAll,
@@ -54,6 +64,9 @@ const canvasSlice = createSlice({
     },
     select(state: any, action: PayloadAction<string>) {
       return { ...state, selected: action.payload };
+    },
+    dialogOpened(state: any, action: PayloadAction<boolean>) {
+      return { ...state, dialogOpen: action.payload }
     }
   }
 });
@@ -77,8 +90,8 @@ const entitiesSelectors = entitiesAdapter.getSelectors<RootState>(
 )
 export const store = configureStore({ reducer: reducer });
 // And then use the selectors to retrieve values
-export const allEntities = entitiesSelectors.selectAll(store.getState())
-export const entityById = (id: string) => { return entitiesSelectors.selectById(store.getState(), id)};
+export const allEntities = () => { return entitiesSelectors.selectAll(store.getState()) };
+export const entityById = (id: string) => { return entitiesSelectors.selectById(store.getState(), id) };
 
-export const { switchMode, updateBackground, switchTool, select } = canvasSlice.actions;
-export const { entityAdded, entitiesAdded, entityLoaded, entityUpdated, entityDeleted, entityUpdateXYZ } = entitiesSlice.actions;
+export const { switchMode, updateBackground, switchTool, select, dialogOpened } = canvasSlice.actions;
+export const { entityAdded, entitiesAdded, entityLoaded, entityUpdated, entityDeleted, entityUpdateXYZ, deleteSuccess } = entitiesSlice.actions;

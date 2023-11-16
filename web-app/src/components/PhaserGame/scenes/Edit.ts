@@ -9,6 +9,8 @@ import {
   select,
   entityUpdated,
   entityById,
+  dialogOpened,
+  deleteSuccess,
 } from "../../../store";
 import { data as assets } from "../../../data/assets.ts";
 import { Entity, EntityType, Tool } from "@/data/types.ts";
@@ -25,7 +27,7 @@ export default class Edit extends BaseScene {
   gameObjects!: Map<string, Phaser.GameObjects.GameObject>;
   gameEntityIDs!: Array<string>;
   playerEntity: any;
-  selected!: Phaser.GameObjects.Image;
+  selected!: Phaser.GameObjects.Image | undefined;
   mode: any;
   tool!: Tool;
   constructor() {
@@ -110,6 +112,17 @@ export default class Edit extends BaseScene {
         }
         break;
       default:
+        if (this.gameObjects.has('player')) {
+          let player = this.getSpriteObject('player');
+          player?.setInteractive();
+          player && this.input.setDraggable(player, false);
+        }
+        if (this.platforms) {
+          this.platforms
+            .getChildren()
+            .forEach((child) => child.setInteractive());
+          this.input.setDraggable(this.platforms.getChildren(), false);
+        }
         break;
     }
   }
@@ -139,6 +152,19 @@ export default class Edit extends BaseScene {
       if (state.canvas.tool !== this.tool) {
         this.setTool(state.canvas.tool);
       }
+      if (state.entities.deletion === 'pending') {
+        this.gameObjects.forEach((value, id) => {
+          console.log(this.gameObjects, state.entities.entities[id], state.entities.entities[id] === undefined)
+          if (state.entities.entities[id] === undefined) {
+            this.gameObjects.get(id)?.destroy(true);
+            this.gameObjects.delete(id);
+            this.selectedGraphics.clear();
+            this.selected = undefined;
+            this.gameEntities[id] = undefined;
+          }
+        });
+        store.dispatch(deleteSuccess())
+      }
       if (state.entities.entities !== this.gameEntities) {
         // We only want to load entities that are unloaded
         Object.entries(state.entities.entities)
@@ -160,12 +186,21 @@ export default class Edit extends BaseScene {
           });
       }
     }
+
   }
 
   // Add a game object to store given an Entity
   addGameObject(object: Entity) {
     store.dispatch(entityAdded(object));
     this.gameEntities[object.id] = object;
+  }
+
+  // Open dialog for deleting game object
+  deleteGameObject(object: Phaser.GameObjects.Image) {
+    // Check for update delay between this.tool and store tool
+    if (store.getState().canvas.tool == Tool.Delete) {
+      store.dispatch(dialogOpened(true));
+    }
   }
 
   // Update entire game object entity in store
@@ -192,7 +227,6 @@ export default class Edit extends BaseScene {
 
   // Update game object position (x,y,z) values in store
   updateGameObjectPosition(id: string, x: number, y: number, z: number) {
-    console.log('updating game object position for entity with id ', id);
     store.dispatch(
       entityUpdateXYZ({
         id: id,
@@ -395,10 +429,18 @@ export default class Edit extends BaseScene {
             gameObject.y,
             1
           );
-          console.log(gameObject, gameObject.getData('id'), this.gameEntities[gameObject.getData('id')])
         }
       );
     }
+    if (this.tool == Tool.Delete) {
+      this.input.once(
+        "gameobjectup",
+        (pointer: any, gameObject: Phaser.GameObjects.Image) => {
+          this.deleteGameObject(gameObject)
+        }
+      );
+    }
+
     // Select game object on click
     this.input.on(
       "gameobjectdown",
