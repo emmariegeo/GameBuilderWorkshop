@@ -111,8 +111,7 @@ export default class Play extends BaseScene {
                 ) {
                     if (this.textures.exists(`PLAY_${object.title}`)) {
                         this.gameObjects.get('player')?.setData('id', 'player');
-                        this.getSpriteObject('player')?.setTexture(`PLAY_${object.title}`);
-                        this.getSpriteObject('player')?.setBodySize(object.width, object.height, true);
+                        this.getSpriteObject('player')?.setTexture(`PLAY_${object.title}`).setScale(object.scaleX, object.scaleY);
                         this.setAnimations(`PLAY_${object.title}`);
                         this.getSpriteObject('player')?.refreshBody();
                     } else {
@@ -125,8 +124,7 @@ export default class Play extends BaseScene {
                         loader.once(Phaser.Loader.Events.COMPLETE, () => {
                             // texture loaded, so replace
                             this.gameObjects.get('player')?.setData('id', 'player');
-                            this.getSpriteObject('player')?.setTexture(`PLAY_${object.title}`);
-                            this.getSpriteObject('player')?.setBodySize(object.width, object.height, true);
+                            this.getSpriteObject('player')?.setTexture(`PLAY_${object.title}`).setScale(object.scaleX, object.scaleY);
                             this.setAnimations(`PLAY_${object.title}`);
                             this.getSpriteObject('player')?.refreshBody();
                         });
@@ -143,6 +141,7 @@ export default class Play extends BaseScene {
                         this.getSpriteObject('player')?.setInteractive();
                         this.getSpriteObject('player')?.setCollideWorldBounds(true);
                         this.getSpriteObject('player')?.setBounce(0.2);
+                        this.getSpriteObject(object.id)?.setScale(object.scaleX, object.scaleY);
                         this.getSpriteObject('player')?.refreshBody();
                         let player = this.getSpriteObject('player');
                         player && this.physics.add.collider(player, this.platforms);
@@ -164,6 +163,7 @@ export default class Play extends BaseScene {
                             this.getSpriteObject('player')?.setCollideWorldBounds(true);
                             this.getSpriteObject('player')?.setBounce(0.2);
                             let player = this.getSpriteObject('player');
+                            this.getSpriteObject(object.id)?.setScale(object.scaleX, object.scaleY);
                             this.setAnimations(`PLAY_${object.title}`);
                             this.getSpriteObject('player')?.refreshBody();
                             player && this.physics.add.collider(player, this.platforms);
@@ -182,9 +182,8 @@ export default class Play extends BaseScene {
                     if (this.textures.exists(`PLAY_${object.title}`)) {
                         let platform = this.getGameObject(object.id);
                         platform && this.platforms.remove(platform, true);
-                        this.getSpriteObject(object.id)?.setTexture(`PLAY_${object.title}`).setScale(object.scale);
+                        this.getSpriteObject(object.id)?.setTexture(`PLAY_${object.title}`).setScale(object.scaleX, object.scaleY);
                         this.getGameObject(object.id)?.setData('id', object.id);
-                        this.getSpriteObject(object.id)?.setBodySize(object.width, object.height, true);
                         platform = this.getGameObject(object.id);
                         platform && this.platforms.add(platform);
                         this.platforms.refresh();
@@ -196,9 +195,8 @@ export default class Play extends BaseScene {
                             // texture loaded, so replace
                             let platform = this.getGameObject(object.id);
                             platform && this.platforms.remove(platform, true);
-                            this.getSpriteObject(object.id)?.setTexture(`PLAY_${object.title}`);
+                            this.getSpriteObject(object.id)?.setTexture(`PLAY_${object.title}`).setScale(object.scaleX, object.scaleY);
                             this.getGameObject(object.id)?.setData('id', object.id);
-                            this.getSpriteObject(object.id)?.setBodySize(object.width, object.height, true);
                             platform = this.getGameObject(object.id);
                             platform && this.platforms.add(platform);
                             this.platforms.refresh();
@@ -208,7 +206,7 @@ export default class Play extends BaseScene {
                     // Game Object does not exist
                 } else if (!this.gameObjects.has(object.id)) {
                     if (this.textures.exists(`PLAY_${object.title}`)) {
-                        this.gameObjects.set(object.id, this.physics.add.staticImage(object.x, object.y, `PLAY_${object.title}`).setScale(object.scale));
+                        this.gameObjects.set(object.id, this.physics.add.staticImage(object.x, object.y, `PLAY_${object.title}`).setScale(object.scaleX, object.scaleY));
                         this.getGameObject(object.id)?.setData('id', object.id);
                         let platform = this.getGameObject(object.id);
                         platform && this.platforms.add(platform);
@@ -219,7 +217,7 @@ export default class Play extends BaseScene {
                         loader.image(`PLAY_${object.title}`, object.spriteUrl);
                         loader.once(Phaser.Loader.Events.COMPLETE, () => {
                             // texture loaded, so replace
-                            this.gameObjects.set(object.id, this.physics.add.staticImage(object.x, object.y, `PLAY_${object.title}`).setScale(object.scale));
+                            this.gameObjects.set(object.id, this.physics.add.staticImage(object.x, object.y, `PLAY_${object.title}`).setScale(object.scaleX, object.scaleY));
                             this.getGameObject(object.id)?.setData('id', object.id);
                             let platform = this.getGameObject(object.id);
                             platform && this.platforms.add(platform);

@@ -17,6 +17,8 @@ export type Entity = {
     title: string;
     width: number;
     height: number;
+    scaleX: number;
+    scaleY: number;
     scale: number;
     orientation: number;
     spriteUrl: string;

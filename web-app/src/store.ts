@@ -44,6 +44,9 @@ const entitiesSlice = createSlice({
     entityUpdateXYZ(state, action: { payload: { id: string, position: { x: number, y: number, z: number } } }) {
       entitiesAdapter.updateOne(state, { id: action.payload.id, changes: { x: action.payload.position.x, y: action.payload.position.y, z: action.payload.position.z, } })
     },
+    entityUpdateScale(state, action: { payload: { id: string, size: { width: number, height: number, scaleX: number, scaleY: number, scale: number } } }) {
+      entitiesAdapter.updateOne(state, { id: action.payload.id, changes: { width: action.payload.size.width, height: action.payload.size.height, scaleX: action.payload.size.scaleX, scaleY: action.payload.size.scaleY, scale: action.payload.size.scale} })
+    },
     entitiesAdded: entitiesAdapter.setAll,
   },
 });
@@ -94,4 +97,4 @@ export const allEntities = () => { return entitiesSelectors.selectAll(store.getS
 export const entityById = (id: string) => { return entitiesSelectors.selectById(store.getState(), id) };
 
 export const { switchMode, updateBackground, switchTool, select, dialogOpened } = canvasSlice.actions;
-export const { entityAdded, entitiesAdded, entityLoaded, entityUpdated, entityDeleted, entityUpdateXYZ, deleteSuccess } = entitiesSlice.actions;
+export const { entityAdded, entitiesAdded, entityLoaded, entityUpdated, entityDeleted, entityUpdateXYZ, entityUpdateScale, deleteSuccess } = entitiesSlice.actions;
