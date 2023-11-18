@@ -71,7 +71,7 @@ export default class Edit extends BaseScene {
 
     // We want to create a game object for each entry in gameEntities
     Object.entries(this.gameEntities).forEach((entry) => {
-      entry[1] && !entry[1].loaded && this.createGameObject(entry[1]);
+      entry[1] && !entry[1].loaded && this.loadGameObject(entry[1]);
     });
 
     this.scale.on('resize', this.resize, this);
@@ -303,13 +303,8 @@ export default class Edit extends BaseScene {
           })
           .forEach(([, entity]) => {
             if (entity) {
-              // If object has been created, reload it
-              if (this.gameObjects.has(entity.id)) {
-                this.loadGameObject(entity);
-              } else {
-                // If object has not been created in scene, create it.
-                this.createGameObject(entity);
-              }
+              // Load game object
+              this.loadGameObject(entity);
               // Set entity id and value in gameEntities, used to track changes with entities in store.
               this.gameEntities[entity.id] = entity;
             }
@@ -603,11 +598,6 @@ export default class Edit extends BaseScene {
       default:
         break;
     }
-  }
-
-  // Display a given game object
-  createGameObject(object: Entity) {
-    this.loadGameObject(object);
   }
 
   // Canvas resize
