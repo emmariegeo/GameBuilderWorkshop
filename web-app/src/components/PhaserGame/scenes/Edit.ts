@@ -120,6 +120,7 @@ export default class Edit extends BaseScene {
         break;
       // Switch to the Resize tool, which provides points to drag and resize the selected object.
       case Tool.Resize:
+        console.log('switching to tool resize');
         if (this.gameObjects.has('player')) {
           let player = this.getSpriteObject('player');
           player?.setInteractive();
@@ -154,7 +155,7 @@ export default class Edit extends BaseScene {
    * @param object Phaser.GameObjects.Image
    * */
   showBounds(object: Phaser.GameObjects.Image) {
-    if (this.tool == Tool.Resize) {
+    if (store.getState().canvas.tool == Tool.Resize) {
       this.resizeGroup.forEach((item) => {
         item.clear();
         item.lineStyle(2, 0x0033cc).fillStyle(0xffffff);
@@ -393,17 +394,21 @@ export default class Edit extends BaseScene {
     height: number,
     scaleX: number,
     scaleY: number,
-    scale: number
+    scale: number,
+    x: number,
+    y: number
   ) {
     store.dispatch(
       entityUpdateScale({
         id: id,
-        size: {
+        changes: {
           width: width,
           height: height,
           scaleX: scaleX,
           scaleY: scaleY,
           scale: scale,
+          x: x,
+          y: y
         },
       })
     );
@@ -443,12 +448,13 @@ export default class Edit extends BaseScene {
               object.height,
               true
             );
+            this.getSpriteObject('player')?.refreshBody();
           } else {
             // We wait to switch the player sprite texture
             let loader = new Phaser.Loader.LoaderPlugin(this);
             loader.spritesheet(`EDIT_${object.title}`, object.spriteUrl, {
-              frameWidth: object.width,
-              frameHeight: object.height,
+              frameWidth: object.spriteWidth,
+              frameHeight: object.spriteHeight,
             });
             loader.once(Phaser.Loader.Events.COMPLETE, () => {
               // texture loaded, so replace
@@ -460,6 +466,7 @@ export default class Edit extends BaseScene {
                 object.height,
                 true
               );
+              this.getSpriteObject('player')?.refreshBody();
             });
             loader.start();
           }
@@ -485,8 +492,8 @@ export default class Edit extends BaseScene {
             // We wait to switch the player sprite texture
             let loader = new Phaser.Loader.LoaderPlugin(this);
             loader.spritesheet(`EDIT_${object.title}`, object.spriteUrl, {
-              frameWidth: object.width,
-              frameHeight: object.height,
+              frameWidth: object.spriteWidth,
+              frameHeight: object.spriteHeight,
             });
             loader.once(Phaser.Loader.Events.COMPLETE, () => {
               this.gameObjects.set(
@@ -659,49 +666,64 @@ export default class Edit extends BaseScene {
         'drag',
         (
           pointer: any,
-          gameObject: Phaser.GameObjects.Image,
+          gameObject: Phaser.GameObjects.Graphics,
           dragX: number,
           dragY: number
         ) => {
           if (store.getState().canvas.tool == Tool.Resize) {
-            this.selected && this.showResize(this.selected);
             switch (gameObject.name) {
               case 'TL':
-                this.selected &&
-                  (this.selected.displayWidth =
-                    this.selected.width - (dragX - gameObject.x));
-                this.selected &&
-                  (this.selected.displayHeight =
-                    this.selected.height - (dragY - gameObject.y));
+                if (this.selected) {
+                  this.selected.displayWidth = this.selected.width - dragX;
+                  this.selected.displayHeight = this.selected.height - dragY;
+                  gameObject.y = 0;
+                  gameObject.x = 0;
+                  this.selected.y =
+                    pointer.downY +
+                    this.selected.height -
+                    this.selected.displayHeight / 2;
+                  this.selected.x =
+                    pointer.downX +
+                    this.selected.width -
+                    this.selected.displayWidth / 2;
+                }
                 break;
               case 'TR':
-                this.selected &&
-                  (this.selected.displayWidth =
-                    this.selected.width + (dragX - gameObject.x));
-                this.selected &&
-                  (this.selected.displayHeight =
-                    this.selected.height - (dragY - gameObject.y));
+                if (this.selected) {
+                  this.selected.displayWidth = this.selected.width + dragX;
+                  this.selected.displayHeight = this.selected.height - dragY;
+                  gameObject.y = 0;
+                  gameObject.x = 0;
+                  this.selected.y =
+                    pointer.downY +
+                    this.selected.height -
+                    this.selected.displayHeight / 2;
+                }
                 break;
               case 'BR':
-                this.selected &&
-                  (this.selected.displayWidth =
-                    this.selected.width + (dragX - gameObject.x));
-                this.selected &&
-                  (this.selected.displayHeight =
-                    this.selected.height + (dragY - gameObject.y));
+                if (this.selected) {
+                  this.selected.displayWidth = this.selected.width + dragX;
+                  this.selected.displayHeight = this.selected.height + dragY;
+                  gameObject.y = 0;
+                  gameObject.x = 0;
+                }
                 break;
               case 'BL':
-                this.selected &&
-                  (this.selected.displayWidth =
-                    this.selected.width - (dragX - gameObject.x));
-                this.selected &&
-                  (this.selected.displayHeight =
-                    this.selected.height + (dragY - gameObject.y));
+                if (this.selected) {
+                  this.selected.displayWidth = this.selected.width - dragX;
+                  this.selected.displayHeight = this.selected.height + dragY;
+                  gameObject.y = 0;
+                  gameObject.x = 0;
+                  this.selected.x =
+                    pointer.downX +
+                    this.selected.width -
+                    this.selected.displayWidth / 2;
+                }
                 break;
               default:
-                this.showResize(gameObject);
                 break;
             }
+            this.selected && this.showResize(this.selected);
           }
         }
       );
@@ -716,7 +738,9 @@ export default class Edit extends BaseScene {
                 this.selected.displayHeight,
                 this.selected.scaleX,
                 this.selected.scaleY,
-                this.selected.scale
+                this.selected.scale,
+                this.selected.x,
+                this.selected.y
               );
             }
           }

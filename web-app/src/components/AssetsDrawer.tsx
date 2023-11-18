@@ -86,6 +86,8 @@ export default function AssetsDrawer() {
           scale: 1,
           orientation: 0,
           spriteUrl: data['sprites'][itemKey].img,
+          spriteWidth: data['sprites'][itemKey].width ?? 32,
+          spriteHeight: data['sprites'][itemKey].height ?? 32,
           physics: 'arcade',
           type: EntityType.Player,
           loaded: false,

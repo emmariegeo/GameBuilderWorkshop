@@ -113,8 +113,8 @@ export default class Play extends BaseScene {
             // We wait to switch the player sprite texture
             let loader = new Phaser.Loader.LoaderPlugin(this);
             loader.spritesheet(`PLAY_${object.title}`, object.spriteUrl, {
-              frameWidth: object.width,
-              frameHeight: object.height,
+              frameWidth: object.spriteWidth,
+              frameHeight: object.spriteHeight,
             });
             loader.once(Phaser.Loader.Events.COMPLETE, () => {
               // texture loaded, so replace
@@ -153,8 +153,8 @@ export default class Play extends BaseScene {
             // We wait to switch the player sprite texture
             let loader = new Phaser.Loader.LoaderPlugin(this);
             loader.spritesheet(`PLAY_${object.title}`, object.spriteUrl, {
-              frameWidth: object.width,
-              frameHeight: object.height,
+              frameWidth: object.spriteWidth,
+              frameHeight: object.spriteHeight,
             });
             loader.once(Phaser.Loader.Events.COMPLETE, () => {
               this.gameObjects.set(
@@ -239,9 +239,7 @@ export default class Play extends BaseScene {
               // texture loaded, so replace
               this.gameObjects.set(
                 object.id,
-                this.physics.add
-                  .staticImage(object.x, object.y, `PLAY_${object.title}`)
-                  .setScale(object.scaleX, object.scaleY)
+                this.physics.add.staticImage(object.x, object.y, `PLAY_${object.title}`).setScale(object.scaleX, object.scaleY)
               );
               this.getGameObject(object.id)?.setData('id', object.id);
               let platform = this.getGameObject(object.id);

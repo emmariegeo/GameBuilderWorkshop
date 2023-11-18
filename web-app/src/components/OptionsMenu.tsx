@@ -51,6 +51,12 @@ export default function OptionsMenu(this: any) {
           Width: {selectedEntity?.width}
         </Typography>
         <Typography variant="body2" color="text.secondary">
+          ScaleX: {selectedEntity?.scaleX}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          ScaleY: {selectedEntity?.scaleY}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
           Sprite: {selectedEntity?.spriteUrl}
         </Typography>
         <Typography variant="body2" color="text.secondary">

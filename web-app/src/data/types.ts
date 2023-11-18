@@ -22,6 +22,8 @@ export type Entity = {
   scale: number;
   orientation: number;
   spriteUrl: string;
+  spriteWidth: number;
+  spriteHeight: number;
   physics: string;
   type: EntityType;
   loaded: boolean;

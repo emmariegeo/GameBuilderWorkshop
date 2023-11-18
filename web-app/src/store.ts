@@ -84,12 +84,14 @@ const entitiesSlice = createSlice({
       action: {
         payload: {
           id: string;
-          size: {
+          changes: {
             width: number;
             height: number;
             scaleX: number;
             scaleY: number;
             scale: number;
+            x: number;
+            y: number;
           };
         };
       }
@@ -97,11 +99,13 @@ const entitiesSlice = createSlice({
       entitiesAdapter.updateOne(state, {
         id: action.payload.id,
         changes: {
-          width: action.payload.size.width,
-          height: action.payload.size.height,
-          scaleX: action.payload.size.scaleX,
-          scaleY: action.payload.size.scaleY,
-          scale: action.payload.size.scale,
+          width: action.payload.changes.width,
+          height: action.payload.changes.height,
+          scaleX: action.payload.changes.scaleX,
+          scaleY: action.payload.changes.scaleY,
+          scale: action.payload.changes.scale,
+          x: action.payload.changes.x,
+          y: action.payload.changes.y,
         },
       });
     },
