@@ -1,4 +1,4 @@
-import { Entity, EntityType } from "./types";
+import { Entity, EntityType } from './types';
 
 export const startData: Entity[] = [
   {
@@ -13,8 +13,8 @@ export const startData: Entity[] = [
     scaleY: 1,
     scale: 1,
     orientation: 0,
-    spriteUrl: "../assets/sprites/pinkman.png",
-    physics: "arcade",
+    spriteUrl: '../assets/sprites/pinkman.png',
+    physics: 'arcade',
     type: EntityType.Player,
     loaded: false,
   },
@@ -30,8 +30,8 @@ export const startData: Entity[] = [
     scaleY: 1,
     scale: 2,
     orientation: 0,
-    spriteUrl: "../assets/platforms/platform.png",
-    physics: "arcade",
+    spriteUrl: '../assets/platforms/platform.png',
+    physics: 'arcade',
     type: EntityType.Platform,
     loaded: false,
   },
@@ -47,8 +47,8 @@ export const startData: Entity[] = [
     scaleY: 1,
     scale: 1,
     orientation: 0,
-    spriteUrl: "../assets/platforms/platform.png",
-    physics: "arcade",
+    spriteUrl: '../assets/platforms/platform.png',
+    physics: 'arcade',
     type: EntityType.Platform,
     loaded: false,
   },
@@ -64,8 +64,8 @@ export const startData: Entity[] = [
     scaleY: 1,
     scale: 1,
     orientation: 0,
-    spriteUrl: "../assets/platforms/platform.png",
-    physics: "arcade",
+    spriteUrl: '../assets/platforms/platform.png',
+    physics: 'arcade',
     type: EntityType.Platform,
     loaded: false,
   },
@@ -81,9 +81,9 @@ export const startData: Entity[] = [
     scaleY: 1,
     scale: 1,
     orientation: 0,
-    spriteUrl: "../assets/platforms/platform.png",
-    physics: "arcade",
+    spriteUrl: '../assets/platforms/platform.png',
+    physics: 'arcade',
     type: EntityType.Platform,
     loaded: false,
-  }
-]
+  },
+];

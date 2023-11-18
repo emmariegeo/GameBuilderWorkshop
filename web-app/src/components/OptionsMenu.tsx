@@ -16,15 +16,19 @@ export default function OptionsMenu(this: any) {
     const state = store.getState();
     // When the store changes, reretrieve the entity to check for data changes
     setSelectedEntity(entityById(state.canvas.selected));
-  }
+  };
 
   // Subscribing to store so we can handle updates
-  store.subscribe(onStoreChange.bind(this))
+  store.subscribe(onStoreChange.bind(this));
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardMedia
         sx={{ height: 140 }}
-        image={selectedEntity?.spriteUrl ? selectedEntity?.spriteUrl : 'assets/phaser3-logo.png'}
+        image={
+          selectedEntity?.spriteUrl
+            ? selectedEntity?.spriteUrl
+            : 'assets/phaser3-logo.png'
+        }
         title={selectedEntity?.id ? selectedEntity?.id : ''}
       />
       <CardContent>
