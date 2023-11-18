@@ -12,12 +12,12 @@ import { Tool } from '@/data/types';
 import { switchTool, useAppDispatch, useAppSelector } from '@/store';
 
 export default function Toolbox() {
-  const tool = useAppSelector(state => state.canvas.tool);
+  const tool = useAppSelector((state) => state.canvas.tool);
   const dispatch = useAppDispatch();
 
   const handleChangeTool = async (
     event: React.MouseEvent<HTMLElement>,
-    newTool: Tool | null,
+    newTool: Tool | null
   ) => {
     if (newTool !== null) {
       dispatch(switchTool(newTool));
@@ -53,5 +53,5 @@ export default function Toolbox() {
         <ContentCopyOutlined />
       </ToggleButton>
     </ToggleButtonGroup>
-  )
+  );
 }
