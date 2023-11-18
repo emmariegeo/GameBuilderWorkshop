@@ -353,7 +353,7 @@ export default class Edit extends BaseScene {
           this.getSpriteObject('player')?.texture.key !== `EDIT_${object.title}`
         ) {
           if (this.textures.exists(`EDIT_${object.title}`)) {
-            this.getSpriteObject('player')?.setTexture(`EDIT_${object.title}`).setScale(object.scaleX,object.scaleY);
+            this.getSpriteObject('player')?.setTexture(`EDIT_${object.title}`).setScale(object.scaleX, object.scaleY);
             this.getSpriteObject('player')?.setBodySize(object.width, object.height, true);
           } else {
             // We wait to switch the player sprite texture
@@ -364,7 +364,7 @@ export default class Edit extends BaseScene {
             });
             loader.once(Phaser.Loader.Events.COMPLETE, () => {
               // texture loaded, so replace
-              this.getSpriteObject('player')?.setTexture(`EDIT_${object.title}`).setScale(object.scaleX,object.scaleY);
+              this.getSpriteObject('player')?.setTexture(`EDIT_${object.title}`).setScale(object.scaleX, object.scaleY);
               this.getSpriteObject('player')?.setBodySize(object.width, object.height, true);
             });
             loader.start();
@@ -377,7 +377,7 @@ export default class Edit extends BaseScene {
             );
             let player = this.gameObjects.get('player');
             player && this.physics.add.existing(player, false)
-            this.getSpriteObject('player')?.setScale(object.scaleX,object.scaleY).setBodySize(object.width, object.height, true);
+            this.getSpriteObject('player')?.setScale(object.scaleX, object.scaleY).setBodySize(object.width, object.height, true);
             this.gameObjects.get('player')?.setData('id', object.id);
             this.getSpriteObject('player')?.refreshBody();
           } else {
@@ -393,7 +393,7 @@ export default class Edit extends BaseScene {
               );
               let player = this.gameObjects.get('player');
               player && this.physics.add.existing(player, false)
-              this.getSpriteObject('player')?.setScale(object.scaleX,object.scaleY).setBodySize(object.width, object.height, true);
+              this.getSpriteObject('player')?.setScale(object.scaleX, object.scaleY).setBodySize(object.width, object.height, true);
               this.gameObjects.get('player')?.setData('id', object.id);
               this.getSpriteObject('player')?.refreshBody();
             });
@@ -411,7 +411,7 @@ export default class Edit extends BaseScene {
           if (this.textures.exists(`EDIT_${object.title}`)) {
             let platform = this.getGameObject(object.id);
             platform && this.platforms.remove(platform, true);
-            this.getSpriteObject(object.id)?.setTexture(`EDIT_${object.title}`).setScale(object.scaleX,object.scaleY);
+            this.getSpriteObject(object.id)?.setTexture(`EDIT_${object.title}`).setScale(object.scaleX, object.scaleY);
             this.getGameObject(object.id)?.setData('id', object.id);
             this.getGameObject(object.id)?.setInteractive();
             this.getSpriteObject(object.id)?.setBodySize(object.width, object.height, true);
@@ -427,7 +427,7 @@ export default class Edit extends BaseScene {
               // texture loaded, so replace
               let platform = this.getGameObject(object.id);
               platform && this.platforms.remove(platform, true);
-              this.getSpriteObject(object.id)?.setTexture(`EDIT_${object.title}`).setScale(object.scaleX,object.scaleY);
+              this.getSpriteObject(object.id)?.setTexture(`EDIT_${object.title}`).setScale(object.scaleX, object.scaleY);
               this.getGameObject(object.id)?.setData('id', object.id);
               this.getGameObject(object.id)?.setInteractive();
               this.getSpriteObject(object.id)?.setBodySize(object.width, object.height, true);
@@ -441,7 +441,7 @@ export default class Edit extends BaseScene {
           // Game Object does not exist
         } else if (!this.gameObjects.has(object.id)) {
           if (this.textures.exists(`EDIT_${object.title}`)) {
-            this.gameObjects.set(object.id, this.physics.add.staticSprite(object.x, object.y, `EDIT_${object.title}`).setScale(object.scaleX,object.scaleY));
+            this.gameObjects.set(object.id, this.physics.add.staticSprite(object.x, object.y, `EDIT_${object.title}`).setScale(object.scaleX, object.scaleY));
             this.getGameObject(object.id)?.setData('id', object.id);
             this.getGameObject(object.id)?.setInteractive();
             let platform = this.getGameObject(object.id);
@@ -453,7 +453,7 @@ export default class Edit extends BaseScene {
             loader.image(`EDIT_${object.title}`, object.spriteUrl);
             loader.once(Phaser.Loader.Events.COMPLETE, () => {
               // texture loaded, so replace
-              this.gameObjects.set(object.id, this.physics.add.staticSprite(object.x, object.y, `EDIT_${object.title}`).setScale(object.scaleX,object.scaleY));
+              this.gameObjects.set(object.id, this.physics.add.staticSprite(object.x, object.y, `EDIT_${object.title}`).setScale(object.scaleX, object.scaleY));
               this.getGameObject(object.id)?.setData('id', object.id);
               this.getGameObject(object.id)?.setInteractive();
               let platform = this.getGameObject(object.id);
@@ -570,11 +570,10 @@ export default class Edit extends BaseScene {
         }
       );
       this.input.on(
-        "gameobjectup",
+        'dragend',
         (pointer: any, gameObject: Phaser.GameObjects.Image) => {
           if (store.getState().canvas.tool == Tool.Resize) {
             if (this.selected) {
-              console.log('updating selected with id ', this.selected.getData('id'), ' new width ',this.selected.displayWidth)
               this.updateGameObjectSize(
                 this.selected.getData('id'),
                 this.selected.displayWidth,
