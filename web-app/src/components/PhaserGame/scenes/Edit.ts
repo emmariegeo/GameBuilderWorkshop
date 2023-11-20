@@ -120,7 +120,6 @@ export default class Edit extends BaseScene {
         break;
       // Switch to the Resize tool, which provides points to drag and resize the selected object.
       case Tool.Resize:
-        console.log('switching to tool resize');
         if (this.gameObjects.has('player')) {
           let player = this.getSpriteObject('player');
           player?.setInteractive();
@@ -408,7 +407,7 @@ export default class Edit extends BaseScene {
           scaleY: scaleY,
           scale: scale,
           x: x,
-          y: y
+          y: y,
         },
       })
     );
@@ -723,7 +722,6 @@ export default class Edit extends BaseScene {
               default:
                 break;
             }
-            this.selected && this.showResize(this.selected);
           }
         }
       );
@@ -758,6 +756,7 @@ export default class Edit extends BaseScene {
         }
       }
     );
+
     this.mode !== Tool.Resize &&
       this.selected &&
       this.showBounds(this.selected);

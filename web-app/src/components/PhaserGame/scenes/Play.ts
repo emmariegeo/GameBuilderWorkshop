@@ -19,6 +19,7 @@ export default class Play extends BaseScene {
   gameEntities!: Dictionary<Entity>;
   gameEntityIDs!: Array<string>;
   mode: any;
+  currentAnimKey: string | undefined;
   gameObjects!: Map<string, Phaser.GameObjects.GameObject>;
   constructor() {
     super('Play');
@@ -56,7 +57,6 @@ export default class Play extends BaseScene {
     // We want to create a game object for each entry in gameEntities
     // The platforms group contains the ground and the 2 ledges we can jump on
     this.platforms = this.physics.add.staticGroup();
-
     this.scale.on('resize', this.resize, this);
     Object.entries(this.gameEntities).forEach((entry) => {
       entry[1] && !entry[1].loaded && this.loadGameObject(entry[1]);
@@ -107,7 +107,7 @@ export default class Play extends BaseScene {
             this.getSpriteObject('player')
               ?.setTexture(`PLAY_${object.title}`)
               .setScale(object.scaleX, object.scaleY);
-            this.setAnimations(`PLAY_${object.title}`);
+            this.setAnimations(object.title);
             this.getSpriteObject('player')?.refreshBody();
           } else {
             // We wait to switch the player sprite texture
@@ -122,7 +122,7 @@ export default class Play extends BaseScene {
               this.getSpriteObject('player')
                 ?.setTexture(`PLAY_${object.title}`)
                 .setScale(object.scaleX, object.scaleY);
-              this.setAnimations(`PLAY_${object.title}`);
+              this.setAnimations(object.title);
               this.getSpriteObject('player')?.refreshBody();
             });
             loader.start();
@@ -137,7 +137,7 @@ export default class Play extends BaseScene {
                 `PLAY_${object.title}`
               )
             );
-            this.setAnimations(`PLAY_${object.title}`);
+            this.setAnimations(object.title);
             this.getSpriteObject('player')?.setInteractive();
             this.getSpriteObject('player')?.setCollideWorldBounds(true);
             this.getSpriteObject('player')?.setBounce(0.2);
@@ -174,7 +174,7 @@ export default class Play extends BaseScene {
                 object.scaleX,
                 object.scaleY
               );
-              this.setAnimations(`PLAY_${object.title}`);
+              this.setAnimations(object.title);
               this.getSpriteObject('player')?.refreshBody();
               player && this.physics.add.collider(player, this.platforms);
             });
@@ -239,7 +239,9 @@ export default class Play extends BaseScene {
               // texture loaded, so replace
               this.gameObjects.set(
                 object.id,
-                this.physics.add.staticImage(object.x, object.y, `PLAY_${object.title}`).setScale(object.scaleX, object.scaleY)
+                this.physics.add
+                  .staticImage(object.x, object.y, `PLAY_${object.title}`)
+                  .setScale(object.scaleX, object.scaleY)
               );
               this.getGameObject(object.id)?.setData('id', object.id);
               let platform = this.getGameObject(object.id);
@@ -257,26 +259,30 @@ export default class Play extends BaseScene {
 
   setAnimations(key: string) {
     // Player Animations
-    this.anims.remove('left');
-    this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers(key, { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    this.anims.remove('turn');
-    this.anims.create({
-      key: 'turn',
-      frames: [{ key: key, frame: 4 }],
-      frameRate: 20,
-    });
-    this.anims.remove('right');
-    this.anims.create({
-      key: 'right',
-      frames: this.anims.generateFrameNumbers(key, { start: 5, end: 8 }),
-      frameRate: 10,
-      repeat: -1,
-    });
+    if (!this.anims.exists(`left_${key}`)) {
+      this.anims.create({
+        key: `left_${key}`,
+        frames: this.anims.generateFrameNumbers(`PLAY_${key}`, { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1,
+      });
+    }
+    if (!this.anims.exists(`turn_${key}`)) {
+      this.anims.create({
+        key: `turn_${key}`,
+        frames: [{ key: `PLAY_${key}`, frame: 4 }],
+        frameRate: 20,
+      });
+    }
+    if (!this.anims.exists(`right_${key}`)) {
+      this.anims.create({
+        key: `right_${key}`,
+        frames: this.anims.generateFrameNumbers(`PLAY_${key}`, { start: 5, end: 8 }),
+        frameRate: 10,
+        repeat: -1,
+      });
+    }
+    this.currentAnimKey = key;
   }
 
   // Canvas resize
@@ -300,13 +306,13 @@ export default class Play extends BaseScene {
     if (this.gameObjects.has('player')) {
       if (this.cursors?.left.isDown) {
         this.getSpriteObject('player')?.setVelocityX(-160);
-        this.getSpriteObject('player')?.anims.play('left', true);
+        this.getSpriteObject('player')?.anims.play(`left_${this.currentAnimKey}`, true);
       } else if (this.cursors?.right.isDown) {
         this.getSpriteObject('player')?.setVelocityX(160);
-        this.getSpriteObject('player')?.anims.play('right', true);
+        this.getSpriteObject('player')?.anims.play(`right_${this.currentAnimKey}`, true);
       } else {
         this.getSpriteObject('player')?.setVelocityX(0);
-        this.getSpriteObject('player')?.anims.play('turn');
+        this.getSpriteObject('player')?.anims.play(`turn_${this.currentAnimKey}`, true);
       }
       if (
         this.cursors?.up.isDown &&
