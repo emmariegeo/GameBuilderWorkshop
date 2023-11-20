@@ -153,7 +153,14 @@ const reducer = combineReducers({
 const entitiesSelectors = entitiesAdapter.getSelectors<RootState>(
   (state) => state.entities
 );
-export const store = configureStore({ reducer: reducer });
+export const store = configureStore({
+  reducer: reducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
+});
+
 // And then use the selectors to retrieve values
 export const allEntities = () => {
   return entitiesSelectors.selectAll(store.getState());
