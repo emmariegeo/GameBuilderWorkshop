@@ -38,7 +38,10 @@ export default class Play extends BaseScene {
   }
 
   create() {
-    console.log('Running Play', this);
+    console.log(
+      'RUNNING PLAY MODE',
+      this,
+    );
     // Subscribing to store so we can handle updates
     store.subscribe(this.onStoreChange.bind(this));
     // Getting the initial state from the store
@@ -69,7 +72,7 @@ export default class Play extends BaseScene {
   onStoreChange() {
     if (this.scene.isActive()) {
       const state = store.getState();
-      if (state.canvas.mode !== this.mode) {
+      if (state.canvas.modeSwitch === 'pending') {
         this.setMode(state.canvas.mode);
       }
       if (state.entities.entities !== this.gameEntities) {
@@ -262,7 +265,10 @@ export default class Play extends BaseScene {
     if (!this.anims.exists(`left_${key}`)) {
       this.anims.create({
         key: `left_${key}`,
-        frames: this.anims.generateFrameNumbers(`PLAY_${key}`, { start: 0, end: 3 }),
+        frames: this.anims.generateFrameNumbers(`PLAY_${key}`, {
+          start: 0,
+          end: 3,
+        }),
         frameRate: 10,
         repeat: -1,
       });
@@ -277,7 +283,10 @@ export default class Play extends BaseScene {
     if (!this.anims.exists(`right_${key}`)) {
       this.anims.create({
         key: `right_${key}`,
-        frames: this.anims.generateFrameNumbers(`PLAY_${key}`, { start: 5, end: 8 }),
+        frames: this.anims.generateFrameNumbers(`PLAY_${key}`, {
+          start: 5,
+          end: 8,
+        }),
         frameRate: 10,
         repeat: -1,
       });
@@ -306,13 +315,22 @@ export default class Play extends BaseScene {
     if (this.gameObjects.has('player')) {
       if (this.cursors?.left.isDown) {
         this.getSpriteObject('player')?.setVelocityX(-160);
-        this.getSpriteObject('player')?.anims.play(`left_${this.currentAnimKey}`, true);
+        this.getSpriteObject('player')?.anims.play(
+          `left_${this.currentAnimKey}`,
+          true
+        );
       } else if (this.cursors?.right.isDown) {
         this.getSpriteObject('player')?.setVelocityX(160);
-        this.getSpriteObject('player')?.anims.play(`right_${this.currentAnimKey}`, true);
+        this.getSpriteObject('player')?.anims.play(
+          `right_${this.currentAnimKey}`,
+          true
+        );
       } else {
         this.getSpriteObject('player')?.setVelocityX(0);
-        this.getSpriteObject('player')?.anims.play(`turn_${this.currentAnimKey}`, true);
+        this.getSpriteObject('player')?.anims.play(
+          `turn_${this.currentAnimKey}`,
+          true
+        );
       }
       if (
         this.cursors?.up.isDown &&

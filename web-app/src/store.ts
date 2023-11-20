@@ -15,12 +15,14 @@ const initialState: {
   tool: Tool;
   selected: string;
   dialogOpen: boolean;
+  modeSwitch: string;
 } = {
   mode: 'edit',
   background: 'bg1',
   tool: Tool.Select,
   selected: '',
   dialogOpen: false,
+  modeSwitch: 'idle'
 };
 
 // Normalizing game object data
@@ -119,7 +121,12 @@ const canvasSlice = createSlice({
   initialState,
   reducers: {
     switchMode(state: any, action: PayloadAction<string>) {
-      return { ...state, mode: action.payload };
+      return { ...state, modeSwitch: 'pending', mode: action.payload };
+    },
+    modeSwitched(state) {
+      if (state.modeSwitch === 'pending') {
+        state.modeSwitch = 'idle';
+      }
     },
     updateBackground(state: any, action: PayloadAction<string>) {
       return { ...state, background: action.payload };
@@ -175,6 +182,7 @@ export const {
   switchTool,
   select,
   dialogOpened,
+  modeSwitched
 } = canvasSlice.actions;
 export const {
   entityAdded,

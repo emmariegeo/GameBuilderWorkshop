@@ -3,6 +3,7 @@ import * as Phaser from 'phaser';
 import { data as assets } from '../../../data/assets.ts';
 import { Dictionary } from '@reduxjs/toolkit';
 import { Entity, EntityType } from '@/data/types.ts';
+import { modeSwitched, store } from '@/store.ts';
 
 // Provides methods shared between Edit and Play Scenes
 export default class BaseScene extends Phaser.Scene {
@@ -67,10 +68,24 @@ export default class BaseScene extends Phaser.Scene {
    * @param newMode string representing canvas mode
    */
   setMode(newMode: string) {
-    if (newMode == 'edit' && this.scene.key === 'Play') {
-      this.scene.start('Edit');
-    } else if (newMode == 'play' && this.scene.key === 'Edit') {
-      this.scene.start('Play');
+    // Using modeSwitched state and scene getStatus to avoid creating scene multiple times when switching
+    store.dispatch(modeSwitched());
+    if (newMode === 'edit' && this.scene.key === 'Play') {
+      if (
+        this.scene.getStatus('Play') === Phaser.Scenes.RUNNING &&
+        (this.scene.getStatus('Edit') > Phaser.Scenes.RUNNING ||
+          this.scene.getStatus('Edit') < Phaser.Scenes.START)
+      ) {
+        this.scene.start('Edit');
+      }
+    } else if (newMode === 'play' && this.scene.key === 'Edit') {
+      if (
+        this.scene.getStatus('Edit') === Phaser.Scenes.RUNNING &&
+        (this.scene.getStatus('Play') > Phaser.Scenes.RUNNING ||
+          this.scene.getStatus('Play') < Phaser.Scenes.START)
+      ) {
+        this.scene.start('Play');
+      }
     }
   }
 }
