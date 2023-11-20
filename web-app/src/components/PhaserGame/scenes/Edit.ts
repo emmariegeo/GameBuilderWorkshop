@@ -47,7 +47,10 @@ export default class Edit extends BaseScene {
 
   create() {
     // Subscribing to store so we can handle updates
-    console.log('Running Edit', this);
+    console.log(
+      'RUNNING EDIT MODE',
+      this
+    );
     store.subscribe(this.onStoreChange.bind(this));
     // Getting the initial state from the store
     let initialState = store.getState();
@@ -120,7 +123,6 @@ export default class Edit extends BaseScene {
         break;
       // Switch to the Resize tool, which provides points to drag and resize the selected object.
       case Tool.Resize:
-        console.log('switching to tool resize');
         if (this.gameObjects.has('player')) {
           let player = this.getSpriteObject('player');
           player?.setInteractive();
@@ -266,7 +268,7 @@ export default class Edit extends BaseScene {
     if (this.scene.isActive()) {
       const state = store.getState();
       // Update canvas mode
-      if (state.canvas.mode !== this.mode) {
+      if (state.canvas.modeSwitch === 'pending') {
         this.setMode(state.canvas.mode);
       }
       // Update background
@@ -286,7 +288,7 @@ export default class Edit extends BaseScene {
             state.entities.entities[id] === undefined
           );
           if (state.entities.entities[id] === undefined) {
-            this.gameObjects.get(id)?.destroy(true);
+            this.gameObjects.get(id)?.destroy();
             this.gameObjects.delete(id);
             this.selectedGraphics.clear();
             this.selected = undefined;
@@ -408,7 +410,7 @@ export default class Edit extends BaseScene {
           scaleY: scaleY,
           scale: scale,
           x: x,
-          y: y
+          y: y,
         },
       })
     );
@@ -723,7 +725,6 @@ export default class Edit extends BaseScene {
               default:
                 break;
             }
-            this.selected && this.showResize(this.selected);
           }
         }
       );
@@ -758,6 +759,7 @@ export default class Edit extends BaseScene {
         }
       }
     );
+
     this.mode !== Tool.Resize &&
       this.selected &&
       this.showBounds(this.selected);
