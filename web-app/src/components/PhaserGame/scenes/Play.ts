@@ -106,25 +106,7 @@ export default class Play extends BaseScene {
 
   // ---- END METHODS FOR INTERACTING WITH STORE ----
 
-  // Load a given game object
-  loadGameObject(object: Entity) {
-    switch (object.type) {
-      case EntityType.Player:
-        this.loadPlayer(object);
-        break;
-      case EntityType.Platform:
-        this.loadPlatform(object);
-        break;
-      case EntityType.Item:
-        this.loadItem(object);
-        break;
-      case EntityType.Obstacle:
-        this.loadObstacle(object);
-        break;
-      default:
-        break;
-    }
-  }
+  // this.loadGameObject method is inherited from BaseScene
 
   /**
    * Load the player object

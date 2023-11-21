@@ -29,6 +29,41 @@ export default class BaseScene extends Phaser.Scene {
     this.load.image('bg', this.background['img']);
     this.load.image('ground', '../assets/platforms/platform.png');
   }
+  /**
+   * Load a given entity into a game object
+   * @param object Entity
+   */
+  loadGameObject(object: Entity) {
+    switch (object.type) {
+      case EntityType.Player:
+        this.loadPlayer(object);
+        break;
+      case EntityType.Platform:
+        this.loadPlatform(object);
+        break;
+      case EntityType.Item:
+        this.loadItem(object);
+        break;
+      case EntityType.Obstacle:
+        this.loadObstacle(object);
+        break;
+      default:
+        break;
+    }
+  }
+  
+  loadObstacle(object: Entity) {
+    throw new Error('Method not implemented.');
+  }
+  loadItem(object: Entity) {
+    throw new Error('Method not implemented.');
+  }
+  loadPlatform(object: Entity) {
+    throw new Error('Method not implemented.');
+  }
+  loadPlayer(object: Entity) {
+    throw new Error('Method not implemented.');
+  }
 
   getGameObject(key: string) {
     let object = this.gameObjects.get(key);

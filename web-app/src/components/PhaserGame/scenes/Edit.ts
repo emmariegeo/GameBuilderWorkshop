@@ -431,22 +431,8 @@ export default class Edit extends BaseScene {
 
   // ---- END METHODS FOR INTERACTING WITH STORE ----
 
-  /**
-   * Load a given entity into a game object
-   * @param object Entity
-   */
-  loadGameObject(object: Entity) {
-    switch (object.type) {
-      case EntityType.Player:
-        this.loadPlayer(object);
-        break;
-      case EntityType.Platform:
-        this.loadPlatform(object);
-        break;
-      default:
-        break;
-    }
-  }
+  // this.loadGameObject method is inherited from BaseScene
+
   /**
    * Load the player object
    * @param object Entity
@@ -604,6 +590,24 @@ export default class Edit extends BaseScene {
         loader.start();
       }
     }
+  }
+
+  /**
+   * Load item
+   * @param object Entity
+   * @returns
+   */
+  loadItem(object: Entity) {
+    return;
+  }
+
+  /**
+   * Load obstacle
+   * @param object Entity
+   * @returns
+   */
+  loadObstacle(object: Entity) {
+    return;
   }
 
   // Canvas resize
