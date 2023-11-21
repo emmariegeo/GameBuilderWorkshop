@@ -21,6 +21,7 @@ export default class Play extends BaseScene {
   mode: any;
   currentAnimKey: string | undefined;
   gameObjects!: Map<string, Phaser.GameObjects.GameObject>;
+  gameOver: boolean;
   constructor() {
     super('Play');
   }
@@ -307,6 +308,25 @@ export default class Play extends BaseScene {
     this.cameras.resize(width, height);
   }
 
+  // ----- BEGIN GAME LOGIC METHODS ------
+
+  /**
+   * Hitting an obstacle ends the game.
+   * @param player Phaser.Physics.Arcade.Sprite
+   * @param obstacle Phaser.GameObjects.GameObject
+   */
+  hitObstacle (player: Phaser.Physics.Arcade.Sprite, obstacle: Phaser.GameObjects.GameObject)
+  {
+    this.physics.pause();
+
+    player.setTint(0xff0000);
+
+    player.anims.play('turn');
+
+    this.gameOver = true;
+  }
+
+  // ----- END GAME LOGIC METHODS ------
   /**
    * Run game updates
    */
