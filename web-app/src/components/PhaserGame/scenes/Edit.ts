@@ -47,10 +47,7 @@ export default class Edit extends BaseScene {
 
   create() {
     // Subscribing to store so we can handle updates
-    console.log(
-      'RUNNING EDIT MODE',
-      this
-    );
+    console.log('RUNNING EDIT MODE', this);
     store.subscribe(this.onStoreChange.bind(this));
     // Getting the initial state from the store
     let initialState = store.getState();
@@ -110,9 +107,11 @@ export default class Edit extends BaseScene {
       // Switch to the Select tool, which allows an object to be selected and dragged to a new location.
       case Tool.Select:
         if (this.gameObjects.has('player')) {
-          let player = this.getSpriteObject('player');
-          player?.setInteractive();
-          player && this.input.setDraggable(player);
+          let player = this.getGameObject(
+            'player'
+          ) as Phaser.Physics.Arcade.Sprite;
+          player.setInteractive();
+          this.input.setDraggable(player);
         }
         if (this.platforms) {
           this.platforms
@@ -124,9 +123,11 @@ export default class Edit extends BaseScene {
       // Switch to the Resize tool, which provides points to drag and resize the selected object.
       case Tool.Resize:
         if (this.gameObjects.has('player')) {
-          let player = this.getSpriteObject('player');
-          player?.setInteractive();
-          player && this.input.setDraggable(player, false);
+          let player = this.getGameObject(
+            'player'
+          ) as Phaser.Physics.Arcade.Sprite;
+          player.setInteractive();
+          this.input.setDraggable(player, false);
         }
         if (this.platforms) {
           this.platforms
@@ -138,9 +139,11 @@ export default class Edit extends BaseScene {
         break;
       default:
         if (this.gameObjects.has('player')) {
-          let player = this.getSpriteObject('player');
-          player?.setInteractive();
-          player && this.input.setDraggable(player, false);
+          let player = this.getGameObject(
+            'player'
+          ) as Phaser.Physics.Arcade.Sprite;
+          player.setInteractive();
+          this.input.setDraggable(player, false);
         }
         if (this.platforms) {
           this.platforms
@@ -435,177 +438,171 @@ export default class Edit extends BaseScene {
   loadGameObject(object: Entity) {
     switch (object.type) {
       case EntityType.Player:
-        // We only will have one player, so we will swap the sprite texture
-        // We check if the texture has been previously loaded
-        if (
-          this.gameObjects.has('player') &&
-          this.getSpriteObject('player')?.texture.key !== `EDIT_${object.title}`
-        ) {
-          if (this.textures.exists(`EDIT_${object.title}`)) {
-            this.getSpriteObject('player')
-              ?.setTexture(`EDIT_${object.title}`)
-              .setScale(object.scaleX, object.scaleY);
-            this.getSpriteObject('player')?.setBodySize(
-              object.width,
-              object.height,
-              true
-            );
-            this.getSpriteObject('player')?.refreshBody();
-          } else {
-            // We wait to switch the player sprite texture
-            let loader = new Phaser.Loader.LoaderPlugin(this);
-            loader.spritesheet(`EDIT_${object.title}`, object.spriteUrl, {
-              frameWidth: object.spriteWidth,
-              frameHeight: object.spriteHeight,
-            });
-            loader.once(Phaser.Loader.Events.COMPLETE, () => {
-              // texture loaded, so replace
-              this.getSpriteObject('player')
-                ?.setTexture(`EDIT_${object.title}`)
-                .setScale(object.scaleX, object.scaleY);
-              this.getSpriteObject('player')?.setBodySize(
-                object.width,
-                object.height,
-                true
-              );
-              this.getSpriteObject('player')?.refreshBody();
-            });
-            loader.start();
-          }
-          this.gameObjects.get('player')?.setData('id', object.id);
-        } else if (!this.gameObjects.has('player')) {
-          if (this.textures.exists(`EDIT_${object.title}`)) {
-            this.gameObjects.set(
-              'player',
-              this.physics.add.sprite(
-                object.x,
-                object.y,
-                `EDIT_${object.title}`
-              )
-            );
-            let player = this.gameObjects.get('player');
-            player && this.physics.add.existing(player, false);
-            this.getSpriteObject('player')
-              ?.setScale(object.scaleX, object.scaleY)
-              .setBodySize(object.width, object.height, true);
-            this.gameObjects.get('player')?.setData('id', object.id);
-            this.getSpriteObject('player')?.refreshBody();
-          } else {
-            // We wait to switch the player sprite texture
-            let loader = new Phaser.Loader.LoaderPlugin(this);
-            loader.spritesheet(`EDIT_${object.title}`, object.spriteUrl, {
-              frameWidth: object.spriteWidth,
-              frameHeight: object.spriteHeight,
-            });
-            loader.once(Phaser.Loader.Events.COMPLETE, () => {
-              this.gameObjects.set(
-                'player',
-                this.physics.add.sprite(
-                  object.x,
-                  object.y,
-                  `EDIT_${object.title}`
-                )
-              );
-              let player = this.gameObjects.get('player');
-              player && this.physics.add.existing(player, false);
-              this.getSpriteObject('player')
-                ?.setScale(object.scaleX, object.scaleY)
-                .setBodySize(object.width, object.height, true);
-              this.gameObjects.get('player')?.setData('id', object.id);
-              this.getSpriteObject('player')?.refreshBody();
-            });
-            loader.start();
-          }
-        }
+        this.loadPlayer(object);
         break;
       case EntityType.Platform:
-        // Game Object exists but has the incorrect texture
-        if (
-          this.gameObjects.has(object.id) &&
-          this.getSpriteObject(object.id)?.texture.key !==
-            `EDIT_${object.title}`
-        ) {
-          // If the correct texture exists, update the object texture
-          if (this.textures.exists(`EDIT_${object.title}`)) {
-            let platform = this.getGameObject(object.id);
-            platform && this.platforms.remove(platform, true);
-            this.getSpriteObject(object.id)
-              ?.setTexture(`EDIT_${object.title}`)
-              .setScale(object.scaleX, object.scaleY);
-            this.getGameObject(object.id)?.setData('id', object.id);
-            this.getGameObject(object.id)?.setInteractive();
-            this.getSpriteObject(object.id)?.setBodySize(
-              object.width,
-              object.height,
-              true
-            );
-            platform = this.getGameObject(object.id);
-            platform && this.input.setDraggable(platform);
-            platform && this.platforms.add(platform);
-            this.platforms.refresh();
-          } else {
-            // If not, we wait to switch the object texture
-            let loader = new Phaser.Loader.LoaderPlugin(this);
-            loader.image(`EDIT_${object.title}`, object.spriteUrl);
-            loader.once(Phaser.Loader.Events.COMPLETE, () => {
-              // texture loaded, so replace
-              let platform = this.getGameObject(object.id);
-              platform && this.platforms.remove(platform, true);
-              this.getSpriteObject(object.id)
-                ?.setTexture(`EDIT_${object.title}`)
-                .setScale(object.scaleX, object.scaleY);
-              this.getGameObject(object.id)?.setData('id', object.id);
-              this.getGameObject(object.id)?.setInteractive();
-              this.getSpriteObject(object.id)?.setBodySize(
-                object.width,
-                object.height,
-                true
-              );
-              platform = this.getGameObject(object.id);
-              platform && this.input.setDraggable(platform);
-              platform && this.platforms.add(platform);
-              this.platforms.refresh();
-            });
-            loader.start();
-          }
-          // Game Object does not exist
-        } else if (!this.gameObjects.has(object.id)) {
-          if (this.textures.exists(`EDIT_${object.title}`)) {
-            this.gameObjects.set(
-              object.id,
-              this.physics.add
-                .staticSprite(object.x, object.y, `EDIT_${object.title}`)
-                .setScale(object.scaleX, object.scaleY)
-            );
-            this.getGameObject(object.id)?.setData('id', object.id);
-            this.getGameObject(object.id)?.setInteractive();
-            let platform = this.getGameObject(object.id);
-            platform && this.platforms.add(platform);
-            platform && this.input.setDraggable(platform);
-          } else {
-            // We wait to switch the platform texture
-            let loader = new Phaser.Loader.LoaderPlugin(this);
-            loader.image(`EDIT_${object.title}`, object.spriteUrl);
-            loader.once(Phaser.Loader.Events.COMPLETE, () => {
-              // texture loaded, so replace
-              this.gameObjects.set(
-                object.id,
-                this.physics.add
-                  .staticSprite(object.x, object.y, `EDIT_${object.title}`)
-                  .setScale(object.scaleX, object.scaleY)
-              );
-              this.getGameObject(object.id)?.setData('id', object.id);
-              this.getGameObject(object.id)?.setInteractive();
-              let platform = this.getGameObject(object.id);
-              platform && this.platforms.add(platform);
-              platform && this.input.setDraggable(platform);
-            });
-            loader.start();
-          }
-        }
+        this.loadPlatform(object);
         break;
       default:
         break;
+    }
+  }
+  /**
+   * Load the player object
+   * @param object Entity
+   */
+  loadPlayer(object: Entity) {
+    let player = this.gameObjects.get('player') as Phaser.Physics.Arcade.Sprite;
+    // We only will have one player, so we will swap the sprite texture
+    // We check if the texture has been previously loaded
+    if (
+      this.gameObjects.has('player') &&
+      player.texture.key !== `EDIT_${object.title}`
+    ) {
+      if (this.textures.exists(`EDIT_${object.title}`)) {
+        player
+          .setTexture(`EDIT_${object.title}`)
+          .setScale(object.scaleX, object.scaleY)
+          .setBodySize(object.width, object.height, true)
+          .refreshBody();
+      } else {
+        // We wait to switch the player sprite texture
+        let loader = new Phaser.Loader.LoaderPlugin(this);
+        loader.spritesheet(`EDIT_${object.title}`, object.spriteUrl, {
+          frameWidth: object.spriteWidth,
+          frameHeight: object.spriteHeight,
+        });
+        loader.once(Phaser.Loader.Events.COMPLETE, () => {
+          // texture loaded, so replace
+          player
+            .setTexture(`EDIT_${object.title}`)
+            .setScale(object.scaleX, object.scaleY)
+            .setBodySize(object.width, object.height, true)
+            .refreshBody();
+        });
+        loader.start();
+      }
+      player.setData('id', object.id);
+    } else if (!this.gameObjects.has('player')) {
+      if (this.textures.exists(`EDIT_${object.title}`)) {
+        this.gameObjects.set(
+          'player',
+          this.physics.add.sprite(object.x, object.y, `EDIT_${object.title}`)
+        );
+        player = this.gameObjects.get('player') as Phaser.Physics.Arcade.Sprite;
+        this.physics.add.existing(player, false);
+        player
+          .setScale(object.scaleX, object.scaleY)
+          .setBodySize(object.width, object.height, true)
+          .setData('id', object.id)
+          .refreshBody();
+      } else {
+        // We wait to switch the player sprite texture
+        let loader = new Phaser.Loader.LoaderPlugin(this);
+        loader.spritesheet(`EDIT_${object.title}`, object.spriteUrl, {
+          frameWidth: object.spriteWidth,
+          frameHeight: object.spriteHeight,
+        });
+        loader.once(Phaser.Loader.Events.COMPLETE, () => {
+          this.gameObjects.set(
+            'player',
+            this.physics.add.sprite(object.x, object.y, `EDIT_${object.title}`)
+          );
+          player = this.gameObjects.get(
+            'player'
+          ) as Phaser.Physics.Arcade.Sprite;
+          this.physics.add.existing(player, false);
+          player
+            .setScale(object.scaleX, object.scaleY)
+            .setBodySize(object.width, object.height, true)
+            .setData('id', object.id)
+            .refreshBody();
+        });
+        loader.start();
+      }
+    }
+  }
+
+  /**
+   * Load a platform object
+   * @param object Entity
+   */
+  loadPlatform(object: Entity) {
+    let platform = this.getGameObject(
+      object.id
+    ) as Phaser.Physics.Arcade.Sprite;
+    // Game Object exists but has the incorrect texture
+    if (
+      this.gameObjects.has(object.id) &&
+      platform.texture.key !== `EDIT_${object.title}`
+    ) {
+      // If the correct texture exists, update the object texture
+      if (this.textures.exists(`EDIT_${object.title}`)) {
+        this.platforms.remove(platform, true);
+        platform
+          .setTexture(`EDIT_${object.title}`)
+          .setScale(object.scaleX, object.scaleY)
+          .setData('id', object.id)
+          .setInteractive()
+          .setBodySize(object.width, object.height, true);
+        this.input.setDraggable(platform);
+        this.platforms.add(platform);
+        this.platforms.refresh();
+      } else {
+        // If not, we wait to switch the object texture
+        let loader = new Phaser.Loader.LoaderPlugin(this);
+        loader.image(`EDIT_${object.title}`, object.spriteUrl);
+        loader.once(Phaser.Loader.Events.COMPLETE, () => {
+          // texture loaded, so replace
+          this.platforms.remove(platform, true);
+          platform
+            .setTexture(`EDIT_${object.title}`)
+            .setScale(object.scaleX, object.scaleY)
+            .setData('id', object.id)
+            .setInteractive()
+            .setBodySize(object.width, object.height, true);
+          this.input.setDraggable(platform);
+          this.platforms.add(platform);
+          this.platforms.refresh();
+        });
+        loader.start();
+      }
+      // Game Object does not exist
+    } else if (!this.gameObjects.has(object.id)) {
+      if (this.textures.exists(`EDIT_${object.title}`)) {
+        this.gameObjects.set(
+          object.id,
+          this.physics.add
+            .staticSprite(object.x, object.y, `EDIT_${object.title}`)
+            .setScale(object.scaleX, object.scaleY)
+        );
+        platform = this.getGameObject(
+          object.id
+        ) as Phaser.Physics.Arcade.Sprite;
+        platform.setData('id', object.id).setInteractive();
+        this.platforms.add(platform);
+        this.input.setDraggable(platform);
+      } else {
+        // We wait to switch the platform texture
+        let loader = new Phaser.Loader.LoaderPlugin(this);
+        loader.image(`EDIT_${object.title}`, object.spriteUrl);
+        loader.once(Phaser.Loader.Events.COMPLETE, () => {
+          // texture loaded, so replace
+          this.gameObjects.set(
+            object.id,
+            this.physics.add
+              .staticSprite(object.x, object.y, `EDIT_${object.title}`)
+              .setScale(object.scaleX, object.scaleY)
+          );
+          platform = this.getGameObject(
+            object.id
+          ) as Phaser.Physics.Arcade.Sprite;
+          platform.setData('id', object.id).setInteractive();
+          this.platforms.add(platform);
+          this.input.setDraggable(platform);
+        });
+        loader.start();
+      }
     }
   }
 
