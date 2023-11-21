@@ -116,6 +116,7 @@ export default class Play extends BaseScene {
   loadPlayer(object: Entity) {
     // We only will have one player, so we will swap the sprite texture
     let player = this.gameObjects.get('player') as Phaser.Physics.Arcade.Sprite;
+
     // We check if the texture has been previously loaded
     if (this.textures.exists(`PLAY_${object.title}`)) {
       if (this.gameObjects.has('player')) {
@@ -224,6 +225,15 @@ export default class Play extends BaseScene {
           .setTexture(`PLAY_${object.title}`)
           .setScale(object.scaleX, object.scaleY);
       } else {
+        this.gameObjects.set(
+          object.id,
+          this.physics.add
+            .staticImage(object.x, object.y, `PLAY_${object.title}`)
+            .setScale(object.scaleX, object.scaleY)
+        );
+        platform = this.getGameObject(
+          object.id
+        ) as Phaser.Physics.Arcade.Sprite;
       }
       platform.setData('id', object.id);
       this.platforms.add(platform);
