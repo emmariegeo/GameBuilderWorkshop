@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { v4 as uuid } from 'uuid';
+
 import {
   Box,
   Button,
@@ -12,6 +14,7 @@ import {
 import { data } from '../data/assets.ts';
 import {
   entityAdded,
+  entityById,
   updateBackground,
   useAppDispatch,
   useAppSelector,
@@ -39,8 +42,11 @@ export default function AssetsDrawer() {
 
   // Get current background from store
   const background = useAppSelector((state) => state.canvas.background);
+
   // Dispatch to store
   const dispatch = useAppDispatch();
+
+  const player = entityById('player');
 
   // Toggle asset drawer
   const toggleDrawer =
@@ -82,18 +88,18 @@ export default function AssetsDrawer() {
           changeBackground(itemKey);
           break;
         case 'sprites':
-          let playerSample: Entity = {
+          let playerSprite: Entity = {
             id: 'player',
-            x: 100,
-            y: 450,
-            z: 1,
+            x: player?.x ?? 100,
+            y: player?.y ?? 450,
+            z: player?.z ?? 1,
             title: data['sprites'][itemKey].title ?? 'sprite',
-            width: data['sprites'][itemKey].width ?? 32,
-            height: data['sprites'][itemKey].height ?? 32,
-            scaleX: 1,
-            scaleY: 1,
-            scale: 1,
-            orientation: 0,
+            width: (data['sprites'][itemKey].width ?? 32) * (player?.scaleX ?? 1),
+            height: (data['sprites'][itemKey].height ?? 32) * (player?.scaleY ?? 1),
+            scaleX: player?.scaleX ?? 1,
+            scaleY: player?.scaleY ?? 1,
+            scale: player?.scale ?? 1,
+            orientation: player?.orientation ?? 0,
             spriteUrl: data['sprites'][itemKey].img,
             spriteWidth: data['sprites'][itemKey].width ?? 32,
             spriteHeight: data['sprites'][itemKey].height ?? 32,
@@ -101,9 +107,30 @@ export default function AssetsDrawer() {
             type: EntityType.Player,
             loaded: false,
           };
-          dispatch(entityAdded(playerSample));
+          dispatch(entityAdded(playerSprite));
           break;
         case 'items':
+          let item: Entity = {
+            id: uuid(),
+            x: 100,
+            y: 450,
+            z: 1,
+            title: data['items'][itemKey].title ?? 'item',
+            width: (data['items'][itemKey].width ?? 32),
+            height: (data['items'][itemKey].height ?? 32),
+            scaleX: 1,
+            scaleY: 1,
+            scale: 1,
+            orientation: 0,
+            spriteUrl: data['items'][itemKey].img,
+            spriteWidth: data['items'][itemKey].width ?? 32,
+            spriteHeight: data['items'][itemKey].height ?? 32,
+            physics: 'arcade',
+            type: EntityType.Item,
+            loaded: false,
+          };
+          dispatch(entityAdded(item));
+          break;
       }
     };
 

@@ -473,7 +473,7 @@ export default class Edit extends BaseScene {
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
         if (this.gameObjects.has('player')) {
-          player.setTexture(`EDIT_${object.title}`);
+          player?.setTexture(`EDIT_${object.title}`);
         } else {
           this.gameObjects.set(
             'player',
@@ -577,13 +577,13 @@ export default class Edit extends BaseScene {
         if (item.texture.key === `EDIT_${object.title}`) return;
         this.items.remove(item, true);
         item
-          .setTexture(`EDIT_${object.title}`)
+          ?.setTexture(`EDIT_${object.title}`)
           .setScale(object.scaleX, object.scaleY);
       } else if (!this.gameObjects.has(object.id)) {
         this.gameObjects.set(
           object.id,
           this.physics.add
-            .staticImage(object.x, object.y, `EDIT_${object.title}`)
+            .sprite(object.x, object.y, `EDIT_${object.title}`)
             .setScale(object.scaleX, object.scaleY)
         );
         item = this.getGameObject(object.id) as Phaser.Physics.Arcade.Sprite;
@@ -606,7 +606,7 @@ export default class Edit extends BaseScene {
           this.gameObjects.set(
             object.id,
             this.physics.add
-              .staticImage(object.x, object.y, `EDIT_${object.title}`)
+              .sprite(object.x, object.y, `EDIT_${object.title}`)
               .setScale(object.scaleX, object.scaleY)
           );
           item = this.getGameObject(object.id) as Phaser.Physics.Arcade.Sprite;

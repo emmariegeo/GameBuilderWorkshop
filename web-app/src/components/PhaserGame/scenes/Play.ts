@@ -69,6 +69,9 @@ export default class Play extends BaseScene {
     // The obstacles group contains objects the player can hit
     this.obstacles = this.physics.add.group();
 
+    //  The score
+    this.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', color: '#000' });
+
     this.scale.on('resize', this.resize, this);
 
     // We want to create a game object for each entry in gameEntities and add it to the appropriate group
@@ -291,7 +294,7 @@ export default class Play extends BaseScene {
         this.gameObjects.set(
           object.id,
           this.physics.add
-            .staticImage(object.x, object.y, `PLAY_${object.title}`)
+            .sprite(object.x, object.y, `PLAY_${object.title}`)
             .setScale(object.scaleX, object.scaleY)
         );
         item = this.getGameObject(object.id) as Phaser.Physics.Arcade.Sprite;
@@ -313,7 +316,7 @@ export default class Play extends BaseScene {
           this.gameObjects.set(
             object.id,
             this.physics.add
-              .staticImage(object.x, object.y, `PLAY_${object.title}`)
+              .sprite(object.x, object.y, `PLAY_${object.title}`)
               .setScale(object.scaleX, object.scaleY)
           );
           item = this.getGameObject(object.id) as Phaser.Physics.Arcade.Sprite;
