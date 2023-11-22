@@ -600,7 +600,7 @@ export default class Edit extends BaseScene {
         if (this.gameObjects.has(object.id)) {
           this.items.remove(item, true);
           item
-            .setTexture(`EDIT_${object.title}`)
+            ?.setTexture(`EDIT_${object.title}`)
             .setScale(object.scaleX, object.scaleY);
         } else {
           this.gameObjects.set(
@@ -611,8 +611,8 @@ export default class Edit extends BaseScene {
           );
           item = this.getGameObject(object.id) as Phaser.Physics.Arcade.Sprite;
         }
-        item.setData('id', object.id).setInteractive();
-        this.input.setDraggable(item);
+        item?.setData('id', object.id).setInteractive();
+        this.input?.setDraggable(item);
         this.items.add(item);
       });
       loader.start();

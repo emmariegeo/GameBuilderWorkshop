@@ -70,7 +70,10 @@ export default class Play extends BaseScene {
     this.obstacles = this.physics.add.group();
 
     //  The score
-    this.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', color: '#000' });
+    this.scoreText = this.add.text(16, 16, 'score: 0', {
+      fontSize: '32px',
+      color: '#000',
+    });
 
     this.scale.on('resize', this.resize, this);
 
@@ -78,6 +81,8 @@ export default class Play extends BaseScene {
     Object.entries(this.gameEntities).forEach((entry) => {
       entry[1] && !entry[1].loaded && this.loadGameObject(entry[1]);
     });
+
+    this.physics.add.collider(this.items, this.platforms);
   }
 
   // ---- START METHODS FOR INTERACTING WITH STORE ----
