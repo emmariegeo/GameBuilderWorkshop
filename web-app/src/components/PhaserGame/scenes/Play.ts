@@ -5,7 +5,6 @@ import { data as assets } from '../../../data/assets.ts';
 import { Entity } from '@/data/types.ts';
 import { Dictionary } from '@reduxjs/toolkit';
 import BaseScene from './BaseScene.ts';
-import { it } from 'node:test';
 
 /**
  * Play scene extends the BaseScene and is used to play the game.
