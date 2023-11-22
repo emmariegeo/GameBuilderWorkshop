@@ -120,6 +120,7 @@ export default class Play extends BaseScene {
     // We check if the texture has been previously loaded
     if (this.textures.exists(`PLAY_${object.title}`)) {
       if (this.gameObjects.has('player')) {
+        if (player.texture.key === `EDIT_${object.title}`) return;
         player
           .setTexture(`PLAY_${object.title}`)
           .setScale(object.scaleX, object.scaleY);
@@ -220,6 +221,7 @@ export default class Play extends BaseScene {
     // If the correct texture exists, update the object texture
     if (this.textures.exists(`PLAY_${object.title}`)) {
       if (this.gameObjects.has(object.id)) {
+        if (platform.texture.key === `EDIT_${object.title}`) return;
         this.platforms.remove(platform, true);
         platform
           .setTexture(`PLAY_${object.title}`)
