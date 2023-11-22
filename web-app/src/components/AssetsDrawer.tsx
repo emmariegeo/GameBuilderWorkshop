@@ -59,7 +59,14 @@ export default function AssetsDrawer() {
     };
   // Asset data from external file
   const assets: {
-    [index: string]: { [id: string]: { img?: string; title?: string } };
+    [index: string]: {
+      [id: string]: {
+        width?: any;
+        height?: any;
+        img?: string;
+        title?: string;
+      };
+    };
   } = data;
 
   // Dispatch to store: Update background
@@ -96,6 +103,7 @@ export default function AssetsDrawer() {
           };
           dispatch(entityAdded(playerSample));
           break;
+        case 'items':
       }
     };
 
@@ -124,10 +132,10 @@ export default function AssetsDrawer() {
             sx={{ width: 164, height: 164 }}
             key={item[0]}
           >
-            <ImageListItem>
+            <ImageListItem sx={{ width: '100%' }}>
               <img
-                srcSet={`${item[1].img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                src={`${item[1].img}?w=164&h=164&fit=crop&auto=format`}
+                srcSet={`${item[1].img}?w=${item[1].width}&h=${item[1].height}&fit=crop&auto=format&dpr=2 2x`}
+                src={`${item[1].img}?w=${item[1].width}&h=${item[1].height}&fit=crop&auto=format`}
                 alt={item[1].title}
                 loading="lazy"
               />

@@ -82,9 +82,11 @@ export const data: Map = {
     },
   },
   items: {
-    bg1: {
-      img: 'assets/sprites/pinkman.png',
-      title: 'pinkman',
+    star: {
+      img: 'assets/items/star.png',
+      title: 'star',
+      width: 24,
+      height: 22,
     },
   },
   obstacles: {
