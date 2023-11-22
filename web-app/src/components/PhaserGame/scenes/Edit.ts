@@ -80,8 +80,6 @@ export default class Edit extends BaseScene {
       entry[1] && !entry[1].loaded && this.loadGameObject(entry[1]);
     });
 
-    this.scale.on('resize', this.resize, this);
-
     // Pause physics for Edit mode
     this.physics.pause();
 
@@ -482,9 +480,10 @@ export default class Edit extends BaseScene {
           player = this.gameObjects.get(
             'player'
           ) as Phaser.Physics.Arcade.Sprite;
-          player.setInteractive();
         }
-        player.setScale(object.scaleX, object.scaleY).setData('id', 'player');
+        player?.setInteractive();
+        this.input.setDraggable(player);
+        player?.setScale(object.scaleX, object.scaleY).setData('id', 'player');
       });
       loader.start();
     }
@@ -535,7 +534,7 @@ export default class Edit extends BaseScene {
         // Set texture on existing platform
         if (this.gameObjects.has(object.id)) {
           this.platforms.remove(platform, true);
-          platform.setTexture(`EDIT_${object.title}`);
+          platform?.setTexture(`EDIT_${object.title}`);
         } else {
           // texture loaded, so replace
           this.gameObjects.set(
@@ -612,7 +611,7 @@ export default class Edit extends BaseScene {
           item = this.getGameObject(object.id) as Phaser.Physics.Arcade.Sprite;
         }
         item?.setData('id', object.id).setInteractive();
-        this.input?.setDraggable(item);
+        this.input.setDraggable(item);
         this.items.add(item);
       });
       loader.start();
@@ -625,20 +624,60 @@ export default class Edit extends BaseScene {
    * @returns
    */
   loadObstacle(object: Entity) {
-    return;
-  }
-
-  // Canvas resize
-  resize(
-    gameSize: { width: any; height: any },
-    baseSize: any,
-    displaySize: any,
-    resolution: any
-  ) {
-    const width = gameSize.width;
-    const height = gameSize.height;
-
-    this.cameras.resize(width, height);
+    let obstacle = this.getGameObject(
+      object.id
+    ) as Phaser.Physics.Arcade.Sprite;
+    // If texture exists, apply
+    if (this.textures.exists(`EDIT_${object.title}`)) {
+      if (this.gameObjects.has(object.id)) {
+        // If obstacle has correct texture applied, return
+        if (obstacle.texture.key === `EDIT_${object.title}`) return;
+        this.obstacles.remove(obstacle, true);
+        obstacle
+          ?.setTexture(`EDIT_${object.title}`)
+          .setScale(object.scaleX, object.scaleY);
+      } else if (!this.gameObjects.has(object.id)) {
+        this.gameObjects.set(
+          object.id,
+          this.physics.add
+            .sprite(object.x, object.y, `EDIT_${object.title}`)
+            .setScale(object.scaleX, object.scaleY)
+        );
+        obstacle = this.getGameObject(
+          object.id
+        ) as Phaser.Physics.Arcade.Sprite;
+      }
+      obstacle.setData('id', object.id).setInteractive();
+      this.input.setDraggable(obstacle);
+      this.obstacles.add(obstacle);
+    } else {
+      // If texture does not exist, load before applying
+      let loader = new Phaser.Loader.LoaderPlugin(this);
+      loader.image(`EDIT_${object.title}`, object.spriteUrl);
+      loader.once(Phaser.Loader.Events.COMPLETE, () => {
+        // texture loaded, so replace
+        if (this.gameObjects.has(object.id)) {
+          this.obstacles.remove(obstacle, true);
+          obstacle
+            ?.setTexture(`EDIT_${object.title}`)
+            .setScale(object.scaleX, object.scaleY);
+        } else {
+          this.gameObjects.set(
+            object.id,
+            this.physics.add
+              .sprite(object.x, object.y, `EDIT_${object.title}`)
+              .setScale(object.scaleX, object.scaleY)
+          );
+          obstacle = this.getGameObject(
+            object.id
+          ) as Phaser.Physics.Arcade.Sprite;
+        }
+        obstacle?.setData('id', object.id).setInteractive();
+        this.input.setDraggable(obstacle);
+        this.obstacles.add(obstacle);
+      });
+      loader.start();
+    }
   }
 
   /**

@@ -28,6 +28,7 @@ export default class BaseScene extends Phaser.Scene {
   preload() {
     this.load.image('bg', this.background['img']);
     this.load.image('ground', '../assets/platforms/platform.png');
+    this.load.image('bomb', '../assets/obstacles/bomb.png');
   }
   /**
    * Load a given entity into a game object

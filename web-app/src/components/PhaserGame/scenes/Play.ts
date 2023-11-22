@@ -75,8 +75,6 @@ export default class Play extends BaseScene {
       color: '#000',
     });
 
-    this.scale.on('resize', this.resize, this);
-
     // We want to create a game object for each entry in gameEntities and add it to the appropriate group
     Object.entries(this.gameEntities).forEach((entry) => {
       entry[1] && !entry[1].loaded && this.loadGameObject(entry[1]);
@@ -339,7 +337,59 @@ export default class Play extends BaseScene {
    * @returns
    */
   loadObstacle(object: Entity) {
-    return;
+    let obstacle = this.getGameObject(
+      object.id
+    ) as Phaser.Physics.Arcade.Sprite;
+    // If texture exists, apply
+    if (this.textures.exists(`PLAY_${object.title}`)) {
+      if (
+        this.gameObjects.has(object.id) &&
+        obstacle.texture.key !== `PLAY_${object.title}`
+      ) {
+        this.obstacles.remove(obstacle, true);
+        obstacle
+          .setTexture(`PLAY_${object.title}`)
+          .setScale(object.scaleX, object.scaleY);
+      } else if (!this.gameObjects.has(object.id)) {
+        this.gameObjects.set(
+          object.id,
+          this.physics.add
+            .sprite(object.x, object.y, `PLAY_${object.title}`)
+            .setScale(object.scaleX, object.scaleY)
+        );
+        obstacle = this.getGameObject(
+          object.id
+        ) as Phaser.Physics.Arcade.Sprite;
+      }
+      obstacle.setData('id', object.id);
+      this.obstacles.add(obstacle);
+    } else {
+      // If texture does not exist, load before applying
+      let loader = new Phaser.Loader.LoaderPlugin(this);
+      loader.image(`PLAY_${object.title}`, object.spriteUrl);
+      loader.once(Phaser.Loader.Events.COMPLETE, () => {
+        // texture loaded, so replace
+        if (this.gameObjects.has(object.id)) {
+          this.obstacles.remove(obstacle, true);
+          obstacle
+            .setTexture(`PLAY_${object.title}`)
+            .setScale(object.scaleX, object.scaleY);
+        } else {
+          this.gameObjects.set(
+            object.id,
+            this.physics.add
+              .sprite(object.x, object.y, `PLAY_${object.title}`)
+              .setScale(object.scaleX, object.scaleY)
+          );
+          obstacle = this.getGameObject(
+            object.id
+          ) as Phaser.Physics.Arcade.Sprite;
+        }
+        obstacle.setData('id', object.id);
+        this.obstacles.add(obstacle);
+      });
+      loader.start();
+    }
   }
 
   setAnimations(key: string) {
@@ -373,20 +423,8 @@ export default class Play extends BaseScene {
         repeat: -1,
       });
     }
+
     this.currentAnimKey = key;
-  }
-
-  // Canvas resize
-  resize(
-    gameSize: { width: any; height: any },
-    baseSize: any,
-    displaySize: any,
-    resolution: any
-  ) {
-    const width = gameSize.width;
-    const height = gameSize.height;
-
-    this.cameras.resize(width, height);
   }
 
   // ----- BEGIN GAME LOGIC METHODS ------
@@ -402,13 +440,33 @@ export default class Play extends BaseScene {
   hitObstacle(player: any, obstacle: any) {
     obstacle = obstacle as Phaser.GameObjects.GameObject;
     player = player as Phaser.Physics.Arcade.Sprite;
-
     this.physics.pause();
 
     player.setTint(0xff0000);
-
-    player.anims.play('turn');
-
+    player.anims.play(`turn_${this.currentAnimKey}`);
+    let spotlight = this.add
+      .graphics()
+      .setAlpha(1)
+      .fillCircle(player.x, player.y, player.width * 2)
+      .createGeometryMask()
+      .setInvertAlpha();
+    let endScreen = this.add
+      .graphics()
+      .fillStyle(0x000000, 0.6)
+      .fillRect(0, 0, this.scale.width, this.scale.height)
+      .setMask(spotlight)
+      .setDepth(2);
+    this.add
+      .text(
+        this.scale.gameSize.width / 2,
+        this.scale.gameSize.height / 2,
+        'GAME OVER!',
+        {
+          fontSize: '32px',
+          color: '#ff0000',
+        }
+      )
+      .setDepth(3);
     this.gameOver = true;
   }
 

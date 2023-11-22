@@ -6,6 +6,7 @@ import Edit from './scenes/Edit';
 import { Component } from 'react';
 import Play from './scenes/Play';
 import BaseScene from './scenes/BaseScene';
+import { Box, Container } from '@mui/material';
 
 type Props = {
   mode: string;
@@ -21,10 +22,8 @@ export default class PhaserGame extends Component<{}, Props> {
 
   componentDidMount() {
     const config = {
-      type: Phaser.CANVAS,
+      type: Phaser.AUTO,
       parent: 'phaser-game',
-      width: 800,
-      height: 600,
       physics: {
         default: 'arcade',
         arcade: {
@@ -33,8 +32,11 @@ export default class PhaserGame extends Component<{}, Props> {
         },
       },
       scale: {
+        mode: Phaser.Scale.FIT,
         parent: 'phaser-game',
-        autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: 800,
+        height: 600,
       },
       scene: [Edit, Play, BaseScene],
     };
@@ -44,6 +46,6 @@ export default class PhaserGame extends Component<{}, Props> {
     return true;
   }
   render() {
-    return <div id="phaser-game" />;
+    return <Box id="phaser-game"/>;
   }
 }

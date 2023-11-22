@@ -94,8 +94,10 @@ export default function AssetsDrawer() {
             y: player?.y ?? 450,
             z: player?.z ?? 1,
             title: data['sprites'][itemKey].title ?? 'sprite',
-            width: (data['sprites'][itemKey].width ?? 32) * (player?.scaleX ?? 1),
-            height: (data['sprites'][itemKey].height ?? 32) * (player?.scaleY ?? 1),
+            width:
+              (data['sprites'][itemKey].width ?? 32) * (player?.scaleX ?? 1),
+            height:
+              (data['sprites'][itemKey].height ?? 32) * (player?.scaleY ?? 1),
             scaleX: player?.scaleX ?? 1,
             scaleY: player?.scaleY ?? 1,
             scale: player?.scale ?? 1,
@@ -116,8 +118,8 @@ export default function AssetsDrawer() {
             y: 450,
             z: 1,
             title: data['items'][itemKey].title ?? 'item',
-            width: (data['items'][itemKey].width ?? 32),
-            height: (data['items'][itemKey].height ?? 32),
+            width: data['items'][itemKey].width ?? 32,
+            height: data['items'][itemKey].height ?? 32,
             scaleX: 1,
             scaleY: 1,
             scale: 1,
@@ -130,6 +132,28 @@ export default function AssetsDrawer() {
             loaded: false,
           };
           dispatch(entityAdded(item));
+          break;
+        case 'obstacles':
+          let obstacle: Entity = {
+            id: uuid(),
+            x: 100,
+            y: 450,
+            z: 1,
+            title: data['obstacles'][itemKey].title ?? 'obstacle',
+            width: data['obstacles'][itemKey].width ?? 14,
+            height: data['obstacles'][itemKey].height ?? 14,
+            scaleX: 1,
+            scaleY: 1,
+            scale: 1,
+            orientation: 0,
+            spriteUrl: data['obstacles'][itemKey].img,
+            spriteWidth: data['obstacles'][itemKey].width ?? 14,
+            spriteHeight: data['obstacles'][itemKey].height ?? 14,
+            physics: 'arcade',
+            type: EntityType.Obstacle,
+            loaded: false,
+          };
+          dispatch(entityAdded(obstacle));
           break;
       }
     };

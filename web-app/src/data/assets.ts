@@ -90,9 +90,11 @@ export const data: Map = {
     },
   },
   obstacles: {
-    bg1: {
-      img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-      title: 'bg1',
+    bomb: {
+      img: 'assets/obstacles/bomb.png',
+      title: 'bomb',
+      width: 14,
+      height: 14,
     },
   },
   platforms: {

@@ -18,15 +18,15 @@ export default function Home() {
               container
               sx={{ height: '100%' }}
               spacing={0}
-              columns={{ xs: 8, sm: 8, md: 12 }}
+              columns={{ xs: 3, md: 12 }}
             >
-              <Grid item xs={8} sm={2}>
+              <Grid item xs={3} md={2}>
                 <Toolbox />
               </Grid>
-              <Grid item xs={12} sm={8} sx={{ overflow: 'hidden', padding: 0 }}>
+              <Grid item xs={3} md={8} sx={{ width: '100%', height: '100%' }}>
                 <Canvas />
               </Grid>
-              <Grid item xs={8} sm={2}>
+              <Grid item xs={3} md={2}>
                 <OptionsMenu />
               </Grid>
             </Grid>
