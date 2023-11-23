@@ -125,7 +125,7 @@ export default class Play extends BaseScene {
     // We check if the texture has been previously loaded
     if (this.textures.exists(`PLAY_${object.title}`)) {
       if (this.gameObjects.has('player')) {
-        if (player.texture.key === `EDIT_${object.title}`) return;
+        if (player.texture.key === `PLAY_${object.title}`) return;
         player
           .setTexture(`PLAY_${object.title}`)
           .setScale(object.scaleX, object.scaleY);
@@ -444,30 +444,69 @@ export default class Play extends BaseScene {
 
     player.setTint(0xff0000);
     player.anims.play(`turn_${this.currentAnimKey}`);
+
     let spotlight = this.add
       .graphics()
       .setAlpha(1)
       .fillCircle(player.x, player.y, player.width * 2)
       .createGeometryMask()
       .setInvertAlpha();
+
     let endScreen = this.add
       .graphics()
       .fillStyle(0x000000, 0.6)
       .fillRect(0, 0, this.scale.width, this.scale.height)
       .setMask(spotlight)
       .setDepth(2);
+
+    // Add centered game over text
     this.add
       .text(
         this.scale.gameSize.width / 2,
-        this.scale.gameSize.height / 2,
+        this.scale.displaySize.height / 3,
         'GAME OVER!',
         {
-          fontSize: '32px',
+          fontSize: '64px',
           color: '#ff0000',
         }
       )
-      .setDepth(3);
+      .setDepth(3)
+      .setOrigin(0.5);
+
+    const button = this.add
+      .text(
+        this.scale.gameSize.width / 2,
+        this.scale.displaySize.height / 2,
+        'PLAY AGAIN',
+        {
+          fontFamily: 'Arial',
+          fontSize: '32px',
+          color: '#ffffff',
+          align: 'center',
+          fixedWidth: 260,
+          backgroundColor: '#2d2d2d',
+        }
+      )
+      .setPadding(24)
+      .setDepth(3)
+      .setOrigin(0.5);
+
+    button.setInteractive({ useHandCursor: true });
+
+    button.on('pointerover', () => {
+      button.setBackgroundColor('#8d8d8d');
+    });
+
+    button.on('pointerout', () => {
+      button.setBackgroundColor('#2d2d2d');
+    });
+
     this.gameOver = true;
+
+    button.once(
+      'pointerup', () => {
+        this.scene.restart()
+    });
   }
 
   /**
