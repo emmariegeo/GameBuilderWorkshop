@@ -88,6 +88,30 @@ export const data: Map = {
       width: 24,
       height: 22,
     },
+    carrot: {
+      img: 'assets/items/carrot.png',
+      title: 'carrot',
+      width: 24,
+      height: 24,
+    },
+    money: {
+      img: 'assets/items/money.png',
+      title: 'money',
+      width: 24,
+      height: 24,
+    },
+    strawberry: {
+      img: 'assets/items/strawberry.png',
+      title: 'strawberry',
+      width: 24,
+      height: 24,
+    },
+    pumpkin: {
+      img: 'assets/items/pumpkin.png',
+      title: 'pumpkin',
+      width: 24,
+      height: 24,
+    },
   },
   obstacles: {
     bomb: {
