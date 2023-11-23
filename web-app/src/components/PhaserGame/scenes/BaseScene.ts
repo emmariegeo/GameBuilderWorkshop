@@ -28,15 +28,42 @@ export default class BaseScene extends Phaser.Scene {
   preload() {
     this.load.image('bg', this.background['img']);
     this.load.image('ground', '../assets/platforms/platform.png');
+    this.load.image('bomb', '../assets/obstacles/bomb.png');
   }
-
   /**
-   * Return game object cast to respective type
+   * Load a given entity into a game object
+   * @param object Entity
    */
-  getSpriteObject(key: string) {
-    let object = this.gameObjects.get(key);
-
-    return object as Phaser.Physics.Arcade.Sprite;
+  loadGameObject(object: Entity) {
+    switch (object.type) {
+      case EntityType.Player:
+        this.loadPlayer(object);
+        break;
+      case EntityType.Platform:
+        this.loadPlatform(object);
+        break;
+      case EntityType.Item:
+        this.loadItem(object);
+        break;
+      case EntityType.Obstacle:
+        this.loadObstacle(object);
+        break;
+      default:
+        break;
+    }
+  }
+  
+  loadObstacle(object: Entity) {
+    throw new Error('Method not implemented.');
+  }
+  loadItem(object: Entity) {
+    throw new Error('Method not implemented.');
+  }
+  loadPlatform(object: Entity) {
+    throw new Error('Method not implemented.');
+  }
+  loadPlayer(object: Entity) {
+    throw new Error('Method not implemented.');
   }
 
   getGameObject(key: string) {

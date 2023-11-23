@@ -4,7 +4,6 @@ import {
   createSlice,
   createEntityAdapter,
   combineReducers,
-  createSelector,
 } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { Entity, EntityType, Tool } from './data/types';

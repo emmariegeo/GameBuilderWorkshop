@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { v4 as uuid } from 'uuid';
+
 import {
   Box,
   Button,
@@ -12,6 +14,7 @@ import {
 import { data } from '../data/assets.ts';
 import {
   entityAdded,
+  entityById,
   updateBackground,
   useAppDispatch,
   useAppSelector,
@@ -39,8 +42,11 @@ export default function AssetsDrawer() {
 
   // Get current background from store
   const background = useAppSelector((state) => state.canvas.background);
+
   // Dispatch to store
   const dispatch = useAppDispatch();
+
+  const player = entityById('player');
 
   // Toggle asset drawer
   const toggleDrawer =
@@ -59,7 +65,14 @@ export default function AssetsDrawer() {
     };
   // Asset data from external file
   const assets: {
-    [index: string]: { [id: string]: { img?: string; title?: string } };
+    [index: string]: {
+      [id: string]: {
+        width?: any;
+        height?: any;
+        img?: string;
+        title?: string;
+      };
+    };
   } = data;
 
   // Dispatch to store: Update background
@@ -70,29 +83,78 @@ export default function AssetsDrawer() {
   // When an asset is clicked
   const handleAssetClick =
     (itemKey: string) => (event: React.KeyboardEvent | React.MouseEvent) => {
-      if (assetType == 'backgrounds') {
-        changeBackground(itemKey);
-      } else if (assetType == 'sprites') {
-        let playerSample: Entity = {
-          id: 'player',
-          x: 100,
-          y: 450,
-          z: 1,
-          title: data['sprites'][itemKey].title ?? 'sprite',
-          width: data['sprites'][itemKey].width ?? 32,
-          height: data['sprites'][itemKey].height ?? 32,
-          scaleX: 1,
-          scaleY: 1,
-          scale: 1,
-          orientation: 0,
-          spriteUrl: data['sprites'][itemKey].img,
-          spriteWidth: data['sprites'][itemKey].width ?? 32,
-          spriteHeight: data['sprites'][itemKey].height ?? 32,
-          physics: 'arcade',
-          type: EntityType.Player,
-          loaded: false,
-        };
-        dispatch(entityAdded(playerSample));
+      switch (assetType) {
+        case 'backgrounds':
+          changeBackground(itemKey);
+          break;
+        case 'sprites':
+          let playerSprite: Entity = {
+            id: 'player',
+            x: player?.x ?? 100,
+            y: player?.y ?? 450,
+            z: player?.z ?? 1,
+            title: data['sprites'][itemKey].title ?? 'sprite',
+            width:
+              (data['sprites'][itemKey].width ?? 32) * (player?.scaleX ?? 1),
+            height:
+              (data['sprites'][itemKey].height ?? 32) * (player?.scaleY ?? 1),
+            scaleX: player?.scaleX ?? 1,
+            scaleY: player?.scaleY ?? 1,
+            scale: player?.scale ?? 1,
+            orientation: player?.orientation ?? 0,
+            spriteUrl: data['sprites'][itemKey].img,
+            spriteWidth: data['sprites'][itemKey].width ?? 32,
+            spriteHeight: data['sprites'][itemKey].height ?? 32,
+            physics: 'arcade',
+            type: EntityType.Player,
+            loaded: false,
+          };
+          dispatch(entityAdded(playerSprite));
+          break;
+        case 'items':
+          let item: Entity = {
+            id: uuid(),
+            x: 100,
+            y: 450,
+            z: 1,
+            title: data['items'][itemKey].title ?? 'item',
+            width: data['items'][itemKey].width ?? 32,
+            height: data['items'][itemKey].height ?? 32,
+            scaleX: 1,
+            scaleY: 1,
+            scale: 1,
+            orientation: 0,
+            spriteUrl: data['items'][itemKey].img,
+            spriteWidth: data['items'][itemKey].width ?? 32,
+            spriteHeight: data['items'][itemKey].height ?? 32,
+            physics: 'arcade',
+            type: EntityType.Item,
+            loaded: false,
+          };
+          dispatch(entityAdded(item));
+          break;
+        case 'obstacles':
+          let obstacle: Entity = {
+            id: uuid(),
+            x: 100,
+            y: 450,
+            z: 1,
+            title: data['obstacles'][itemKey].title ?? 'obstacle',
+            width: data['obstacles'][itemKey].width ?? 14,
+            height: data['obstacles'][itemKey].height ?? 14,
+            scaleX: 1,
+            scaleY: 1,
+            scale: 1,
+            orientation: 0,
+            spriteUrl: data['obstacles'][itemKey].img,
+            spriteWidth: data['obstacles'][itemKey].width ?? 14,
+            spriteHeight: data['obstacles'][itemKey].height ?? 14,
+            physics: 'arcade',
+            type: EntityType.Obstacle,
+            loaded: false,
+          };
+          dispatch(entityAdded(obstacle));
+          break;
       }
     };
 
@@ -121,10 +183,10 @@ export default function AssetsDrawer() {
             sx={{ width: 164, height: 164 }}
             key={item[0]}
           >
-            <ImageListItem>
+            <ImageListItem sx={{ width: '100%' }}>
               <img
-                srcSet={`${item[1].img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                src={`${item[1].img}?w=164&h=164&fit=crop&auto=format`}
+                srcSet={`${item[1].img}?w=${item[1].width}&h=${item[1].height}&fit=crop&auto=format&dpr=2 2x`}
+                src={`${item[1].img}?w=${item[1].width}&h=${item[1].height}&fit=crop&auto=format`}
                 alt={item[1].title}
                 loading="lazy"
               />

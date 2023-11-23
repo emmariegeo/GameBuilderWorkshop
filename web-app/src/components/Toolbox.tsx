@@ -12,7 +12,10 @@ import { Tool } from '@/data/types';
 import { switchTool, useAppDispatch, useAppSelector } from '@/store';
 
 export default function Toolbox() {
-  const tool = useAppSelector((state) => state.canvas.tool);
+  const [tool, mode] = useAppSelector((state) => [
+    state.canvas.tool,
+    state.canvas.mode,
+  ]);
   const dispatch = useAppDispatch();
 
   const handleChangeTool = async (
@@ -30,6 +33,7 @@ export default function Toolbox() {
       value={tool}
       exclusive
       onChange={handleChangeTool}
+      disabled={mode !== 'edit'}
     >
       <ToggleButton value={Tool.Select} aria-label="select">
         <NearMeOutlined />
