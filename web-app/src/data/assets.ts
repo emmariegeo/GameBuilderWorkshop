@@ -122,9 +122,29 @@ export const data: Map = {
     },
   },
   platforms: {
-    ground: {
-      img: 'assets/platform.png',
-      title: 'ground',
+    simple: {
+      img: 'assets/platforms/simple_platform.png',
+      title: 'simple',
+    },
+    dirt: {
+      img: 'assets/platforms/dirt_platform.png',
+      title: 'dirt',
+    },
+    green: {
+      img: 'assets/platforms/green_platform.png',
+      title: 'green',
+    },
+    ice: {
+      img: 'assets/platforms/ice_platform.png',
+      title: 'ice',
+    },
+    purple: {
+      img: 'assets/platforms/purple_platform.png',
+      title: 'purple',
+    },
+    red: {
+      img: 'assets/platforms/red_platform.png',
+      title: 'red',
     },
   },
   effects: {

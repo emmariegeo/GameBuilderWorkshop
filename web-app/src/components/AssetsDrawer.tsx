@@ -87,6 +87,28 @@ export default function AssetsDrawer() {
         case 'backgrounds':
           changeBackground(itemKey);
           break;
+        case 'platforms':
+          let platform: Entity = {
+            id: uuid(),
+            x: 100,
+            y: 450,
+            z: 1,
+            title: data[assetType][itemKey].title ?? assetType,
+            width: data[assetType][itemKey].width ?? 14,
+            height: data[assetType][itemKey].height ?? 14,
+            scaleX: 1,
+            scaleY: 1,
+            scale: 1,
+            orientation: 0,
+            spriteUrl: data[assetType][itemKey].img,
+            spriteWidth: data[assetType][itemKey].width ?? 14,
+            spriteHeight: data[assetType][itemKey].height ?? 14,
+            physics: 'arcade',
+            type: EntityType.Platform,
+            loaded: false,
+          };
+          dispatch(entityAdded(platform));
+          break;
         case 'sprites':
           let playerSprite: Entity = {
             id: 'player',
@@ -169,6 +191,7 @@ export default function AssetsDrawer() {
         aria-label="Asset Types"
       >
         <ToggleButton value="backgrounds">Backgrounds</ToggleButton>
+        <ToggleButton value="platforms">Platforms</ToggleButton>
         <ToggleButton value="sprites">Sprites</ToggleButton>
         <ToggleButton value="items">Items</ToggleButton>
         <ToggleButton value="obstacles">Obstacles</ToggleButton>
