@@ -59,7 +59,7 @@ export default class Play extends BaseScene {
     // Making shallow copy of entities dictionary from the store
     this.gameEntities = { ...initialState.entities.entities };
 
-    this.bg = this.add.image(this.scale.width / 4, this.scale.height / 4, 'bg');
+    this.bg = this.add.image(this.scale.width / 2, this.scale.height / 2, 'bg');
     this.setBackground(this.background);
 
     // The platforms group contains objects the player can jump on/collide with
@@ -503,9 +503,8 @@ export default class Play extends BaseScene {
 
     this.gameOver = true;
 
-    button.once(
-      'pointerup', () => {
-        this.scene.restart()
+    button.once('pointerup', () => {
+      this.scene.restart();
     });
   }
 

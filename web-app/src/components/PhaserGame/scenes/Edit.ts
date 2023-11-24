@@ -64,7 +64,7 @@ export default class Edit extends BaseScene {
     this.gameEntities = { ...initialState.entities.entities };
 
     // Instantiating bg object
-    this.bg = this.add.image(this.scale.width / 4, this.scale.height / 4, 'bg');
+    this.bg = this.add.image(this.scale.width / 2, this.scale.height / 2, 'bg');
     // Setting with existing background value
     this.setBackground(this.background);
 
