@@ -39,7 +39,6 @@ export default class Play extends BaseScene {
 
   preload() {
     this.load.image('bg', this.background['img']);
-    this.load.image('ground', '../assets/platform.png');
   }
 
   create() {
@@ -363,6 +362,22 @@ export default class Play extends BaseScene {
       }
       obstacle.setData('id', object.id);
       this.obstacles.add(obstacle);
+      console.log(object.physics);
+      switch (object.physics) {
+        case 'BOUNCE':
+          console.log('yup');
+          obstacle.setBounce(1);
+          obstacle.setCollideWorldBounds(true);
+          obstacle.setVelocity(Phaser.Math.Between(-200, 200), 20);
+          break;
+        case 'FLOAT':
+          obstacle.setBounce(0,1);
+          obstacle.setCollideWorldBounds(true);
+          obstacle.setGravity(0, 0);
+          break;
+        default:
+          break;
+      }
     } else {
       // If texture does not exist, load before applying
       let loader = new Phaser.Loader.LoaderPlugin(this);
@@ -387,6 +402,21 @@ export default class Play extends BaseScene {
         }
         obstacle.setData('id', object.id);
         this.obstacles.add(obstacle);
+        switch (object.physics) {
+          case 'BOUNCE':
+            obstacle.setBounce(1);
+            obstacle.setCollideWorldBounds(true);
+            obstacle.setVelocity(Phaser.Math.Between(-200, 200), 20);
+            obstacle.setGravity(0, 0);
+            break;
+          case 'FLOAT':
+            obstacle.setBounce(0,1);
+            obstacle.setCollideWorldBounds(true);
+            obstacle.setGravity(0, 0);
+            break;
+          default:
+            break;
+        }
       });
       loader.start();
     }

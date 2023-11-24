@@ -171,7 +171,7 @@ export default function AssetsDrawer() {
             spriteUrl: data['obstacles'][itemKey].img,
             spriteWidth: data['obstacles'][itemKey].width ?? 14,
             spriteHeight: data['obstacles'][itemKey].height ?? 14,
-            physics: 'arcade',
+            physics: data['obstacles'][itemKey].physics ?? 'STATIC',
             type: EntityType.Obstacle,
             loaded: false,
           };

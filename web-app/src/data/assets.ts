@@ -5,6 +5,7 @@ interface Map {
       title: string;
       width?: number;
       height?: number;
+      physics?: string;
       frames?: {};
     };
   };
@@ -119,6 +120,14 @@ export const data: Map = {
       title: 'bomb',
       width: 14,
       height: 14,
+      physics: 'BOUNCE'
+    },
+    floatyalien: {
+      img: 'assets/obstacles/floaty_alien.png',
+      title: 'floatyalien',
+      width: 50,
+      height: 61,
+      physics: 'FLOAT',
     },
   },
   platforms: {
