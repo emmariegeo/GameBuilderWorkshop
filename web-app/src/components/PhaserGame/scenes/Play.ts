@@ -66,7 +66,7 @@ export default class Play extends BaseScene {
     // The items group contains objects the player can collect
     this.items = this.physics.add.group();
     // The obstacles group contains objects the player can hit
-    this.obstacles = this.physics.add.group();
+    this.obstacles = this.physics.add.group().setDepth(4);
 
     //  The score
     this.scoreText = this.add.text(16, 16, 'score: 0', {
@@ -241,7 +241,7 @@ export default class Play extends BaseScene {
           object.id
         ) as Phaser.Physics.Arcade.Sprite;
       }
-      platform.setData('id', object.id);
+      platform.setData('id', object.id).refreshBody();
       this.platforms.add(platform);
       this.platforms.refresh();
     } else {
@@ -267,7 +267,7 @@ export default class Play extends BaseScene {
             object.id
           ) as Phaser.Physics.Arcade.Sprite;
         }
-        platform.setData('id', object.id);
+        platform.setData('id', object.id).refreshBody();
         this.platforms.add(platform);
         this.platforms.refresh();
       });
@@ -362,18 +362,27 @@ export default class Play extends BaseScene {
       }
       obstacle.setData('id', object.id);
       this.obstacles.add(obstacle);
-      console.log(object.physics);
       switch (object.physics) {
         case 'BOUNCE':
-          console.log('yup');
-          obstacle.setBounce(1);
-          obstacle.setCollideWorldBounds(true);
-          obstacle.setVelocity(Phaser.Math.Between(-200, 200), 20);
+          obstacle
+            .setBounce(1)
+            .setCollideWorldBounds(true)
+            .setVelocity(Phaser.Math.Between(-200, 200), 20)
+            .setGravity(0);
           break;
         case 'FLOAT':
-          obstacle.setBounce(0,1);
-          obstacle.setCollideWorldBounds(true);
-          obstacle.setGravity(0, 0);
+          obstacle
+            .setGravity(0)
+            .setImmovable()
+            .setDirectControl();
+          this.tweens.add({
+            targets: obstacle,
+            y: 600,
+            duration: 3000,
+            ease: 'sine.inout',
+            yoyo: true,
+            repeat: -1,
+          });
           break;
         default:
           break;
@@ -404,15 +413,25 @@ export default class Play extends BaseScene {
         this.obstacles.add(obstacle);
         switch (object.physics) {
           case 'BOUNCE':
-            obstacle.setBounce(1);
-            obstacle.setCollideWorldBounds(true);
-            obstacle.setVelocity(Phaser.Math.Between(-200, 200), 20);
-            obstacle.setGravity(0, 0);
+            obstacle
+              .setBounce(1)
+              .setCollideWorldBounds(true)
+              .setVelocity(Phaser.Math.Between(-200, 200), 20)
+              .setGravity(0);
             break;
           case 'FLOAT':
-            obstacle.setBounce(0,1);
-            obstacle.setCollideWorldBounds(true);
-            obstacle.setGravity(0, 0);
+            obstacle
+              .setGravity(0)
+              .setImmovable()
+              .setDirectControl();
+            this.tweens.add({
+              targets: obstacle,
+              y: 600,
+              duration: 3000,
+              ease: 'sine.inout',
+              yoyo: true,
+              repeat: -1,
+            });
             break;
           default:
             break;
