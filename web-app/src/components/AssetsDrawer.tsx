@@ -15,6 +15,7 @@ import { data } from '../data/assets.ts';
 import {
   entityAdded,
   entityById,
+  updateAudio,
   updateBackground,
   useAppDispatch,
   useAppSelector,
@@ -80,12 +81,20 @@ export default function AssetsDrawer() {
     dispatch(updateBackground(newBackground));
   };
 
+  // Dispatch to store: Update background
+  const changeAudio = (newAudio: string) => {
+    dispatch(updateAudio(newAudio));
+  };
+
   // When an asset is clicked
   const handleAssetClick =
     (itemKey: string) => (event: React.KeyboardEvent | React.MouseEvent) => {
       switch (assetType) {
         case 'backgrounds':
           changeBackground(itemKey);
+          break;
+        case 'audio':
+          changeAudio(itemKey);
           break;
         case 'platforms':
           let platform: Entity = {
@@ -216,6 +225,22 @@ export default function AssetsDrawer() {
             </ImageListItem>
           </Button>
         ))}
+        {assetType == 'audio' && (
+          <Button
+            onClick={handleAssetClick('')}
+            sx={{ width: 164, height: 164 }}
+            key={'clear'}
+          >
+            <ImageListItem sx={{ width: '100%' }}>
+              <img
+                srcSet={`workshop/x.png??w=100&h=100&fit=crop&auto=format&dpr=2 2x`}
+                src={`workshop/x.png?w=100&h=100&fit=crop&auto=format`}
+                alt={'clear'}
+                loading="lazy"
+              />
+            </ImageListItem>
+          </Button>
+        )}
       </ImageList>
     </Box>
   );

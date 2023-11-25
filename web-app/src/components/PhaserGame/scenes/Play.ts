@@ -15,6 +15,12 @@ export default class Play extends BaseScene {
   player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   platforms!: Phaser.Physics.Arcade.StaticGroup;
   background: any;
+  audio!: string;
+  soundObject:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound
+    | undefined;
   selectedGraphics!: Phaser.GameObjects.Graphics;
   gameEntities!: Dictionary<Entity>;
   gameEntityIDs!: Array<string>;
@@ -51,6 +57,7 @@ export default class Play extends BaseScene {
     let initialState = store.getState();
     this.mode = initialState.canvas.mode;
     this.background = initialState.canvas.background;
+    this.audio = initialState.canvas.audio;
 
     // Input Events
     this.cursors = this.input.keyboard?.createCursorKeys();
@@ -60,6 +67,11 @@ export default class Play extends BaseScene {
 
     this.bg = this.add.image(this.scale.width / 2, this.scale.height / 2, 'bg');
     this.setBackground(this.background);
+
+    if (this.audio !== '' && !this.soundObject?.isPlaying) {
+      this.setAudio(this.audio);
+      this.soundObject?.play();
+    }
 
     // The platforms group contains objects the player can jump on/collide with
     this.platforms = this.physics.add.staticGroup();
@@ -371,10 +383,7 @@ export default class Play extends BaseScene {
             .setGravity(0);
           break;
         case 'FLOAT':
-          obstacle
-            .setGravity(0)
-            .setImmovable()
-            .setDirectControl();
+          obstacle.setGravity(0).setImmovable().setDirectControl();
           this.tweens.add({
             targets: obstacle,
             y: 600,
@@ -383,6 +392,9 @@ export default class Play extends BaseScene {
             yoyo: true,
             repeat: -1,
           });
+          break;
+        case 'STATIC':
+          (obstacle.body as Phaser.Physics.Arcade.Body)?.setAllowGravity(false);
           break;
         default:
           break;
@@ -411,19 +423,17 @@ export default class Play extends BaseScene {
         }
         obstacle.setData('id', object.id);
         this.obstacles.add(obstacle);
+        // Obstacles can have different behaviors
         switch (object.physics) {
-          case 'BOUNCE':
+          case 'BOUNCE': // Obstacle bounces around game canvas
             obstacle
               .setBounce(1)
               .setCollideWorldBounds(true)
               .setVelocity(Phaser.Math.Between(-200, 200), 20)
               .setGravity(0);
             break;
-          case 'FLOAT':
-            obstacle
-              .setGravity(0)
-              .setImmovable()
-              .setDirectControl();
+          case 'FLOAT': // Obstacle floats up and down
+            obstacle.setGravity(0).setImmovable().setDirectControl();
             this.tweens.add({
               targets: obstacle,
               y: 600,
@@ -432,6 +442,11 @@ export default class Play extends BaseScene {
               yoyo: true,
               repeat: -1,
             });
+            break;
+          case 'STATIC': // Obstacle does not move
+            (obstacle.body as Phaser.Physics.Arcade.Body)?.setAllowGravity(
+              false
+            );
             break;
           default:
             break;

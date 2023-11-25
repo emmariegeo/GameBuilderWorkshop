@@ -282,6 +282,10 @@ export default class Edit extends BaseScene {
       if (state.canvas.background !== this.background) {
         this.setBackground(state.canvas.background.toString());
       }
+      // Update audio
+      if (state.canvas.audio !== this.audio) {
+        this.setAudio(state.canvas.audio);
+      }
       // Update tool
       if (state.canvas.tool !== this.tool) {
         this.setTool(state.canvas.tool);

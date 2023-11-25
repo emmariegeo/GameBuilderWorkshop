@@ -6,6 +6,7 @@ interface Map {
       width?: number;
       height?: number;
       physics?: string;
+      file?: string;
       frames?: {};
     };
   };
@@ -59,7 +60,7 @@ export const data: Map = {
     },
   },
   sprites: {
-    s1: {
+    dude: {
       img: 'assets/sprites/dude.png',
       title: 'dude',
       width: 32,
@@ -70,9 +71,31 @@ export const data: Map = {
         right: [5, 8],
       },
     },
-    s2: {
+    pinkman: {
       img: 'assets/sprites/pinkman.png',
       title: 'pinkman',
+      width: 32,
+      height: 32,
+      frames: {
+        left: [0, 3],
+        turn: [4],
+        right: [5, 8],
+      },
+    },
+    ninjafrog: {
+      img: 'assets/sprites/ninjafrog.png',
+      title: 'ninjafrog',
+      width: 32,
+      height: 32,
+      frames: {
+        left: [0, 3],
+        turn: [4],
+        right: [5, 8],
+      },
+    },
+    virtualguy: {
+      img: 'assets/sprites/virtualguy.png',
+      title: 'virtualguy',
       width: 32,
       height: 32,
       frames: {
@@ -120,7 +143,7 @@ export const data: Map = {
       title: 'bomb',
       width: 14,
       height: 14,
-      physics: 'BOUNCE'
+      physics: 'BOUNCE',
     },
     floatyalien: {
       img: 'assets/obstacles/floaty_alien.png',
@@ -128,6 +151,20 @@ export const data: Map = {
       width: 50,
       height: 61,
       physics: 'FLOAT',
+    },
+    jellyfish: {
+      img: 'assets/obstacles/jellyfish.png',
+      title: 'jellyfish',
+      width: 50,
+      height: 67,
+      physics: 'FLOAT',
+    },
+    fire: {
+      img: 'assets/obstacles/fire.png',
+      title: 'fire',
+      width: 35,
+      height: 40,
+      physics: 'STATIC',
     },
   },
   platforms: {
@@ -163,9 +200,15 @@ export const data: Map = {
     },
   },
   audio: {
-    bg1: {
-      img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-      title: 'bg1',
+    bgm1: {
+      img: 'assets/items/star.png',
+      title: 'bgm1',
+      file: 'assets/audio/BGM_01.wav',
+    },
+    bgm2: {
+      img: 'assets/items/star.png',
+      title: 'bgm2',
+      file: 'assets/audio/BGM_02.wav',
     },
   },
 };
