@@ -33,7 +33,6 @@ export default class BaseScene extends Phaser.Scene {
 
   preload() {
     this.load.image('bg', this.background['img']);
-    this.load.image('ground', '../assets/platforms/platform.png');
     this.load.image('bomb', '../assets/obstacles/bomb.png');
   }
   /**
@@ -97,8 +96,8 @@ export default class BaseScene extends Phaser.Scene {
   }
 
   /**
-   * Set the new background
-   * @param newBackground string referring to background asset key
+   * Set the new audio
+   * @param newAudio string referring to sound asset key
    */
   setAudio(newAudio: string) {
     // Confirm that background exists in assets
@@ -114,7 +113,7 @@ export default class BaseScene extends Phaser.Scene {
         if (this.soundObject) {
           this.soundObject.destroy();
         }
-        this.soundObject = this.sound.add(newAudio);
+        this.soundObject = this.sound.add(newAudio, { loop: true });
       });
       loader.start();
     }

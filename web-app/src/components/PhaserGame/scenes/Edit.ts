@@ -11,7 +11,7 @@ import {
   entityUpdateScale,
 } from '../../../store';
 import { data as assets } from '../../../data/assets.ts';
-import { Entity, EntityType, Tool } from '@/data/types.ts';
+import { Entity, Tool } from '@/data/types.ts';
 import { Dictionary } from '@reduxjs/toolkit';
 import BaseScene from './BaseScene.ts';
 
