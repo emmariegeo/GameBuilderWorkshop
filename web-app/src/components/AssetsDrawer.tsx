@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { v4 as uuid } from 'uuid';
-
+import Image from 'next/image';
 import {
   Box,
   Button,
@@ -38,11 +38,16 @@ export default function AssetsDrawer() {
     event: React.MouseEvent<HTMLElement>,
     newAssetType: string
   ) => {
-    setAssetType(newAssetType);
+    if (newAssetType) {
+      setAssetType(newAssetType);
+    }
   };
 
-  // Get current background from store
-  const background = useAppSelector((state) => state.canvas.background);
+  // Get current background and audio from store
+  const [background, audio] = useAppSelector((state) => [
+    state.canvas.background,
+    state.canvas.audio,
+  ]);
 
   // Dispatch to store
   const dispatch = useAppDispatch();
@@ -70,7 +75,7 @@ export default function AssetsDrawer() {
       [id: string]: {
         width?: any;
         height?: any;
-        img?: string;
+        img: string;
         title?: string;
       };
     };
@@ -199,7 +204,9 @@ export default function AssetsDrawer() {
         onChange={handleChange}
         aria-label="Asset Types"
       >
-        <ToggleButton value="backgrounds">Backgrounds</ToggleButton>
+        <ToggleButton value="backgrounds" defaultChecked>
+          Backgrounds
+        </ToggleButton>
         <ToggleButton value="platforms">Platforms</ToggleButton>
         <ToggleButton value="sprites">Sprites</ToggleButton>
         <ToggleButton value="items">Items</ToggleButton>
@@ -212,15 +219,19 @@ export default function AssetsDrawer() {
         {Object.entries(assets[assetType]).map((item) => (
           <Button
             onClick={handleAssetClick(item[0])}
-            sx={{ width: 164, height: 164 }}
+            sx={{
+              width: 164,
+              height: 164,
+              border: item[0] === audio || item[0] === background ? '5px solid blue' : '0',
+            }}
             key={item[0]}
           >
             <ImageListItem sx={{ width: '100%' }}>
-              <img
-                srcSet={`${item[1].img}?w=${item[1].width}&h=${item[1].height}&fit=crop&auto=format&dpr=2 2x`}
-                src={`${item[1].img}?w=${item[1].width}&h=${item[1].height}&fit=crop&auto=format`}
-                alt={item[1].title}
-                loading="lazy"
+              <Image
+                src={item[1].img}
+                alt={item[1].title ?? 'asset'}
+                objectFit="contain"
+                fill={true}
               />
             </ImageListItem>
           </Button>
@@ -232,11 +243,11 @@ export default function AssetsDrawer() {
             key={'clear'}
           >
             <ImageListItem sx={{ width: '100%' }}>
-              <img
-                srcSet={`workshop/x.png??w=100&h=100&fit=crop&auto=format&dpr=2 2x`}
-                src={`workshop/x.png?w=100&h=100&fit=crop&auto=format`}
-                alt={'clear'}
-                loading="lazy"
+              <Image
+                src="/workshop/x.png"
+                alt="clear"
+                objectFit="contain"
+                fill={true}
               />
             </ImageListItem>
           </Button>

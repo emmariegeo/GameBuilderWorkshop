@@ -84,6 +84,7 @@ export default class Play extends BaseScene {
     this.scoreText = this.add.text(16, 16, 'score: 0', {
       fontSize: '32px',
       color: '#000',
+      backgroundColor: '#ffffff',
     });
 
     // We want to create a game object for each entry in gameEntities and add it to the appropriate group
@@ -383,7 +384,8 @@ export default class Play extends BaseScene {
             .setGravity(0);
           break;
         case 'FLOAT':
-          obstacle.setGravity(0).setImmovable().setDirectControl();
+          obstacle.setGravity(0).setImmovable();
+          (obstacle.body as Phaser.Physics.Arcade.Body)?.setDirectControl();
           this.tweens.add({
             targets: obstacle,
             y: 600,
@@ -433,7 +435,8 @@ export default class Play extends BaseScene {
               .setGravity(0);
             break;
           case 'FLOAT': // Obstacle floats up and down
-            obstacle.setGravity(0).setImmovable().setDirectControl();
+            obstacle.setGravity(0).setImmovable();
+            (obstacle.body as Phaser.Physics.Arcade.Body)?.setDirectControl();
             this.tweens.add({
               targets: obstacle,
               y: 600,
