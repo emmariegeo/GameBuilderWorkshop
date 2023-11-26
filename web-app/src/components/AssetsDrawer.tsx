@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { v4 as uuid } from 'uuid';
-
+import Image from 'next/image';
 import {
   Box,
   Button,
@@ -15,6 +15,7 @@ import { data } from '../data/assets.ts';
 import {
   entityAdded,
   entityById,
+  updateAudio,
   updateBackground,
   useAppDispatch,
   useAppSelector,
@@ -37,11 +38,16 @@ export default function AssetsDrawer() {
     event: React.MouseEvent<HTMLElement>,
     newAssetType: string
   ) => {
-    setAssetType(newAssetType);
+    if (newAssetType) {
+      setAssetType(newAssetType);
+    }
   };
 
-  // Get current background from store
-  const background = useAppSelector((state) => state.canvas.background);
+  // Get current background and audio from store
+  const [background, audio] = useAppSelector((state) => [
+    state.canvas.background,
+    state.canvas.audio,
+  ]);
 
   // Dispatch to store
   const dispatch = useAppDispatch();
@@ -69,7 +75,7 @@ export default function AssetsDrawer() {
       [id: string]: {
         width?: any;
         height?: any;
-        img?: string;
+        img: string;
         title?: string;
       };
     };
@@ -80,12 +86,42 @@ export default function AssetsDrawer() {
     dispatch(updateBackground(newBackground));
   };
 
+  // Dispatch to store: Update background
+  const changeAudio = (newAudio: string) => {
+    dispatch(updateAudio(newAudio));
+  };
+
   // When an asset is clicked
   const handleAssetClick =
     (itemKey: string) => (event: React.KeyboardEvent | React.MouseEvent) => {
       switch (assetType) {
         case 'backgrounds':
           changeBackground(itemKey);
+          break;
+        case 'audio':
+          changeAudio(itemKey);
+          break;
+        case 'platforms':
+          let platform: Entity = {
+            id: uuid(),
+            x: 100,
+            y: 450,
+            z: 1,
+            title: data[assetType][itemKey].title ?? assetType,
+            width: data[assetType][itemKey].width ?? 100,
+            height: data[assetType][itemKey].height ?? 100,
+            scaleX: 1,
+            scaleY: 1,
+            scale: 1,
+            orientation: 0,
+            spriteUrl: data[assetType][itemKey].img,
+            spriteWidth: data[assetType][itemKey].width ?? 100,
+            spriteHeight: data[assetType][itemKey].height ?? 100,
+            physics: 'arcade',
+            type: EntityType.Platform,
+            loaded: false,
+          };
+          dispatch(entityAdded(platform));
           break;
         case 'sprites':
           let playerSprite: Entity = {
@@ -149,7 +185,7 @@ export default function AssetsDrawer() {
             spriteUrl: data['obstacles'][itemKey].img,
             spriteWidth: data['obstacles'][itemKey].width ?? 14,
             spriteHeight: data['obstacles'][itemKey].height ?? 14,
-            physics: 'arcade',
+            physics: data['obstacles'][itemKey].physics ?? 'STATIC',
             type: EntityType.Obstacle,
             loaded: false,
           };
@@ -168,7 +204,10 @@ export default function AssetsDrawer() {
         onChange={handleChange}
         aria-label="Asset Types"
       >
-        <ToggleButton value="backgrounds">Backgrounds</ToggleButton>
+        <ToggleButton value="backgrounds" defaultChecked>
+          Backgrounds
+        </ToggleButton>
+        <ToggleButton value="platforms">Platforms</ToggleButton>
         <ToggleButton value="sprites">Sprites</ToggleButton>
         <ToggleButton value="items">Items</ToggleButton>
         <ToggleButton value="obstacles">Obstacles</ToggleButton>
@@ -180,19 +219,39 @@ export default function AssetsDrawer() {
         {Object.entries(assets[assetType]).map((item) => (
           <Button
             onClick={handleAssetClick(item[0])}
-            sx={{ width: 164, height: 164 }}
+            sx={{
+              width: 164,
+              height: 164,
+              border: item[0] === audio || item[0] === background ? '5px solid blue' : '0',
+            }}
             key={item[0]}
           >
             <ImageListItem sx={{ width: '100%' }}>
-              <img
-                srcSet={`${item[1].img}?w=${item[1].width}&h=${item[1].height}&fit=crop&auto=format&dpr=2 2x`}
-                src={`${item[1].img}?w=${item[1].width}&h=${item[1].height}&fit=crop&auto=format`}
-                alt={item[1].title}
-                loading="lazy"
+              <Image
+                src={item[1].img}
+                alt={item[1].title ?? 'asset'}
+                objectFit="contain"
+                fill={true}
               />
             </ImageListItem>
           </Button>
         ))}
+        {assetType == 'audio' && (
+          <Button
+            onClick={handleAssetClick('')}
+            sx={{ width: 164, height: 164 }}
+            key={'clear'}
+          >
+            <ImageListItem sx={{ width: '100%' }}>
+              <Image
+                src="/workshop/x.png"
+                alt="clear"
+                objectFit="contain"
+                fill={true}
+              />
+            </ImageListItem>
+          </Button>
+        )}
       </ImageList>
     </Box>
   );

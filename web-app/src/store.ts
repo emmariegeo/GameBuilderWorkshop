@@ -6,11 +6,12 @@ import {
   combineReducers,
 } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import { Entity, EntityType, Tool } from './data/types';
+import { Entity, Tool } from './data/types';
 
 const initialState: {
   mode: string;
   background: string;
+  audio: string;
   tool: Tool;
   selected: string;
   dialogOpen: boolean;
@@ -18,10 +19,11 @@ const initialState: {
 } = {
   mode: 'edit',
   background: 'bg1',
+  audio: '',
   tool: Tool.Select,
   selected: '',
   dialogOpen: false,
-  modeSwitch: 'idle'
+  modeSwitch: 'idle',
 };
 
 // Normalizing game object data
@@ -130,6 +132,9 @@ const canvasSlice = createSlice({
     updateBackground(state: any, action: PayloadAction<string>) {
       return { ...state, background: action.payload };
     },
+    updateAudio(state: any, action: PayloadAction<string>) {
+      return { ...state, audio: action.payload };
+    },
     switchTool(state: any, action: PayloadAction<Tool>) {
       return { ...state, tool: action.payload };
     },
@@ -178,10 +183,11 @@ export const entityById = (id: string) => {
 export const {
   switchMode,
   updateBackground,
+  updateAudio,
   switchTool,
   select,
   dialogOpened,
-  modeSwitched
+  modeSwitched,
 } = canvasSlice.actions;
 export const {
   entityAdded,

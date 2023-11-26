@@ -11,7 +11,7 @@ import {
   entityUpdateScale,
 } from '../../../store';
 import { data as assets } from '../../../data/assets.ts';
-import { Entity, EntityType, Tool } from '@/data/types.ts';
+import { Entity, Tool } from '@/data/types.ts';
 import { Dictionary } from '@reduxjs/toolkit';
 import BaseScene from './BaseScene.ts';
 
@@ -64,7 +64,7 @@ export default class Edit extends BaseScene {
     this.gameEntities = { ...initialState.entities.entities };
 
     // Instantiating bg object
-    this.bg = this.add.image(this.scale.width / 4, this.scale.height / 4, 'bg');
+    this.bg = this.add.image(this.scale.width / 2, this.scale.height / 2, 'bg');
     // Setting with existing background value
     this.setBackground(this.background);
 
@@ -281,6 +281,10 @@ export default class Edit extends BaseScene {
       // Update background
       if (state.canvas.background !== this.background) {
         this.setBackground(state.canvas.background.toString());
+      }
+      // Update audio
+      if (state.canvas.audio !== this.audio) {
+        this.setAudio(state.canvas.audio);
       }
       // Update tool
       if (state.canvas.tool !== this.tool) {

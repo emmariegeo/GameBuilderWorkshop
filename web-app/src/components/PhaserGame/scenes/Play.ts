@@ -15,6 +15,12 @@ export default class Play extends BaseScene {
   player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   platforms!: Phaser.Physics.Arcade.StaticGroup;
   background: any;
+  audio!: string;
+  soundObject:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound
+    | undefined;
   selectedGraphics!: Phaser.GameObjects.Graphics;
   gameEntities!: Dictionary<Entity>;
   gameEntityIDs!: Array<string>;
@@ -39,7 +45,6 @@ export default class Play extends BaseScene {
 
   preload() {
     this.load.image('bg', this.background['img']);
-    this.load.image('ground', '../assets/platform.png');
   }
 
   create() {
@@ -52,6 +57,7 @@ export default class Play extends BaseScene {
     let initialState = store.getState();
     this.mode = initialState.canvas.mode;
     this.background = initialState.canvas.background;
+    this.audio = initialState.canvas.audio;
 
     // Input Events
     this.cursors = this.input.keyboard?.createCursorKeys();
@@ -59,20 +65,26 @@ export default class Play extends BaseScene {
     // Making shallow copy of entities dictionary from the store
     this.gameEntities = { ...initialState.entities.entities };
 
-    this.bg = this.add.image(this.scale.width / 4, this.scale.height / 4, 'bg');
+    this.bg = this.add.image(this.scale.width / 2, this.scale.height / 2, 'bg');
     this.setBackground(this.background);
+
+    if (this.audio !== '' && !this.soundObject?.isPlaying) {
+      this.setAudio(this.audio);
+      this.soundObject?.play();
+    }
 
     // The platforms group contains objects the player can jump on/collide with
     this.platforms = this.physics.add.staticGroup();
     // The items group contains objects the player can collect
     this.items = this.physics.add.group();
     // The obstacles group contains objects the player can hit
-    this.obstacles = this.physics.add.group();
+    this.obstacles = this.physics.add.group().setDepth(4);
 
     //  The score
     this.scoreText = this.add.text(16, 16, 'score: 0', {
       fontSize: '32px',
       color: '#000',
+      backgroundColor: '#ffffff',
     });
 
     // We want to create a game object for each entry in gameEntities and add it to the appropriate group
@@ -242,7 +254,7 @@ export default class Play extends BaseScene {
           object.id
         ) as Phaser.Physics.Arcade.Sprite;
       }
-      platform.setData('id', object.id);
+      platform.setData('id', object.id).refreshBody();
       this.platforms.add(platform);
       this.platforms.refresh();
     } else {
@@ -268,7 +280,7 @@ export default class Play extends BaseScene {
             object.id
           ) as Phaser.Physics.Arcade.Sprite;
         }
-        platform.setData('id', object.id);
+        platform.setData('id', object.id).refreshBody();
         this.platforms.add(platform);
         this.platforms.refresh();
       });
@@ -363,6 +375,32 @@ export default class Play extends BaseScene {
       }
       obstacle.setData('id', object.id);
       this.obstacles.add(obstacle);
+      switch (object.physics) {
+        case 'BOUNCE':
+          obstacle
+            .setBounce(1)
+            .setCollideWorldBounds(true)
+            .setVelocity(Phaser.Math.Between(-200, 200), 20)
+            .setGravity(0);
+          break;
+        case 'FLOAT':
+          obstacle.setGravity(0).setImmovable();
+          (obstacle.body as Phaser.Physics.Arcade.Body)?.setDirectControl();
+          this.tweens.add({
+            targets: obstacle,
+            y: 600,
+            duration: 3000,
+            ease: 'sine.inout',
+            yoyo: true,
+            repeat: -1,
+          });
+          break;
+        case 'STATIC':
+          (obstacle.body as Phaser.Physics.Arcade.Body)?.setAllowGravity(false);
+          break;
+        default:
+          break;
+      }
     } else {
       // If texture does not exist, load before applying
       let loader = new Phaser.Loader.LoaderPlugin(this);
@@ -387,6 +425,35 @@ export default class Play extends BaseScene {
         }
         obstacle.setData('id', object.id);
         this.obstacles.add(obstacle);
+        // Obstacles can have different behaviors
+        switch (object.physics) {
+          case 'BOUNCE': // Obstacle bounces around game canvas
+            obstacle
+              .setBounce(1)
+              .setCollideWorldBounds(true)
+              .setVelocity(Phaser.Math.Between(-200, 200), 20)
+              .setGravity(0);
+            break;
+          case 'FLOAT': // Obstacle floats up and down
+            obstacle.setGravity(0).setImmovable();
+            (obstacle.body as Phaser.Physics.Arcade.Body)?.setDirectControl();
+            this.tweens.add({
+              targets: obstacle,
+              y: 600,
+              duration: 3000,
+              ease: 'sine.inout',
+              yoyo: true,
+              repeat: -1,
+            });
+            break;
+          case 'STATIC': // Obstacle does not move
+            (obstacle.body as Phaser.Physics.Arcade.Body)?.setAllowGravity(
+              false
+            );
+            break;
+          default:
+            break;
+        }
       });
       loader.start();
     }
@@ -503,9 +570,8 @@ export default class Play extends BaseScene {
 
     this.gameOver = true;
 
-    button.once(
-      'pointerup', () => {
-        this.scene.restart()
+    button.once('pointerup', () => {
+      this.scene.restart();
     });
   }
 

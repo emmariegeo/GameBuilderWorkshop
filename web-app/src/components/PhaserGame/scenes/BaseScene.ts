@@ -12,6 +12,12 @@ export default class BaseScene extends Phaser.Scene {
   gameEntityIDs!: Array<string>;
   gameObjects!: Map<string, Phaser.GameObjects.GameObject>;
   bg: any;
+  audio!: string;
+  soundObject:
+    | Phaser.Sound.NoAudioSound
+    | Phaser.Sound.HTML5AudioSound
+    | Phaser.Sound.WebAudioSound
+    | undefined;
 
   constructor(key: string) {
     super({ key: key });
@@ -27,7 +33,6 @@ export default class BaseScene extends Phaser.Scene {
 
   preload() {
     this.load.image('bg', this.background['img']);
-    this.load.image('ground', '../assets/platforms/platform.png');
     this.load.image('bomb', '../assets/obstacles/bomb.png');
   }
   /**
@@ -52,7 +57,7 @@ export default class BaseScene extends Phaser.Scene {
         break;
     }
   }
-  
+
   loadObstacle(object: Entity) {
     throw new Error('Method not implemented.');
   }
@@ -73,7 +78,7 @@ export default class BaseScene extends Phaser.Scene {
 
   /**
    * Set the new background
-   * @param newBackground string referring to background asset ket
+   * @param newBackground string referring to background asset key
    */
   setBackground(newBackground: string) {
     // Confirm that background exists in assets
@@ -91,6 +96,30 @@ export default class BaseScene extends Phaser.Scene {
   }
 
   /**
+   * Set the new audio
+   * @param newAudio string referring to sound asset key
+   */
+  setAudio(newAudio: string) {
+    // Confirm that background exists in assets
+    if (newAudio in assets['audio']) {
+      this.audio = newAudio;
+      // We wait to set the background image to the new texture until the image has been loaded in.
+      let loader = new Phaser.Loader.LoaderPlugin(this);
+      loader.audio(newAudio, assets['audio'][newAudio]['file'], {
+        stream: true,
+      });
+      loader.once(Phaser.Loader.Events.COMPLETE, () => {
+        // texture loaded, so replace
+        if (this.soundObject) {
+          this.soundObject.destroy();
+        }
+        this.soundObject = this.sound.add(newAudio, { loop: true });
+      });
+      loader.start();
+    }
+  }
+
+  /**
    * Set the mode to edit or play
    * @param newMode string representing canvas mode
    */
@@ -98,6 +127,7 @@ export default class BaseScene extends Phaser.Scene {
     // Using modeSwitched state and scene getStatus to avoid creating scene multiple times when switching
     store.dispatch(modeSwitched());
     if (newMode === 'edit' && this.scene.key === 'Play') {
+      this.soundObject?.destroy();
       if (
         this.scene.getStatus('Play') === Phaser.Scenes.RUNNING &&
         (this.scene.getStatus('Edit') > Phaser.Scenes.RUNNING ||
