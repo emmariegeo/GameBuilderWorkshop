@@ -6,7 +6,7 @@ import {
   combineReducers,
 } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import { Entity, EntityType, Tool } from './data/types';
+import { Entity, Tool } from './data/types';
 
 const initialState: {
   mode: string;
