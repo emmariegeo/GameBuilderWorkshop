@@ -230,7 +230,6 @@ export default function AssetsDrawer() {
               <Image
                 src={item[1].img}
                 alt={item[1].title ?? 'asset'}
-                objectFit="contain"
                 fill={true}
               />
             </ImageListItem>
@@ -246,7 +245,6 @@ export default function AssetsDrawer() {
               <Image
                 src="/workshop/x.png"
                 alt="clear"
-                objectFit="contain"
                 fill={true}
               />
             </ImageListItem>
