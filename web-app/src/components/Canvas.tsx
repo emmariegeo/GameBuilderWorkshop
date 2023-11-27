@@ -144,22 +144,21 @@ const Canvas = () => {
     await fetch('/export/game.js')
       .then((res) => res.blob())
       .then((data) => {
-        // Copy over python script for launching game
+        // Copy over game files
         zip.file('game.js', data, { binary: true });
       });
     await fetch('/export/index.html')
       .then((res) => res.text())
-      .then((data) => 
-      {
-        let blob = new Blob([data],{type: "text/html"})
-        // Copy over python script for launching game
+      .then((data) => {
+        let blob = new Blob([data], { type: 'text/html' });
+        // Copy over html
         zip.file('index.html', blob, { binary: true });
       });
 
     fetch('/export/launchgame.exe')
       .then((res) => res.blob())
       .then((data) => {
-        // Copy over python script for launching game
+        // Copy over executable for launching game
         zip.file('launchgame.exe', data, { binary: true });
         zip.generateAsync({ type: 'blob' }).then(function (content) {
           saveAs(content, 'download.zip');
