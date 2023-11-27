@@ -238,7 +238,7 @@ export default class Play extends BaseScene {
     // If the correct texture exists, update the object texture
     if (this.textures.exists(`PLAY_${object.title}`)) {
       if (this.gameObjects.has(object.id)) {
-        if (platform.texture.key === `EDIT_${object.title}`) return;
+        if (platform.texture.key === `PLAY_${object.title}`) return;
         this.platforms.remove(platform, true);
         platform
           .setTexture(`PLAY_${object.title}`)
