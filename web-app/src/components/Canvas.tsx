@@ -156,11 +156,11 @@ const Canvas = () => {
         zip.file('index.html', blob, { binary: true });
       });
 
-    fetch('/export/launchgame.py')
+    fetch('/export/launchgame.exe')
       .then((res) => res.blob())
       .then((data) => {
         // Copy over python script for launching game
-        zip.file('launchgame.py', data, { binary: true });
+        zip.file('launchgame.exe', data, { binary: true });
         zip.generateAsync({ type: 'blob' }).then(function (content) {
           saveAs(content, 'download.zip');
         });
