@@ -4,7 +4,6 @@ import http.server
 import threading
 import webbrowser
 
-
 HandlerClass = http.server.SimpleHTTPRequestHandler
 ServerClass  = http.server.HTTPServer
 Protocol     = "HTTP/1.0"
@@ -26,11 +25,14 @@ def start_server():
     print("Serving HTTP on", sa[0], "port", sa[1], "...")
     httpd.serve_forever()
 
-threading.Thread(target=start_server).start()
-webbrowser.open_new(url)
+def main():
+    threading.Thread(target=start_server).start()
+    webbrowser.open_new(url)
+    while True:
+        try:
+            time.sleep(1)
+        except KeyboardInterrupt:
+            sys.exit(0)
 
-while True:
-    try:
-        time.sleep(1)
-    except KeyboardInterrupt:
-        sys.exit(0)
+if __name__ == '__main__':
+    main()
