@@ -18,6 +18,8 @@ url = f"http://127.0.0.1:{port}"
 def start_server():
     server_address = ('127.0.0.1', port)
     HandlerClass.protocol_version = Protocol
+    HandlerClass.extensions_map[".js"] = "text/javascript"
+    HandlerClass.extensions_map[".mjs"] = "text/javascript"
     httpd = ServerClass(server_address, HandlerClass)
 
     sa = httpd.socket.getsockname()
