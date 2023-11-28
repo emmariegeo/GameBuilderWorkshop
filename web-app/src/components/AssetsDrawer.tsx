@@ -15,6 +15,7 @@ import { data } from '../data/assets.ts';
 import {
   entityAdded,
   entityById,
+  select,
   updateAudio,
   updateBackground,
   useAppDispatch,
@@ -123,6 +124,7 @@ export default function AssetsDrawer() {
             loaded: false,
           };
           dispatch(entityAdded(platform));
+          dispatch(select(platform.id));
           break;
         case 'sprites':
           let playerSprite: Entity = {
@@ -147,6 +149,7 @@ export default function AssetsDrawer() {
             loaded: false,
           };
           dispatch(entityAdded(playerSprite));
+          dispatch(select(playerSprite.id));
           break;
         case 'items':
           let item: Entity = {
@@ -169,6 +172,7 @@ export default function AssetsDrawer() {
             loaded: false,
           };
           dispatch(entityAdded(item));
+          dispatch(select(item.id));
           break;
         case 'obstacles':
           let obstacle: Entity = {
@@ -191,6 +195,7 @@ export default function AssetsDrawer() {
             loaded: false,
           };
           dispatch(entityAdded(obstacle));
+          dispatch(select(obstacle.id));
           break;
       }
     };

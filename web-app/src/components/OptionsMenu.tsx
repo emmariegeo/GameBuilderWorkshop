@@ -5,12 +5,9 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { entityById, store } from '@/store';
+import { dialogOpened, entityById, store, useAppDispatch } from '@/store';
 import { useState } from 'react';
-import {
-  Box,
-  Grid
-} from '@mui/material';
+import { Box, Grid, Skeleton } from '@mui/material';
 
 export default function OptionsMenu(this: any) {
   // Get the selected entity by its id using the currently selected from store
@@ -20,6 +17,13 @@ export default function OptionsMenu(this: any) {
     const state = store.getState();
     // When the store changes, reretrieve the entity to check for data changes
     setSelectedEntity(entityById(state.canvas.selected));
+  };
+
+  // dispatch to store
+  const dispatch = useAppDispatch();
+
+  const onDelete = () => {
+    dispatch(dialogOpened(true));
   };
 
   const rows: { prop: string; value: any }[] = [
@@ -67,6 +71,10 @@ export default function OptionsMenu(this: any) {
       prop: 'Physics',
       value: selectedEntity?.physics,
     },
+    {
+      prop: 'ID',
+      value: selectedEntity?.id,
+    },
   ];
 
   // Subscribing to store so we can handle updates
@@ -76,16 +84,27 @@ export default function OptionsMenu(this: any) {
       <Box padding={1} width={'auto'}>
         <Typography variant="overline">Selected</Typography>
       </Box>
-      <CardMedia
-        sx={{ height: 140 }}
-        image={
-          selectedEntity?.spriteUrl
-            ? selectedEntity?.spriteUrl
-            : 'assets/phaser3-logo.png'
-        }
-        title={selectedEntity?.id ? selectedEntity?.id : ''}
-      />
+      {selectedEntity?.spriteUrl ? (
+        <CardMedia
+          sx={{ height: 100, objectFit: 'contain' }}
+          image={
+            selectedEntity?.spriteUrl
+              ? selectedEntity?.spriteUrl
+              : 'assets/phaser3-logo.png'
+          }
+          title={selectedEntity?.id ? selectedEntity?.id : ''}
+        />
+      ) : (
+        <Skeleton variant="rectangular" height={100} />
+      )}
+
       <CardContent sx={{ paddingX: '8px' }}>
+        <Typography variant={'subtitle1'}>
+          {selectedEntity?.title ?? 'No object selected.'}
+        </Typography>
+        <Typography variant={'subtitle2'}>
+          {selectedEntity?.type ?? 'Select an object to view it here.'}
+        </Typography>
         <Grid
           container
           spacing={0}
@@ -120,7 +139,13 @@ export default function OptionsMenu(this: any) {
         </Grid>
       </CardContent>
       <CardActions>
-        <Button size="small">Delete</Button>
+        <Button
+          size="small"
+          onClick={onDelete}
+          disabled={selectedEntity === undefined}
+        >
+          Delete
+        </Button>
       </CardActions>
     </Card>
   );
