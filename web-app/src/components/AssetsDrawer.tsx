@@ -4,17 +4,18 @@ import Image from 'next/image';
 import {
   Box,
   Button,
+  Container,
   Divider,
-  ImageList,
-  ImageListItem,
   SwipeableDrawer,
   ToggleButton,
   ToggleButtonGroup,
+  Tooltip,
 } from '@mui/material';
 import { data } from '../data/assets.ts';
 import {
   entityAdded,
   entityById,
+  select,
   updateAudio,
   updateBackground,
   useAppDispatch,
@@ -43,10 +44,11 @@ export default function AssetsDrawer() {
     }
   };
 
-  // Get current background and audio from store
-  const [background, audio] = useAppSelector((state) => [
+  // Get current background, audio, mode from store
+  const [background, audio, mode] = useAppSelector((state) => [
     state.canvas.background,
     state.canvas.audio,
+    state.canvas.mode,
   ]);
 
   // Dispatch to store
@@ -122,6 +124,7 @@ export default function AssetsDrawer() {
             loaded: false,
           };
           dispatch(entityAdded(platform));
+          dispatch(select(platform.id));
           break;
         case 'sprites':
           let playerSprite: Entity = {
@@ -146,6 +149,7 @@ export default function AssetsDrawer() {
             loaded: false,
           };
           dispatch(entityAdded(playerSprite));
+          dispatch(select(playerSprite.id));
           break;
         case 'items':
           let item: Entity = {
@@ -168,6 +172,7 @@ export default function AssetsDrawer() {
             loaded: false,
           };
           dispatch(entityAdded(item));
+          dispatch(select(item.id));
           break;
         case 'obstacles':
           let obstacle: Entity = {
@@ -190,16 +195,18 @@ export default function AssetsDrawer() {
             loaded: false,
           };
           dispatch(entityAdded(obstacle));
+          dispatch(select(obstacle.id));
           break;
       }
     };
 
   // Drawer content
   const content = (anchor: Anchor) => (
-    <Box sx={{ width: 'auto' }} role="presentation">
+    <Container maxWidth={'xl'} role="presentation">
       <ToggleButtonGroup
         color="primary"
         value={assetType}
+        sx={{ display: 'flex', flexWrap: 'wrap' }}
         exclusive
         onChange={handleChange}
         aria-label="Asset Types"
@@ -215,24 +222,40 @@ export default function AssetsDrawer() {
         <ToggleButton value="audio">Audio</ToggleButton>
       </ToggleButtonGroup>
       <Divider />
-      <ImageList sx={{ width: 1200, height: 600 }} cols={6} rowHeight={200}>
+      <Box
+        display={'grid'}
+        gridTemplateColumns="repeat(auto-fill, 164px)"
+        gap={4}
+        paddingY={2}
+        sx={{
+          width: 'auto',
+          height: '600px',
+          overflowY: 'auto',
+          position: 'relative',
+        }}
+      >
         {Object.entries(assets[assetType]).map((item) => (
           <Button
             onClick={handleAssetClick(item[0])}
             sx={{
               width: 164,
               height: 164,
-              border: item[0] === audio || item[0] === background ? '5px solid blue' : '0',
+              border:
+                item[0] === audio || item[0] === background
+                  ? '5px solid blue'
+                  : '0',
             }}
             key={item[0]}
           >
-            <ImageListItem sx={{ width: '100%' }}>
+            <Box sx={{ width: '100%', height: '164px', position: 'relative' }}>
               <Image
                 src={item[1].img}
                 alt={item[1].title ?? 'asset'}
                 fill={true}
+                style={{ objectFit: 'contain' }}
+                sizes="(max-width: 164px) 100vw"
               />
-            </ImageListItem>
+            </Box>
           </Button>
         ))}
         {assetType == 'audio' && (
@@ -241,24 +264,37 @@ export default function AssetsDrawer() {
             sx={{ width: 164, height: 164 }}
             key={'clear'}
           >
-            <ImageListItem sx={{ width: '100%' }}>
-              <Image
-                src="/workshop/x.png"
-                alt="clear"
-                fill={true}
-              />
-            </ImageListItem>
+            <Box sx={{ width: '100%', height: '164px', position: 'relative' }}>
+              <Image src="/workshop/x.png" alt="clear" fill={true} />
+            </Box>
           </Button>
         )}
-      </ImageList>
-    </Box>
+      </Box>
+    </Container>
   );
 
   return (
-    <div>
+    <Box>
       <React.Fragment key={'assets'}>
-        <Button onClick={toggleDrawer('bottom', true)}>{'assets'}</Button>
+        <Tooltip title="Add assets to your game" placement="top">
+          <Button
+            disabled={mode !== 'edit'}
+            variant="contained"
+            fullWidth
+            onClick={toggleDrawer('bottom', true)}
+          >
+            {'Open Assets Drawer'}
+          </Button>
+        </Tooltip>
         <SwipeableDrawer
+          PaperProps={{
+            sx: {
+              width: { md: '60%' },
+              left: { md: '20%' },
+              borderTopLeftRadius: '16px',
+              borderTopRightRadius: '16px',
+            },
+          }}
           anchor={'bottom'}
           open={state['bottom']}
           onClose={toggleDrawer('bottom', false)}
@@ -267,6 +303,6 @@ export default function AssetsDrawer() {
           {content('bottom')}
         </SwipeableDrawer>
       </React.Fragment>
-    </div>
+    </Box>
   );
 }
