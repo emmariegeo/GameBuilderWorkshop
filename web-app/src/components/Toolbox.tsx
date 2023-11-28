@@ -14,7 +14,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { Box, Stack, Tooltip, Typography } from '@mui/material';
 
-export default function Toolbox() {
+const Toolbox = () => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -103,4 +103,6 @@ export default function Toolbox() {
       </Box>
     </Stack>
   );
-}
+};
+
+export default Toolbox;

@@ -46,6 +46,6 @@ export default class PhaserGame extends Component<{}, Props> {
     return true;
   }
   render() {
-    return <Box height={'auto'} id="phaser-game"/>;
+    return <Box height={'auto'} id="phaser-game" />;
   }
 }

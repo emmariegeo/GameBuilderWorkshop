@@ -9,7 +9,7 @@ import { Provider } from 'react-redux';
 import { store } from '@/store';
 import ActionButtons from '@/components/ActionButtons';
 
-export default function Home() {
+const Home = () => {
   return (
     <Container>
       <Provider store={store}>
@@ -49,3 +49,4 @@ export default function Home() {
     </Container>
   );
 }
+export default Home;

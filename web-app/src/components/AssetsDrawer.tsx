@@ -25,7 +25,7 @@ import { Entity, EntityType } from '@/data/types.ts';
 
 type Anchor = 'bottom';
 
-export default function AssetsDrawer() {
+const AssetsDrawer = () => {
   // Drawer state
   const [state, setState] = React.useState({
     bottom: false,
@@ -305,4 +305,5 @@ export default function AssetsDrawer() {
       </React.Fragment>
     </Box>
   );
-}
+};
+export default AssetsDrawer;
