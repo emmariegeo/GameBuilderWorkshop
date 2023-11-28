@@ -21,8 +21,13 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import { ReactNode, useState } from 'react';
+import Tutorial from './Tutorial';
 
-export default function Navigation(props: { children: ReactNode }) {
+/**
+ * Top navigation bar and help/about dialog
+ * @param props children (page content)
+ */
+const Navigation = (props: { children: ReactNode }) => {
   const drawerWidth = 240;
   const navItems = ['Help'];
 
@@ -143,8 +148,14 @@ export default function Navigation(props: { children: ReactNode }) {
             <CloseIcon />
           </IconButton>
           <DialogContent dividers>
-            <Typography gutterBottom>Game Builder Workshop provides an interface for creating a 2D platformer game with the <Link href="https://phaser.io/Phaser">Phaser</Link> HTML5 game engine.</Typography>
+            <Typography gutterBottom>
+              Game Builder Workshop provides an interface for creating a 2D
+              platformer game with the{' '}
+              <Link href="https://phaser.io/Phaser">Phaser</Link> HTML5 game
+              engine.
+            </Typography>
           </DialogContent>
+          <Tutorial />
           <DialogActions>
             <Button autoFocus onClick={handleClose}>
               Learn More
@@ -154,4 +165,5 @@ export default function Navigation(props: { children: ReactNode }) {
       </Box>
     </Box>
   );
-}
+};
+export default Navigation;
