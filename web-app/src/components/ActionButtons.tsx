@@ -1,16 +1,37 @@
-import { Button, Stack } from '@mui/material';
+import {
+  Alert,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Snackbar,
+  Stack,
+} from '@mui/material';
 import { startData } from '@/data/startData';
 import { data as assets } from '@/data/assets.ts';
 import { entitiesAdded, store, useAppDispatch } from '@/store';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import { useState } from 'react';
 
 const ActionButtons = () => {
   // dispatch to store
+  const [dialogOpen, dialogOpened] = useState(false);
+  const [exportSuccess, setExportSuccess] = useState(false);
+  const [exportError, setExportError] = useState(undefined);
+  const [dialogType, setDialogType] = useState('export');
+
   const dispatch = useAppDispatch();
 
   const handleNewGame = async (event: React.MouseEvent<HTMLElement>) => {
     dispatch(entitiesAdded(startData));
+    dialogOpened(false);
+  };
+
+  const handleClose = () => {
+    dialogOpened(false);
   };
 
   const handleDownload = async () => {
@@ -22,8 +43,8 @@ const ActionButtons = () => {
         img: assets['backgrounds'][state.canvas.background]['img'] ?? '',
       },
       audio: {
-        file: assets['audio'][state.canvas.audio]['file'] ?? '',
-        title: assets['audio'][state.canvas.audio]['title'] ?? '',
+        file: assets['audio'][state.canvas.audio]?.file ?? '',
+        title: assets['audio'][state.canvas.audio]?.title ?? '',
       },
       entities: state.entities.entities,
     };
@@ -114,20 +135,111 @@ const ActionButtons = () => {
       .then((data) => {
         // Copy over executable for launching game
         zip.file('launchgame.exe', data, { binary: true });
-        zip.generateAsync({ type: 'blob' }).then(function (content) {
-          saveAs(content, 'download.zip');
-        });
+        zip
+          .generateAsync({ type: 'blob' })
+          .then(function (content) {
+            saveAs(content, 'yourgame.zip');
+          })
+          .then(() => setExportSuccess(true))
+          .catch((reason) => setExportError(reason));
       });
+    dialogOpened(false);
   };
+
+  const exportContent = (
+    <>
+      <DialogTitle id="alert-dialog-title">{'Export your game.'}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          You can export your game by downloading a ZIP file below. To play your
+          game, extract the ZIP file into a new folder and run the
+          'launchgame.exe' file.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={handleDownload}
+          autoFocus
+          about="Download your game as a zip file."
+        >
+          Download game as ZIP File
+        </Button>
+        <Button onClick={handleClose}>Cancel</Button>
+      </DialogActions>
+    </>
+  );
+  const newGameContent = (
+    <>
+      <DialogTitle id="alert-dialog-title">{'Create a new game?'}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Clicking confirm will erase your existing game. Are you sure you wish
+          to continue?
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleNewGame} autoFocus>
+          Confirm
+        </Button>
+        <Button onClick={handleClose}>Cancel</Button>
+      </DialogActions>
+    </>
+  );
   return (
-    <Stack direction={'row'} spacing={2} justifyContent={'space-between'}>
-      <Button variant="contained" onClick={handleNewGame}>
-        New Game
-      </Button>
-      <Button variant="contained" onClick={handleDownload}>
-        Download
-      </Button>
-    </Stack>
+    <>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        {dialogType === 'newgame' ? newGameContent : ''}
+        {dialogType === 'export' ? exportContent : ''}
+      </Dialog>
+      <Snackbar
+        open={exportSuccess}
+        autoHideDuration={6000}
+        onClose={() => {
+          setExportSuccess(false);
+        }}
+      >
+        <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
+          Success! Your game has been exported.
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={exportError}
+        autoHideDuration={6000}
+        onClose={() => {
+          setExportError(undefined);
+        }}
+      >
+        <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+          Something went wrong! Please try again. {exportError}
+        </Alert>
+      </Snackbar>
+      <Stack direction={'row'} spacing={2} justifyContent={'space-between'}>
+        <Button
+          variant="contained"
+          onClick={() => {
+            setDialogType('newgame');
+            dialogOpened(true);
+          }}
+        >
+          New Game
+        </Button>
+        <Button
+          variant="contained"
+          onClick={() => {
+            setDialogType('export');
+            dialogOpened(true);
+          }}
+        >
+          Export
+        </Button>
+      </Stack>
+    </>
   );
 };
 export default ActionButtons;

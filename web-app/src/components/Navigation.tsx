@@ -16,6 +16,7 @@ import {
   DialogContent,
   DialogActions,
   Drawer,
+  Link,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
@@ -142,17 +143,7 @@ export default function Navigation(props: { children: ReactNode }) {
             <CloseIcon />
           </IconButton>
           <DialogContent dividers>
-            <Typography gutterBottom>Blurb about the project.</Typography>
-            <Typography gutterBottom>
-              Praesent commodo cursus magna, vel scelerisque nisl consectetur
-              et. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor
-              auctor.
-            </Typography>
-            <Typography gutterBottom>
-              Aenean lacinia bibendum nulla sed consectetur. Praesent commodo
-              cursus magna, vel scelerisque nisl consectetur et. Donec sed odio
-              dui. Donec ullamcorper nulla non metus auctor fringilla.
-            </Typography>
+            <Typography gutterBottom>Game Builder Workshop provides an interface for creating a 2D platformer game with the <Link href="https://phaser.io/Phaser">Phaser</Link> HTML5 game engine.</Typography>
           </DialogContent>
           <DialogActions>
             <Button autoFocus onClick={handleClose}>
