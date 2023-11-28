@@ -153,7 +153,7 @@ const ActionButtons = () => {
         <DialogContentText>
           You can export your game by downloading a ZIP file below. To play your
           game, extract the ZIP file into a new folder and run the
-          'launchgame.exe' file.
+          <code> launchgame.exe </code> file.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
