@@ -145,7 +145,7 @@ const canvasSlice = createSlice({
       return { ...state, dialogOpen: action.payload };
     },
     reset() {
-      return { ...initialState,   modeSwitch: 'pending'};
+      return { ...initialState, modeSwitch: 'pending' };
     },
   },
 });

@@ -6,7 +6,7 @@ import Edit from './scenes/Edit';
 import { Component } from 'react';
 import Play from './scenes/Play';
 import BaseScene from './scenes/BaseScene';
-import { Box, Container } from '@mui/material';
+import { Box } from '@mui/material';
 
 type Props = {
   mode: string;
