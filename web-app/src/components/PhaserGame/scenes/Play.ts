@@ -701,11 +701,11 @@ export default class Play extends BaseScene {
         (
           this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
         ).setVelocityX(0);
-      }
-      (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).anims.play(
+        (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).anims.play(
         `turn_${this.currentAnimKey}`,
         true
       );
+        }
     }
     if (
       this.cursors?.up.isDown &&
