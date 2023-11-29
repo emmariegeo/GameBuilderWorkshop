@@ -265,7 +265,12 @@ const AssetsDrawer = () => {
             key={'clear'}
           >
             <Box sx={{ width: '100%', height: '164px', position: 'relative' }}>
-              <Image src="/workshop/x.png" alt="clear" fill={true} />
+              <Image
+                src="/workshop/x.png"
+                alt="clear"
+                fill={true}
+                sizes="(max-width: 164px) 100vw"
+              />
             </Box>
           </Button>
         )}

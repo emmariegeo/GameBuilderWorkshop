@@ -144,6 +144,9 @@ const canvasSlice = createSlice({
     dialogOpened(state: any, action: PayloadAction<boolean>) {
       return { ...state, dialogOpen: action.payload };
     },
+    reset() {
+      return { ...initialState,   modeSwitch: 'pending'};
+    },
   },
 });
 
@@ -188,6 +191,7 @@ export const {
   select,
   dialogOpened,
   modeSwitched,
+  reset,
 } = canvasSlice.actions;
 export const {
   entityAdded,
