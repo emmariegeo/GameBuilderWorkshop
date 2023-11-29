@@ -77,7 +77,7 @@ const Toolbox = () => {
               <DeleteOutlined />
             </Tooltip>
           </ToggleButton>
-          <ToggleButton value={Tool.Fill} aria-label="fill">
+          <ToggleButton value={Tool.Fill} aria-label="fill" disabled>
             <FormatColorFillOutlined />
           </ToggleButton>
           <ToggleButton value={Tool.Resize} aria-label="resize">
@@ -85,13 +85,13 @@ const Toolbox = () => {
               <AspectRatioOutlined />
             </Tooltip>
           </ToggleButton>
-          <ToggleButton value={Tool.Rotate} aria-label="rotate">
+          <ToggleButton value={Tool.Rotate} aria-label="rotate" disabled>
             <RotateLeftOutlined />
           </ToggleButton>
-          <ToggleButton value={Tool.Flip} aria-label="flip">
+          <ToggleButton value={Tool.Flip} aria-label="flip" disabled>
             <FlipOutlined />
           </ToggleButton>
-          <ToggleButton value={Tool.Duplicate} aria-label="duplicate">
+          <ToggleButton value={Tool.Duplicate} aria-label="duplicate" disabled>
             <ContentCopyOutlined />
           </ToggleButton>
         </ToggleButtonGroup>
