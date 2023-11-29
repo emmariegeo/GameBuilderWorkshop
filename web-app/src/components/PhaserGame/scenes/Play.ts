@@ -176,8 +176,7 @@ export default class Play extends BaseScene {
       this.setAnimations(object.title);
     } else {
       // We wait to switch the player sprite texture
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.spritesheet(`PLAY_${object.title}`, object.spriteUrl, {
+      let loader = this.load.spritesheet(`PLAY_${object.title}`, object.spriteUrl, {
         frameWidth: object.spriteWidth,
         frameHeight: object.spriteHeight,
       });
@@ -241,7 +240,7 @@ export default class Play extends BaseScene {
         if (platform.texture.key === `PLAY_${object.title}`) return;
         this.platforms.remove(platform, true);
         platform
-          .setTexture(`PLAY_${object.title}`)
+          ?.setTexture(`PLAY_${object.title}`)
           .setScale(object.scaleX, object.scaleY);
       } else {
         this.gameObjects.set(
@@ -259,12 +258,11 @@ export default class Play extends BaseScene {
       this.platforms.refresh();
     } else {
       // If not, we wait to switch the object texture
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.image(`PLAY_${object.title}`, object.spriteUrl);
+      let loader = this.load.image(`PLAY_${object.title}`, object.spriteUrl);
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // Set texture on existing platform
         if (this.gameObjects.has(object.id)) {
-          this.platforms.remove(platform, true);
+          this.platforms.remove(platform);
           platform
             .setTexture(`PLAY_${object.title}`)
             .setScale(object.scaleX, object.scaleY);
@@ -318,8 +316,7 @@ export default class Play extends BaseScene {
       this.items.add(item);
     } else {
       // If texture does not exist, load before applying
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.image(`PLAY_${object.title}`, object.spriteUrl);
+      let loader = this.load.image(`PLAY_${object.title}`, object.spriteUrl);
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
         if (this.gameObjects.has(object.id)) {
@@ -403,8 +400,7 @@ export default class Play extends BaseScene {
       }
     } else {
       // If texture does not exist, load before applying
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.image(`PLAY_${object.title}`, object.spriteUrl);
+      let loader = this.load.image(`PLAY_${object.title}`, object.spriteUrl);
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
         if (this.gameObjects.has(object.id)) {
