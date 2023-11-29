@@ -384,7 +384,7 @@ export default class Play extends BaseScene {
           object.id
         ) as Phaser.Physics.Arcade.Sprite;
       }
-      obstacle.setData('id', object.id);
+      obstacle.setData('id', object.id).setData('physics', object.physics);
       this.obstacles.add(obstacle);
       switch (object.physics) {
         case 'BOUNCE':
@@ -392,10 +392,12 @@ export default class Play extends BaseScene {
             .setBounce(1)
             .setCollideWorldBounds(true)
             .setVelocity(Phaser.Math.Between(-200, 200), 20)
-            .setGravity(0);
+            .setGravity(0)
+            .setState(Motion.MOVING);
+
           break;
         case 'FLOAT':
-          obstacle.setGravity(0).setImmovable();
+          obstacle.setGravity(0).setImmovable().setState(Motion.MOVING);
           (obstacle.body as Phaser.Physics.Arcade.Body)?.setDirectControl();
           this.tweens.add({
             targets: obstacle,
@@ -407,6 +409,7 @@ export default class Play extends BaseScene {
           });
           break;
         case 'STATIC':
+          obstacle.setState(Motion.STILL);
           (obstacle.body as Phaser.Physics.Arcade.Body)?.setAllowGravity(false);
           break;
         default:
@@ -433,8 +436,7 @@ export default class Play extends BaseScene {
             object.id
           ) as Phaser.Physics.Arcade.Sprite;
         }
-        obstacle.setData('id', object.id);
-        obstacle.setData('physics', object.physics);
+        obstacle.setData('id', object.id).setData('physics', object.physics);
         this.obstacles.add(obstacle);
         // Obstacles can have different behaviors
         switch (object.physics) {
@@ -701,11 +703,10 @@ export default class Play extends BaseScene {
         (
           this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
         ).setVelocityX(0);
-        (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).anims.play(
-        `turn_${this.currentAnimKey}`,
-        true
-      );
-        }
+        (
+          this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
+        ).anims.play(`turn_${this.currentAnimKey}`, true);
+      }
     }
     if (
       this.cursors?.up.isDown &&
