@@ -18,6 +18,7 @@ import {
   select,
   updateAudio,
   updateBackground,
+  updateEffect,
   useAppDispatch,
   useAppSelector,
 } from '@/store.ts';
@@ -25,7 +26,7 @@ import { Entity, EntityType } from '@/data/types.ts';
 
 type Anchor = 'bottom';
 
-export default function AssetsDrawer() {
+const AssetsDrawer = () => {
   // Drawer state
   const [state, setState] = React.useState({
     bottom: false,
@@ -45,10 +46,11 @@ export default function AssetsDrawer() {
   };
 
   // Get current background, audio, mode from store
-  const [background, audio, mode] = useAppSelector((state) => [
+  const [background, audio, mode, effect] = useAppSelector((state) => [
     state.canvas.background,
     state.canvas.audio,
     state.canvas.mode,
+    state.canvas.effect
   ]);
 
   // Dispatch to store
@@ -88,9 +90,14 @@ export default function AssetsDrawer() {
     dispatch(updateBackground(newBackground));
   };
 
-  // Dispatch to store: Update background
+  // Dispatch to store: Update audio
   const changeAudio = (newAudio: string) => {
     dispatch(updateAudio(newAudio));
+  };
+
+  // Dispatch to store: Update effect
+  const changeEffect = (newEffect: string) => {
+    dispatch(updateEffect(newEffect));
   };
 
   // When an asset is clicked
@@ -102,6 +109,9 @@ export default function AssetsDrawer() {
           break;
         case 'audio':
           changeAudio(itemKey);
+          break;
+        case 'effects':
+          changeEffect(itemKey);
           break;
         case 'platforms':
           let platform: Entity = {
@@ -241,7 +251,7 @@ export default function AssetsDrawer() {
               width: 164,
               height: 164,
               border:
-                item[0] === audio || item[0] === background
+                item[0] === audio || item[0] === background || item[0] === effect
                   ? '5px solid blue'
                   : '0',
             }}
@@ -258,14 +268,19 @@ export default function AssetsDrawer() {
             </Box>
           </Button>
         ))}
-        {assetType == 'audio' && (
+        {(assetType === 'audio' || assetType === 'effects') && (
           <Button
             onClick={handleAssetClick('')}
             sx={{ width: 164, height: 164 }}
             key={'clear'}
           >
             <Box sx={{ width: '100%', height: '164px', position: 'relative' }}>
-              <Image src="/workshop/x.png" alt="clear" fill={true} />
+              <Image
+                src="/workshop/x.png"
+                alt="clear"
+                fill={true}
+                sizes="(max-width: 164px) 100vw"
+              />
             </Box>
           </Button>
         )}
@@ -305,4 +320,5 @@ export default function AssetsDrawer() {
       </React.Fragment>
     </Box>
   );
-}
+};
+export default AssetsDrawer;

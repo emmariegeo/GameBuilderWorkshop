@@ -6,6 +6,12 @@ import { Entity } from '@/data/types.ts';
 import { Dictionary } from '@reduxjs/toolkit';
 import BaseScene from './BaseScene.ts';
 
+// Used to differentiate between moving and still game objects.
+const Motion = {
+  STILL: 0,
+  MOVING: 1,
+};
+
 /**
  * Play scene extends the BaseScene and is used to play the game.
  */
@@ -32,6 +38,8 @@ export default class Play extends BaseScene {
   scoreText: any;
   items!: Phaser.Physics.Arcade.Group;
   obstacles!: Phaser.Physics.Arcade.Group;
+  effectKey: string | undefined;
+  effect: Phaser.GameObjects.Light | undefined;
   constructor() {
     super('Play');
   }
@@ -58,6 +66,7 @@ export default class Play extends BaseScene {
     this.mode = initialState.canvas.mode;
     this.background = initialState.canvas.background;
     this.audio = initialState.canvas.audio;
+    this.effectKey = initialState.canvas.effect;
 
     // Input Events
     this.cursors = this.input.keyboard?.createCursorKeys();
@@ -67,6 +76,7 @@ export default class Play extends BaseScene {
 
     this.bg = this.add.image(this.scale.width / 2, this.scale.height / 2, 'bg');
     this.setBackground(this.background);
+    this.effectKey && this.setEffect(this.effectKey);
 
     if (this.audio !== '' && !this.soundObject?.isPlaying) {
       this.setAudio(this.audio);
@@ -176,11 +186,14 @@ export default class Play extends BaseScene {
       this.setAnimations(object.title);
     } else {
       // We wait to switch the player sprite texture
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.spritesheet(`PLAY_${object.title}`, object.spriteUrl, {
-        frameWidth: object.spriteWidth,
-        frameHeight: object.spriteHeight,
-      });
+      let loader = this.load.spritesheet(
+        `PLAY_${object.title}`,
+        object.spriteUrl,
+        {
+          frameWidth: object.spriteWidth,
+          frameHeight: object.spriteHeight,
+        }
+      );
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
         if (this.gameObjects.has('player')) {
@@ -241,7 +254,7 @@ export default class Play extends BaseScene {
         if (platform.texture.key === `PLAY_${object.title}`) return;
         this.platforms.remove(platform, true);
         platform
-          .setTexture(`PLAY_${object.title}`)
+          ?.setTexture(`PLAY_${object.title}`)
           .setScale(object.scaleX, object.scaleY);
       } else {
         this.gameObjects.set(
@@ -259,12 +272,11 @@ export default class Play extends BaseScene {
       this.platforms.refresh();
     } else {
       // If not, we wait to switch the object texture
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.image(`PLAY_${object.title}`, object.spriteUrl);
+      let loader = this.load.image(`PLAY_${object.title}`, object.spriteUrl);
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // Set texture on existing platform
         if (this.gameObjects.has(object.id)) {
-          this.platforms.remove(platform, true);
+          this.platforms.remove(platform);
           platform
             .setTexture(`PLAY_${object.title}`)
             .setScale(object.scaleX, object.scaleY);
@@ -314,12 +326,11 @@ export default class Play extends BaseScene {
         );
         item = this.getGameObject(object.id) as Phaser.Physics.Arcade.Sprite;
       }
-      item.setData('id', object.id);
+      item.setData('id', object.id).setCollideWorldBounds(true);
       this.items.add(item);
     } else {
       // If texture does not exist, load before applying
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.image(`PLAY_${object.title}`, object.spriteUrl);
+      let loader = this.load.image(`PLAY_${object.title}`, object.spriteUrl);
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
         if (this.gameObjects.has(object.id)) {
@@ -336,7 +347,7 @@ export default class Play extends BaseScene {
           );
           item = this.getGameObject(object.id) as Phaser.Physics.Arcade.Sprite;
         }
-        item.setData('id', object.id);
+        item.setData('id', object.id).setCollideWorldBounds(true);
         this.items.add(item);
       });
       loader.start();
@@ -373,7 +384,7 @@ export default class Play extends BaseScene {
           object.id
         ) as Phaser.Physics.Arcade.Sprite;
       }
-      obstacle.setData('id', object.id);
+      obstacle.setData('id', object.id).setData('physics', object.physics);
       this.obstacles.add(obstacle);
       switch (object.physics) {
         case 'BOUNCE':
@@ -381,10 +392,12 @@ export default class Play extends BaseScene {
             .setBounce(1)
             .setCollideWorldBounds(true)
             .setVelocity(Phaser.Math.Between(-200, 200), 20)
-            .setGravity(0);
+            .setGravity(0)
+            .setState(Motion.MOVING);
+
           break;
         case 'FLOAT':
-          obstacle.setGravity(0).setImmovable();
+          obstacle.setGravity(0).setImmovable().setState(Motion.MOVING);
           (obstacle.body as Phaser.Physics.Arcade.Body)?.setDirectControl();
           this.tweens.add({
             targets: obstacle,
@@ -396,6 +409,7 @@ export default class Play extends BaseScene {
           });
           break;
         case 'STATIC':
+          obstacle.setState(Motion.STILL);
           (obstacle.body as Phaser.Physics.Arcade.Body)?.setAllowGravity(false);
           break;
         default:
@@ -403,8 +417,7 @@ export default class Play extends BaseScene {
       }
     } else {
       // If texture does not exist, load before applying
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.image(`PLAY_${object.title}`, object.spriteUrl);
+      let loader = this.load.image(`PLAY_${object.title}`, object.spriteUrl);
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
         if (this.gameObjects.has(object.id)) {
@@ -423,19 +436,20 @@ export default class Play extends BaseScene {
             object.id
           ) as Phaser.Physics.Arcade.Sprite;
         }
-        obstacle.setData('id', object.id);
+        obstacle.setData('id', object.id).setData('physics', object.physics);
         this.obstacles.add(obstacle);
         // Obstacles can have different behaviors
         switch (object.physics) {
           case 'BOUNCE': // Obstacle bounces around game canvas
             obstacle
+              .setState(Motion.MOVING)
               .setBounce(1)
               .setCollideWorldBounds(true)
               .setVelocity(Phaser.Math.Between(-200, 200), 20)
               .setGravity(0);
             break;
           case 'FLOAT': // Obstacle floats up and down
-            obstacle.setGravity(0).setImmovable();
+            obstacle.setGravity(0).setImmovable().setState(Motion.MOVING);
             (obstacle.body as Phaser.Physics.Arcade.Body)?.setDirectControl();
             this.tweens.add({
               targets: obstacle,
@@ -450,6 +464,7 @@ export default class Play extends BaseScene {
             (obstacle.body as Phaser.Physics.Arcade.Body)?.setAllowGravity(
               false
             );
+            obstacle.setState(Motion.STILL);
             break;
           default:
             break;
@@ -591,28 +606,64 @@ export default class Play extends BaseScene {
     this.score += 10;
     this.scoreText.setText('Score: ' + this.score);
 
-    // TODO: set up items and obstacles
     if (this.items.countActive(true) === 0) {
       //  A new batch of items to collect
       this.items.children.iterate((c) => {
         let child = c as Phaser.Physics.Arcade.Sprite;
-        child.enableBody(true, child.x, 0, true, true);
+        // Randomly choose a new location for the item on the canvas
+        let newX = Phaser.Math.Between(
+          child.displayWidth / 2,
+          this.scale.displaySize.width - child.displayWidth / 2
+        );
+        let newY = Phaser.Math.Between(
+          child.displayHeight / 2,
+          this.scale.displaySize.height - child.displayHeight
+        );
+        child.enableBody(true, newX, newY, true, true);
         return true;
       });
 
-      let x =
-        player.x < 400
-          ? Phaser.Math.Between(400, 800)
-          : Phaser.Math.Between(0, 400);
-
-      let obstacle = this.obstacles.create(x, 16, 'bomb');
-      obstacle.setBounce(1);
-      obstacle.setCollideWorldBounds(true);
-      obstacle.setVelocity(Phaser.Math.Between(-200, 200), 20);
-      obstacle.allowGravity = false;
+      // Get moving obstacles from our obstacles group
+      let movingObstacles = this.obstacles.getMatching('state', Motion.MOVING);
+      // If we have moving obstacles in the obstacles group, randomly choose one and clone it.
+      if (movingObstacles.length > 0) {
+        let obstacle = movingObstacles[
+          Phaser.Math.Between(0, movingObstacles.length - 1)
+        ] as Phaser.Physics.Arcade.Sprite;
+        let obX =
+          player.x < 400
+            ? Phaser.Math.Between(400, 800)
+            : Phaser.Math.Between(0, 400);
+        let clone = this.obstacles
+          .create(obX, 0, obstacle.texture.key)
+          .setData('physics', obstacle.getData('physics'));
+        // Set the clone's motion
+        switch (clone.getData('physics')) {
+          case 'BOUNCE':
+            clone
+              .setBounce(1)
+              .setCollideWorldBounds(true)
+              .setVelocity(Phaser.Math.Between(-200, 200), 20)
+              .setGravity(0);
+            break;
+          case 'FLOAT':
+            clone.setGravity(0).setImmovable();
+            (clone.body as Phaser.Physics.Arcade.Body)?.setDirectControl();
+            this.tweens.add({
+              targets: clone,
+              y: 600,
+              duration: 3000,
+              ease: 'sine.inout',
+              yoyo: true,
+              repeat: -1,
+            });
+            break;
+          default:
+            break;
+        }
+      }
     }
   }
-
   // ----- END GAME LOGIC METHODS ------
   /**
    * Run game updates
@@ -625,6 +676,15 @@ export default class Play extends BaseScene {
 
     // Player movement with arrow controls
     if (this.gameObjects.has('player')) {
+      if (this.effectKey == 'spotlight' && this.effect) {
+        this.effect
+          .setX(
+            (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).x
+          )
+          .setY(
+            (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).y
+          );
+      }
       if (this.cursors?.left.isDown) {
         (
           this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
@@ -647,15 +707,15 @@ export default class Play extends BaseScene {
           this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
         ).anims.play(`turn_${this.currentAnimKey}`, true);
       }
-      if (
-        this.cursors?.up.isDown &&
-        (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).body
-          ?.touching.down
-      ) {
-        (
-          this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
-        )?.setVelocityY(-830);
-      }
+    }
+    if (
+      this.cursors?.up.isDown &&
+      (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).body
+        ?.touching.down
+    ) {
+      (
+        this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
+      )?.setVelocityY(-830);
     }
   }
 }

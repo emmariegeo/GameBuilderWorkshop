@@ -115,13 +115,13 @@ export default class Edit extends BaseScene {
             'player'
           ) as Phaser.Physics.Arcade.Sprite;
           player.setInteractive();
-          this.input.setDraggable(player);
+          this.input?.setDraggable(player);
         }
         if (this.platforms) {
           this.platforms
             .getChildren()
             .forEach((child) => child.setInteractive());
-          this.input.setDraggable(this.platforms.getChildren());
+          this.input?.setDraggable(this.platforms.getChildren());
         }
         break;
       // Switch to the Resize tool, which provides points to drag and resize the selected object.
@@ -131,13 +131,13 @@ export default class Edit extends BaseScene {
             'player'
           ) as Phaser.Physics.Arcade.Sprite;
           player.setInteractive();
-          this.input.setDraggable(player, false);
+          this.input?.setDraggable(player, false);
         }
         if (this.platforms) {
           this.platforms
             .getChildren()
             .forEach((child) => child.setInteractive());
-          this.input.setDraggable(this.platforms.getChildren(), false);
+          this.input?.setDraggable(this.platforms.getChildren(), false);
         }
         this.selected && this.showResize(this.selected);
         break;
@@ -147,13 +147,13 @@ export default class Edit extends BaseScene {
             'player'
           ) as Phaser.Physics.Arcade.Sprite;
           player.setInteractive();
-          this.input.setDraggable(player, false);
+          this.input?.setDraggable(player, false);
         }
         if (this.platforms) {
           this.platforms
             .getChildren()
             .forEach((child) => child.setInteractive());
-          this.input.setDraggable(this.platforms.getChildren(), false);
+          this.input?.setDraggable(this.platforms.getChildren(), false);
         }
         break;
     }
@@ -223,7 +223,7 @@ export default class Edit extends BaseScene {
         new Phaser.Geom.Circle(bounds.left, bounds.top, 4),
         Phaser.Geom.Circle.Contains
       );
-      this.input.setDraggable(TL);
+      this.input?.setDraggable(TL);
     }
 
     BL.fillCircle(bounds.left, bounds.bottom, 4)
@@ -237,7 +237,7 @@ export default class Edit extends BaseScene {
         new Phaser.Geom.Circle(bounds.left, bounds.bottom, 4),
         Phaser.Geom.Circle.Contains
       );
-      this.input.setDraggable(BL);
+      this.input?.setDraggable(BL);
     }
 
     BR.fillCircle(bounds.right, bounds.bottom, 4)
@@ -251,7 +251,7 @@ export default class Edit extends BaseScene {
         new Phaser.Geom.Circle(bounds.right, bounds.bottom, 4),
         Phaser.Geom.Circle.Contains
       );
-      this.input.setDraggable(BR);
+      this.input?.setDraggable(BR);
     }
 
     // Use resize cursor
@@ -293,11 +293,6 @@ export default class Edit extends BaseScene {
       // Check for deleted game entities
       if (state.entities.deletion === 'pending') {
         this.gameObjects.forEach((value, id) => {
-          console.log(
-            this.gameObjects,
-            state.entities.entities[id],
-            state.entities.entities[id] === undefined
-          );
           if (state.entities.entities[id] === undefined) {
             this.gameObjects.get(id)?.destroy();
             this.gameObjects.delete(id);
@@ -342,7 +337,8 @@ export default class Edit extends BaseScene {
    */
   deleteGameObject(object: Phaser.GameObjects.Image) {
     // Check for update delay between this.tool and store tool
-    if (store.getState().canvas.tool == Tool.Delete) {
+    if (store.getState().canvas.tool == Tool.Delete && !store.getState().canvas.dialogOpen) {
+      store.dispatch(select(object.getData('id')))
       store.dispatch(dialogOpened(true));
     }
   }
@@ -462,16 +458,19 @@ export default class Edit extends BaseScene {
         );
 
         player = this.gameObjects.get('player') as Phaser.Physics.Arcade.Sprite;
-        player.setInteractive();
+        player?.setInteractive();
       }
-      player.setScale(object.scaleX, object.scaleY).setData('id', 'player');
+      player?.setScale(object.scaleX, object.scaleY).setData('id', 'player');
     } else {
       // We wait to switch the player sprite texture
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.spritesheet(`EDIT_${object.title}`, object.spriteUrl, {
-        frameWidth: object.spriteWidth,
-        frameHeight: object.spriteHeight,
-      });
+      let loader = this.load.spritesheet(
+        `EDIT_${object.title}`,
+        object.spriteUrl,
+        {
+          frameWidth: object.spriteWidth,
+          frameHeight: object.spriteHeight,
+        }
+      );
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
         if (this.gameObjects.has('player')) {
@@ -485,9 +484,11 @@ export default class Edit extends BaseScene {
             'player'
           ) as Phaser.Physics.Arcade.Sprite;
         }
-        player?.setInteractive();
-        this.input.setDraggable(player);
-        player?.setScale(object.scaleX, object.scaleY).setData('id', 'player');
+        if (player) {
+          player.setInteractive();
+          this.input?.setDraggable(player);
+          player.setScale(object.scaleX, object.scaleY).setData('id', 'player');
+        }
       });
       loader.start();
     }
@@ -523,7 +524,7 @@ export default class Edit extends BaseScene {
         ) as Phaser.Physics.Arcade.Sprite;
       }
       platform
-        .setData('id', object.id)
+        ?.setData('id', object.id)
         .setScale(object.scaleX, object.scaleY)
         .setBodySize(object.width, object.height, true)
         .setInteractive();
@@ -532,36 +533,41 @@ export default class Edit extends BaseScene {
       this.platforms.refresh();
     } else {
       // If not, we wait to switch the object texture
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.image(`EDIT_${object.title}`, object.spriteUrl);
-      loader.once(Phaser.Loader.Events.COMPLETE, () => {
-        // Set texture on existing platform
-        if (this.gameObjects.has(object.id)) {
-          this.platforms.remove(platform, true);
-          platform?.setTexture(`EDIT_${object.title}`);
-        } else {
-          // texture loaded, so replace
-          this.gameObjects.set(
-            object.id,
-            this.physics.add.staticSprite(
-              object.x,
-              object.y,
-              `EDIT_${object.title}`
-            )
-          );
-          platform = this.getGameObject(
-            object.id
-          ) as Phaser.Physics.Arcade.Sprite;
-        }
-        platform
-          .setData('id', object.id)
-          .setScale(object.scaleX, object.scaleY)
-          .setBodySize(object.width, object.height, true)
-          .setInteractive();
-        this.input.setDraggable(platform);
-        this.platforms.add(platform);
-        this.platforms.refresh();
-      });
+      let loader = this.load.image(`EDIT_${object.title}`, object.spriteUrl);
+      loader.once(
+        Phaser.Loader.Events.COMPLETE,
+        () => {
+          // Set texture on existing platform
+          if (this.gameObjects.has(object.id)) {
+            this.platforms.remove(platform, true);
+            platform?.setTexture(`EDIT_${object.title}`);
+          } else {
+            // texture loaded, so replace
+            this.gameObjects.set(
+              object.id,
+              this.physics.add.staticSprite(
+                object.x,
+                object.y,
+                `EDIT_${object.title}`
+              )
+            );
+            platform = this.getGameObject(
+              object.id
+            ) as Phaser.Physics.Arcade.Sprite;
+          }
+          if (platform) {
+            platform
+              .setData('id', object.id)
+              .setScale(object.scaleX, object.scaleY)
+              .setBodySize(object.width, object.height, true)
+              .setInteractive();
+            this.input && this.input.setDraggable(platform);
+            this.platforms.add(platform);
+            this.platforms.refresh();
+          }
+        },
+        this.scene
+      );
       loader.start();
     }
   }
@@ -592,12 +598,11 @@ export default class Edit extends BaseScene {
         item = this.getGameObject(object.id) as Phaser.Physics.Arcade.Sprite;
       }
       item.setData('id', object.id).setInteractive();
-      this.input.setDraggable(item);
+      this.input?.setDraggable(item);
       this.items.add(item);
     } else {
       // If texture does not exist, load before applying
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.image(`EDIT_${object.title}`, object.spriteUrl);
+      let loader = this.load.image(`EDIT_${object.title}`, object.spriteUrl);
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
         if (this.gameObjects.has(object.id)) {
@@ -614,9 +619,11 @@ export default class Edit extends BaseScene {
           );
           item = this.getGameObject(object.id) as Phaser.Physics.Arcade.Sprite;
         }
-        item?.setData('id', object.id).setInteractive();
-        this.input.setDraggable(item);
-        this.items.add(item);
+        if (item) {
+          item?.setData('id', object.id).setInteractive();
+          item && this.input.setDraggable(item);
+          this.items.add(item);
+        }
       });
       loader.start();
     }
@@ -651,13 +658,12 @@ export default class Edit extends BaseScene {
           object.id
         ) as Phaser.Physics.Arcade.Sprite;
       }
-      obstacle.setData('id', object.id).setInteractive();
-      this.input.setDraggable(obstacle);
+      obstacle?.setData('id', object.id).setInteractive();
+      this.input?.setDraggable(obstacle);
       this.obstacles.add(obstacle);
     } else {
       // If texture does not exist, load before applying
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.image(`EDIT_${object.title}`, object.spriteUrl);
+      let loader = this.load.image(`EDIT_${object.title}`, object.spriteUrl);
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
         if (this.gameObjects.has(object.id)) {
@@ -676,9 +682,11 @@ export default class Edit extends BaseScene {
             object.id
           ) as Phaser.Physics.Arcade.Sprite;
         }
-        obstacle?.setData('id', object.id).setInteractive();
-        this.input.setDraggable(obstacle);
-        this.obstacles.add(obstacle);
+        if (obstacle) {
+          obstacle.setData('id', object.id).setInteractive();
+          this.input?.setDraggable(obstacle);
+          this.obstacles.add(obstacle);
+        }
       });
       loader.start();
     }
@@ -815,7 +823,8 @@ export default class Edit extends BaseScene {
     this.input.on(
       'gameobjectdown',
       (pointer: any, gameObject: Phaser.GameObjects.Image) => {
-        if (gameObject.getData('id')) {
+        // Prevent selecting anything when a dialog window is open.
+        if (gameObject.getData('id') && !store.getState().canvas.dialogOpen) {
           this.selected = gameObject;
           this.selectObject(gameObject);
         }

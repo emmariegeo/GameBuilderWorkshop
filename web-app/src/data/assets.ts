@@ -143,7 +143,7 @@ export const data: Map = {
       title: 'bomb',
       width: 14,
       height: 14,
-      physics: 'BOUNCE'
+      physics: 'BOUNCE',
     },
     floatyalien: {
       img: '/assets/obstacles/floaty_alien.png',
@@ -165,7 +165,7 @@ export const data: Map = {
       width: 35,
       height: 40,
       physics: 'STATIC',
-    }
+    },
   },
   platforms: {
     simple: {
@@ -194,21 +194,21 @@ export const data: Map = {
     },
   },
   effects: {
-    bg1: {
-      img: '/assets/items/star.png',
-      title: 'bg1',
+    spotlight: {
+      img: '/workshop/light.png',
+      title: 'spotlight',
     },
   },
   audio: {
     bgm1: {
-      img:'/assets/items/star.png',
+      img: '/workshop/halfnote.png',
       title: 'bgm1',
-      file: '/assets/audio/BGM_01.wav'
+      file: '/assets/audio/BGM_01.wav',
     },
     bgm2: {
-      img:'/assets/items/star.png',
+      img: '/workshop/quarternote.png',
       title: 'bgm2',
-      file: '/assets/audio/BGM_02.wav'
+      file: '/assets/audio/BGM_02.wav',
     },
   },
 };

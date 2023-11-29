@@ -18,6 +18,8 @@ export default class BaseScene extends Phaser.Scene {
     | Phaser.Sound.HTML5AudioSound
     | Phaser.Sound.WebAudioSound
     | undefined;
+  effectKey: string | undefined;
+  effect: Phaser.GameObjects.Light | undefined;
 
   constructor(key: string) {
     super({ key: key });
@@ -92,6 +94,26 @@ export default class BaseScene extends Phaser.Scene {
         this.bg.setTexture(newBackground);
       });
       loader.start();
+    }
+  }
+
+  /**
+   * Set the new effect
+   * @param newEffect string referring to the new effect asset key
+   */
+  setEffect(newEffect: string) {
+    // Confirm that background exists in assets
+    if (newEffect in assets['effects']) {
+      this.effectKey = newEffect;
+      if (this.effectKey == 'spotlight') {
+        this.effect = this.lights
+          .addLight(0, 0, 200, 0xfffde7)
+          .setScrollFactor(0)
+          .setIntensity(1);
+
+        this.lights.enable().setAmbientColor(0x555555);
+        this.bg.setPipeline('Light2D');
+      }
     }
   }
 

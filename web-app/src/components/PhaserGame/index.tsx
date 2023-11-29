@@ -6,7 +6,7 @@ import Edit from './scenes/Edit';
 import { Component } from 'react';
 import Play from './scenes/Play';
 import BaseScene from './scenes/BaseScene';
-import { Box, Container } from '@mui/material';
+import { Box } from '@mui/material';
 
 type Props = {
   mode: string;
@@ -46,6 +46,6 @@ export default class PhaserGame extends Component<{}, Props> {
     return true;
   }
   render() {
-    return <Box height={'auto'} id="phaser-game"/>;
+    return <Box height={'auto'} id="phaser-game" />;
   }
 }

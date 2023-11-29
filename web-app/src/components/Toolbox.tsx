@@ -14,7 +14,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { Box, Stack, Tooltip, Typography } from '@mui/material';
 
-export default function Toolbox() {
+const Toolbox = () => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -77,7 +77,7 @@ export default function Toolbox() {
               <DeleteOutlined />
             </Tooltip>
           </ToggleButton>
-          <ToggleButton value={Tool.Fill} aria-label="fill">
+          <ToggleButton value={Tool.Fill} aria-label="fill" disabled>
             <FormatColorFillOutlined />
           </ToggleButton>
           <ToggleButton value={Tool.Resize} aria-label="resize">
@@ -85,13 +85,13 @@ export default function Toolbox() {
               <AspectRatioOutlined />
             </Tooltip>
           </ToggleButton>
-          <ToggleButton value={Tool.Rotate} aria-label="rotate">
+          <ToggleButton value={Tool.Rotate} aria-label="rotate" disabled>
             <RotateLeftOutlined />
           </ToggleButton>
-          <ToggleButton value={Tool.Flip} aria-label="flip">
+          <ToggleButton value={Tool.Flip} aria-label="flip" disabled>
             <FlipOutlined />
           </ToggleButton>
-          <ToggleButton value={Tool.Duplicate} aria-label="duplicate">
+          <ToggleButton value={Tool.Duplicate} aria-label="duplicate" disabled>
             <ContentCopyOutlined />
           </ToggleButton>
         </ToggleButtonGroup>
@@ -103,4 +103,6 @@ export default function Toolbox() {
       </Box>
     </Stack>
   );
-}
+};
+
+export default Toolbox;

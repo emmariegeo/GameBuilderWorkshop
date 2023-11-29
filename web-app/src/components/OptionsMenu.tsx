@@ -9,7 +9,7 @@ import { dialogOpened, entityById, store, useAppDispatch } from '@/store';
 import { useState } from 'react';
 import { Box, Grid, Skeleton } from '@mui/material';
 
-export default function OptionsMenu(this: any) {
+export const OptionsMenu = () => {
   // Get the selected entity by its id using the currently selected from store
   let [selectedEntity, setSelectedEntity] = useState(entityById(''));
 
@@ -150,3 +150,5 @@ export default function OptionsMenu(this: any) {
     </Card>
   );
 }
+
+export default OptionsMenu;

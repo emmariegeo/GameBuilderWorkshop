@@ -9,14 +9,15 @@ export const metadata: Metadata = {
   description: 'A no-code tool for building games.',
 };
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}) => {
   return (
     <html lang="en">
       <body className={inter.className}>{children}</body>
     </html>
   );
 }
+export default RootLayout
