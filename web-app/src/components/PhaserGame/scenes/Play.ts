@@ -38,6 +38,8 @@ export default class Play extends BaseScene {
   scoreText: any;
   items!: Phaser.Physics.Arcade.Group;
   obstacles!: Phaser.Physics.Arcade.Group;
+  effectKey: string | undefined;
+  effect: Phaser.GameObjects.Light | undefined;
   constructor() {
     super('Play');
   }
@@ -64,6 +66,7 @@ export default class Play extends BaseScene {
     this.mode = initialState.canvas.mode;
     this.background = initialState.canvas.background;
     this.audio = initialState.canvas.audio;
+    this.effectKey = initialState.canvas.effect;
 
     // Input Events
     this.cursors = this.input.keyboard?.createCursorKeys();
@@ -73,6 +76,7 @@ export default class Play extends BaseScene {
 
     this.bg = this.add.image(this.scale.width / 2, this.scale.height / 2, 'bg');
     this.setBackground(this.background);
+    this.effectKey && this.setEffect(this.effectKey);
 
     if (this.audio !== '' && !this.soundObject?.isPlaying) {
       this.setAudio(this.audio);
@@ -670,6 +674,15 @@ export default class Play extends BaseScene {
 
     // Player movement with arrow controls
     if (this.gameObjects.has('player')) {
+      if (this.effectKey == 'spotlight' && this.effect) {
+        this.effect
+          .setX(
+            (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).x
+          )
+          .setY(
+            (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).y
+          );
+      }
       if (this.cursors?.left.isDown) {
         (
           this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
@@ -688,19 +701,20 @@ export default class Play extends BaseScene {
         (
           this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
         ).setVelocityX(0);
-        (
-          this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
-        ).anims.play(`turn_${this.currentAnimKey}`, true);
       }
-      if (
-        this.cursors?.up.isDown &&
-        (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).body
-          ?.touching.down
-      ) {
-        (
-          this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
-        )?.setVelocityY(-830);
-      }
+      (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).anims.play(
+        `turn_${this.currentAnimKey}`,
+        true
+      );
+    }
+    if (
+      this.cursors?.up.isDown &&
+      (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).body
+        ?.touching.down
+    ) {
+      (
+        this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
+      )?.setVelocityY(-830);
     }
   }
 }

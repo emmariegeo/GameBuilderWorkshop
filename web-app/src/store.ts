@@ -11,6 +11,7 @@ import { Entity, Tool } from './data/types';
 const initialState: {
   mode: string;
   background: string;
+  effect: '',
   audio: string;
   tool: Tool;
   selected: string;
@@ -19,6 +20,7 @@ const initialState: {
 } = {
   mode: 'edit',
   background: 'bg1',
+  effect: '',
   audio: '',
   tool: Tool.Select,
   selected: '',
@@ -132,6 +134,9 @@ const canvasSlice = createSlice({
     updateBackground(state: any, action: PayloadAction<string>) {
       return { ...state, background: action.payload };
     },
+    updateEffect(state: any, action: PayloadAction<string>) {
+      return { ...state, effect: action.payload };
+    },
     updateAudio(state: any, action: PayloadAction<string>) {
       return { ...state, audio: action.payload };
     },
@@ -186,6 +191,7 @@ export const entityById = (id: string) => {
 export const {
   switchMode,
   updateBackground,
+  updateEffect,
   updateAudio,
   switchTool,
   select,

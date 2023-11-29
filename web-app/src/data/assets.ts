@@ -194,19 +194,19 @@ export const data: Map = {
     },
   },
   effects: {
-    bg1: {
-      img: '/assets/items/star.png',
-      title: 'bg1',
+    spotlight: {
+      img: '/workshop/light.png',
+      title: 'spotlight',
     },
   },
   audio: {
     bgm1: {
-      img: '/assets/items/star.png',
+      img: '/workshop/halfnote.png',
       title: 'bgm1',
       file: '/assets/audio/BGM_01.wav',
     },
     bgm2: {
-      img: '/assets/items/star.png',
+      img: '/workshop/quarternote.png',
       title: 'bgm2',
       file: '/assets/audio/BGM_02.wav',
     },

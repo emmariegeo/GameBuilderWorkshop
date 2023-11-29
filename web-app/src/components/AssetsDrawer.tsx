@@ -18,6 +18,7 @@ import {
   select,
   updateAudio,
   updateBackground,
+  updateEffect,
   useAppDispatch,
   useAppSelector,
 } from '@/store.ts';
@@ -45,10 +46,11 @@ const AssetsDrawer = () => {
   };
 
   // Get current background, audio, mode from store
-  const [background, audio, mode] = useAppSelector((state) => [
+  const [background, audio, mode, effect] = useAppSelector((state) => [
     state.canvas.background,
     state.canvas.audio,
     state.canvas.mode,
+    state.canvas.effect
   ]);
 
   // Dispatch to store
@@ -88,9 +90,14 @@ const AssetsDrawer = () => {
     dispatch(updateBackground(newBackground));
   };
 
-  // Dispatch to store: Update background
+  // Dispatch to store: Update audio
   const changeAudio = (newAudio: string) => {
     dispatch(updateAudio(newAudio));
+  };
+
+  // Dispatch to store: Update effect
+  const changeEffect = (newEffect: string) => {
+    dispatch(updateEffect(newEffect));
   };
 
   // When an asset is clicked
@@ -102,6 +109,9 @@ const AssetsDrawer = () => {
           break;
         case 'audio':
           changeAudio(itemKey);
+          break;
+        case 'effects':
+          changeEffect(itemKey);
           break;
         case 'platforms':
           let platform: Entity = {
@@ -241,7 +251,7 @@ const AssetsDrawer = () => {
               width: 164,
               height: 164,
               border:
-                item[0] === audio || item[0] === background
+                item[0] === audio || item[0] === background || item[0] === effect
                   ? '5px solid blue'
                   : '0',
             }}
@@ -258,7 +268,7 @@ const AssetsDrawer = () => {
             </Box>
           </Button>
         ))}
-        {assetType == 'audio' && (
+        {(assetType === 'audio' || assetType === 'effects') && (
           <Button
             onClick={handleAssetClick('')}
             sx={{ width: 164, height: 164 }}
