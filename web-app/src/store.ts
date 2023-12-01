@@ -8,6 +8,12 @@ import {
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { Entity, Tool } from './data/types';
 
+export enum dialogState {
+  Closed = 'CLOSED',
+  Delete = 'DELETE',
+  Duplicate = 'DUPLICATE'
+}
+
 const initialState: {
   mode: string;
   background: string;
@@ -15,7 +21,7 @@ const initialState: {
   audio: string;
   tool: Tool;
   selected: string;
-  dialogOpen: boolean;
+  dialogOpen: dialogState;
   modeSwitch: string;
 } = {
   mode: 'edit',
@@ -24,7 +30,7 @@ const initialState: {
   audio: '',
   tool: Tool.Select,
   selected: '',
-  dialogOpen: false,
+  dialogOpen: dialogState.Closed,
   modeSwitch: 'idle',
 };
 
@@ -146,7 +152,7 @@ const canvasSlice = createSlice({
     select(state: any, action: PayloadAction<string>) {
       return { ...state, selected: action.payload };
     },
-    dialogOpened(state: any, action: PayloadAction<boolean>) {
+    dialogOpened(state: any, action: PayloadAction<dialogState>) {
       return { ...state, dialogOpen: action.payload };
     },
     reset() {

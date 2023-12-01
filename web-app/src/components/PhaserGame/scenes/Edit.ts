@@ -9,6 +9,7 @@ import {
   dialogOpened,
   deleteSuccess,
   entityUpdateScale,
+  dialogState,
 } from '../../../store';
 import { data as assets } from '../../../data/assets.ts';
 import { Entity, Tool } from '@/data/types.ts';
@@ -319,6 +320,10 @@ export default class Edit extends BaseScene {
             }
           });
       }
+      // Check for change in selected object
+      if (state.canvas.selected !== this.selected?.getData('id')) {
+        this.selected = this.getGameObject(state.canvas.selected) as Phaser.GameObjects.Image;
+      }
     }
   }
 
@@ -337,9 +342,27 @@ export default class Edit extends BaseScene {
    */
   deleteGameObject(object: Phaser.GameObjects.Image) {
     // Check for update delay between this.tool and store tool
-    if (store.getState().canvas.tool == Tool.Delete && !store.getState().canvas.dialogOpen) {
-      store.dispatch(select(object.getData('id')))
-      store.dispatch(dialogOpened(true));
+    if (
+      store.getState().canvas.tool == Tool.Delete &&
+      store.getState().canvas.dialogOpen === dialogState.Closed
+    ) {
+      store.dispatch(select(object.getData('id')));
+      store.dispatch(dialogOpened(dialogState.Delete));
+    }
+  }
+
+  /**
+   * Open dialog for duplicating game object
+   * @param object Phaser.GameObjects.Image
+   */
+  duplicateGameObject(object: Phaser.GameObjects.Image) {
+    // Check for update delay between this.tool and store tool
+    if (
+      store.getState().canvas.tool == Tool.Duplicate &&
+      store.getState().canvas.dialogOpen === dialogState.Closed
+    ) {
+      store.dispatch(select(object.getData('id')));
+      store.dispatch(dialogOpened(dialogState.Duplicate));
     }
   }
 
@@ -733,6 +756,15 @@ export default class Edit extends BaseScene {
       );
     }
 
+    if (this.tool == Tool.Duplicate) {
+      this.input.once(
+        'gameobjectup',
+        (pointer: any, gameObject: Phaser.GameObjects.Image) => {
+          this.duplicateGameObject(gameObject);
+        }
+      );
+    }
+
     if (this.tool == Tool.Resize) {
       this.input.on(
         'drag',
@@ -824,15 +856,16 @@ export default class Edit extends BaseScene {
       'gameobjectdown',
       (pointer: any, gameObject: Phaser.GameObjects.Image) => {
         // Prevent selecting anything when a dialog window is open.
-        if (gameObject.getData('id') && !store.getState().canvas.dialogOpen) {
+        if (
+          gameObject.getData('id') &&
+          store.getState().canvas.dialogOpen === dialogState.Closed
+        ) {
           this.selected = gameObject;
           this.selectObject(gameObject);
         }
       }
     );
 
-    this.mode !== Tool.Resize &&
-      this.selected &&
-      this.showBounds(this.selected);
+    this.selected && this.showBounds(this.selected);
   }
 }
