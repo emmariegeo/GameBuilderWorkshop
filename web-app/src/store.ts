@@ -8,14 +8,20 @@ import {
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { Entity, Tool } from './data/types';
 
+export enum dialogState {
+  Closed = 'CLOSED',
+  Delete = 'DELETE',
+  Duplicate = 'DUPLICATE',
+}
+
 const initialState: {
   mode: string;
   background: string;
-  effect: '',
+  effect: '';
   audio: string;
   tool: Tool;
   selected: string;
-  dialogOpen: boolean;
+  dialogOpen: dialogState;
   modeSwitch: string;
 } = {
   mode: 'edit',
@@ -24,7 +30,7 @@ const initialState: {
   audio: '',
   tool: Tool.Select,
   selected: '',
-  dialogOpen: false,
+  dialogOpen: dialogState.Closed,
   modeSwitch: 'idle',
 };
 
@@ -68,6 +74,19 @@ const entitiesSlice = createSlice({
           changes: { loaded: false },
         });
       }
+    },
+    entityFlipX(
+      state,
+      action: {
+        payload: { id: string; flipX: boolean };
+      }
+    ) {
+      entitiesAdapter.updateOne(state, {
+        id: action.payload.id,
+        changes: {
+          flipX: action.payload.flipX,
+        },
+      });
     },
     entityUpdateXYZ(
       state,
@@ -146,7 +165,7 @@ const canvasSlice = createSlice({
     select(state: any, action: PayloadAction<string>) {
       return { ...state, selected: action.payload };
     },
-    dialogOpened(state: any, action: PayloadAction<boolean>) {
+    dialogOpened(state: any, action: PayloadAction<dialogState>) {
       return { ...state, dialogOpen: action.payload };
     },
     reset() {
@@ -205,6 +224,7 @@ export const {
   entityLoaded,
   entityUpdated,
   entityDeleted,
+  entityFlipX,
   entityUpdateXYZ,
   entityUpdateScale,
   deleteSuccess,

@@ -1,13 +1,17 @@
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import dynamic from 'next/dynamic';
-
+import { v4 as uuid } from 'uuid';
 import {
   switchMode,
   useAppSelector,
   useAppDispatch,
   dialogOpened,
   entityDeleted,
+  entityAdded,
+  entityById,
+  dialogState,
+  select,
 } from '@/store';
 import {
   Box,
@@ -20,6 +24,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { Entity, EntityType } from '@/data/types';
 
 const PhaserGame = dynamic(
   () => import('./PhaserGame').then((m) => m.default),
@@ -59,31 +64,76 @@ const Canvas = () => {
   };
 
   const handleClose = () => {
-    dispatch(dialogOpened(false));
+    dispatch(dialogOpened(dialogState.Closed));
   };
 
+  /**
+   * Delete an entity from the store.
+   */
   const handleDeleteObject = () => {
-    dispatch(dialogOpened(false));
+    dispatch(dialogOpened(dialogState.Closed));
     dispatch(entityDeleted(selected));
   };
+
+  /**
+   * Create a duplicate entity and update the store.
+   */
+  const handleDuplicateObject = () => {
+    let clone = { ...entityById(selected) };
+    // Duplicated player sprites become an obstacle
+    if (clone?.type == EntityType.Player) {
+      clone.type = EntityType.Obstacle;
+      clone.physics = 'STATIC';
+    }
+
+    dispatch(dialogOpened(dialogState.Closed));
+    if (clone?.id !== undefined) {
+      clone.id = uuid();
+      clone.x = clone.x ? clone.x + 20 : 20;
+      clone.y = clone.y ? clone.y + 20 : 20;
+      dispatch(entityAdded(clone as Entity));
+      dispatch(select(clone.id));
+    }
+  };
+
+  // Content for Delete dialog
+  const deleteContent = (
+    <>
+      <DialogTitle id="alert-dialog-title">{'Delete game object?'}</DialogTitle>
+      <DialogActions>
+        <Button onClick={handleDeleteObject} autoFocus>
+          Delete
+        </Button>
+        <Button onClick={handleClose}>Cancel</Button>
+      </DialogActions>
+    </>
+  );
+
+  // Content for Duplicate dialog
+  const duplicateContent = (
+    <>
+      <DialogTitle id="alert-dialog-title">
+        {'Duplicate the selected game object?'}
+      </DialogTitle>
+      <DialogActions>
+        <Button onClick={handleDuplicateObject} autoFocus>
+          Duplicate
+        </Button>
+        <Button onClick={handleClose}>Cancel</Button>
+      </DialogActions>
+    </>
+  );
 
   return (
     <>
       <Dialog
-        open={dialogOpen}
+        open={dialogOpen !== dialogState.Closed}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          {'Delete game object?'}
-        </DialogTitle>
-        <DialogActions>
-          <Button onClick={handleDeleteObject} autoFocus>
-            Delete
-          </Button>
-          <Button onClick={handleClose}>Cancel</Button>
-        </DialogActions>
+        {dialogOpen === dialogState.Delete && deleteContent}
+        {dialogOpen === dialogState.Duplicate && duplicateContent}
       </Dialog>
       <Stack
         bgcolor={'#e3f2fd'}

@@ -1,5 +1,10 @@
 import { data } from './gamedata.js';
 var game;
+// Used to differentiate between moving and still game objects.
+const Motion = {
+  STILL: 0,
+  MOVING: 1,
+};
 
 class LaunchScene extends Phaser.Scene {
   constructor() {
@@ -52,6 +57,8 @@ class YourGame extends Phaser.Scene {
   player;
   bg;
   audio;
+  effect;
+  effectKey;
   items;
   obstacles;
   platforms;
@@ -78,6 +85,18 @@ class YourGame extends Phaser.Scene {
     this.bg = this.add
       .image(this.scale.width / 2, this.scale.height / 2, 'bg')
       .setDepth(0);
+    this.effectKey = data.effect.title;
+
+    if (this.effectKey === 'spotlight') {
+      this.effect = this.lights
+        .addLight(0, 0, 200, 0xfffde7)
+        .setScrollFactor(0)
+        .setIntensity(1);
+
+      this.lights.enable().setAmbientColor(0x555555);
+      this.bg.setPipeline('Light2D');
+    }
+
     this.audio = this.sound.add(data.audio.title, { loop: true });
     if (!this.sound.locked && !this.audio?.isPlaying) {
       this.audio.play();
@@ -165,7 +184,8 @@ class YourGame extends Phaser.Scene {
           .setCollideWorldBounds(true)
           .setBounce(0.2)
           .setScale(object.scaleX, object.scaleY)
-          .setData('id', 'player');
+          .setData({ id: 'player', isFlipped: object.flipX })
+          .setFlipX(object.flipX);
         this.physics.add.collider(this.player, this.platforms);
         // Checks to see if the player overlaps with any of the this.items, if player does, call the collectItem function
         this.physics.add.overlap(
@@ -213,7 +233,8 @@ class YourGame extends Phaser.Scene {
             .setCollideWorldBounds(true)
             .setBounce(0.2)
             .setScale(object.scaleX, object.scaleY)
-            .setData('id', 'player');
+            .setData({ id: 'player', isFlipped: object.flipX })
+            .setFlipX(object.flipX);
 
           this.physics.add.collider(this.player, this.platforms);
           // Checks to see if the player overlaps with any of the this.items, if player does, call the collectItem function
@@ -263,13 +284,15 @@ class YourGame extends Phaser.Scene {
         );
         platform = this.getGameObject(object.id);
       }
-      platform.setData('id', object.id).refreshBody();
+      platform
+        .setData({ id: object.id, isFlipped: object.flipX })
+        .setFlipX(object.flipX)
+        .refreshBody();
       this.platforms.add(platform);
       this.platforms.refresh();
     } else {
       // If not, we wait to switch the object texture
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.image(`PLAY_${object.title}`, object.spriteUrl);
+      let loader = this.load.image(`PLAY_${object.title}`, object.spriteUrl);
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // Set texture on existing platform
         if (this.gameObjects.has(object.id)) {
@@ -287,7 +310,10 @@ class YourGame extends Phaser.Scene {
           );
           platform = this.getGameObject(object.id);
         }
-        platform.setData('id', object.id).refreshBody();
+        platform
+          .setData({ id: object.id, isFlipped: object.flipX })
+          .setFlipX(object.flipX)
+          .refreshBody();
         this.platforms.add(platform);
         this.platforms.refresh();
       });
@@ -321,12 +347,14 @@ class YourGame extends Phaser.Scene {
         );
         item = this.getGameObject(object.id);
       }
-      item.setData('id', object.id);
+      item
+        .setData({ id: object.id, isFlipped: object.flipX })
+        .setFlipX(object.flipX);
+      item.body.collidWorldBounds = true;
       this.items.add(item);
     } else {
       // If texture does not exist, load before applying
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.image(`PLAY_${object.title}`, object.spriteUrl);
+      let loader = this.load.image(`PLAY_${object.title}`, object.spriteUrl);
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
         if (this.gameObjects.has(object.id)) {
@@ -343,7 +371,11 @@ class YourGame extends Phaser.Scene {
           );
           item = this.getGameObject(object.id);
         }
-        item.setData('id', object.id);
+        item
+          .setData({ id: object.id, isFlipped: object.flipX })
+          .setFlipX(object.flipX)
+          .setCollideWorldBounds(true);
+        item.body.collidWorldBounds = true;
         this.items.add(item);
       });
       loader.start();
@@ -376,7 +408,13 @@ class YourGame extends Phaser.Scene {
         );
         obstacle = this.getGameObject(object.id);
       }
-      obstacle.setData('id', object.id);
+      obstacle
+        .setData({
+          id: object.id,
+          physics: object.physics,
+          isFlipped: object.flipX,
+        })
+        .setFlipX(object.flipX);
       this.obstacles.add(obstacle);
       switch (object.physics) {
         case 'BOUNCE':
@@ -384,10 +422,12 @@ class YourGame extends Phaser.Scene {
             .setBounce(1)
             .setCollideWorldBounds(true)
             .setVelocity(Phaser.Math.Between(-200, 200), 20)
-            .setGravity(0);
+            .setGravity(0)
+            .setState(Motion.MOVING);
+
           break;
         case 'FLOAT':
-          obstacle.setGravity(0).setImmovable();
+          obstacle.setGravity(0).setImmovable().setState(Motion.MOVING);
           obstacle.body?.setDirectControl();
           this.tweens.add({
             targets: obstacle,
@@ -399,6 +439,7 @@ class YourGame extends Phaser.Scene {
           });
           break;
         case 'STATIC':
+          obstacle.setState(Motion.STILL);
           obstacle.body?.setAllowGravity(false);
           break;
         default:
@@ -406,8 +447,7 @@ class YourGame extends Phaser.Scene {
       }
     } else {
       // If texture does not exist, load before applying
-      let loader = new Phaser.Loader.LoaderPlugin(this);
-      loader.image(`PLAY_${object.title}`, object.spriteUrl);
+      let loader = this.load.image(`PLAY_${object.title}`, object.spriteUrl);
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
         if (this.gameObjects.has(object.id)) {
@@ -424,19 +464,26 @@ class YourGame extends Phaser.Scene {
           );
           obstacle = this.getGameObject(object.id);
         }
-        obstacle.setData('id', object.id);
+        obstacle
+          .setData({
+            id: object.id,
+            physics: object.physics,
+            isFlipped: object.flipX,
+          })
+          .setFlipX(object.flipX);
         this.obstacles.add(obstacle);
-        // this.obstacles can have different behaviors
+        // Obstacles can have different behaviors
         switch (object.physics) {
           case 'BOUNCE': // Obstacle bounces around game canvas
             obstacle
+              .setState(Motion.MOVING)
               .setBounce(1)
               .setCollideWorldBounds(true)
               .setVelocity(Phaser.Math.Between(-200, 200), 20)
               .setGravity(0);
             break;
           case 'FLOAT': // Obstacle floats up and down
-            obstacle.setGravity(0).setImmovable();
+            obstacle.setGravity(0).setImmovable().setState(Motion.MOVING);
             obstacle.body?.setDirectControl();
             this.tweens.add({
               targets: obstacle,
@@ -449,6 +496,7 @@ class YourGame extends Phaser.Scene {
             break;
           case 'STATIC': // Obstacle does not move
             obstacle.body?.setAllowGravity(false);
+            obstacle.setState(Motion.STILL);
             break;
           default:
             break;
@@ -587,24 +635,62 @@ class YourGame extends Phaser.Scene {
     this.score += 10;
     this.scoreText.setText('Score: ' + this.score);
 
-    // TODO: set up this.items and this.obstacles
     if (this.items.countActive(true) === 0) {
-      //  A new batch of this.items to collect
+      //  A new batch of items to collect
       this.items.children.iterate((child) => {
-        child.enableBody(true, child.x, 0, true, true);
+        // Randomly choose a new location for the item on the canvas
+        let newX = Phaser.Math.Between(
+          child.displayWidth / 2,
+          this.scale.displaySize.width - child.displayWidth / 2
+        );
+        let newY = Phaser.Math.Between(
+          child.displayHeight / 2,
+          this.scale.displaySize.height - child.displayHeight * 2
+        );
+        child
+          .enableBody(true, newX, newY, true, true)
+          .setCollideWorldBounds(true);
         return true;
       });
 
-      let x =
-        this.player.x < 400
-          ? Phaser.Math.Between(400, 800)
-          : Phaser.Math.Between(0, 400);
-
-      let obstacle = this.obstacles.create(x, 16, 'bomb');
-      obstacle.setBounce(1);
-      obstacle.setCollideWorldBounds(true);
-      obstacle.setVelocity(Phaser.Math.Between(-200, 200), 20);
-      obstacle.allowGravity = false;
+      // Get moving obstacles from our obstacles group
+      let movingObstacles = this.obstacles.getMatching('state', Motion.MOVING);
+      // If we have moving obstacles in the obstacles group, randomly choose one and clone it.
+      if (movingObstacles.length > 0) {
+        let obstacle =
+          movingObstacles[Phaser.Math.Between(0, movingObstacles.length - 1)];
+        let obX =
+          player.x < 400
+            ? Phaser.Math.Between(400, 800)
+            : Phaser.Math.Between(0, 400);
+        let clone = this.obstacles
+          .create(obX, 0, obstacle.texture.key)
+          .setData('physics', obstacle.getData('physics'));
+        // Set the clone's motion
+        switch (clone.getData('physics')) {
+          case 'BOUNCE':
+            clone
+              .setBounce(1)
+              .setCollideWorldBounds(true)
+              .setVelocity(Phaser.Math.Between(-200, 200), 20)
+              .setGravity(0);
+            break;
+          case 'FLOAT':
+            clone.setGravity(0).setImmovable();
+            clone.body?.setDirectControl();
+            this.tweens.add({
+              targets: clone,
+              y: 600,
+              duration: 3000,
+              ease: 'sine.inout',
+              yoyo: true,
+              repeat: -1,
+            });
+            break;
+          default:
+            break;
+        }
+      }
     }
   }
 
@@ -620,14 +706,21 @@ class YourGame extends Phaser.Scene {
 
     // Player movement with arrow controls
     if (this.player) {
+      if (this.effectKey == 'spotlight' && this.effect) {
+        this.effect.setX(this.player.x).setY(this.player.y);
+      }
       if (this.cursors?.left.isDown) {
-        this.player?.setVelocityX(-160);
+        this.player
+          ?.setVelocityX(-160)
+          .setFlipX(!this.player.getData('isFlipped'));
         this.player?.anims.play(`left_${this.currentAnimKey}`, true);
       } else if (this.cursors?.right.isDown) {
-        this.player?.setVelocityX(160);
+        this.player
+          ?.setVelocityX(160)
+          .setFlipX(this.player.getData('isFlipped'));
         this.player?.anims.play(`right_${this.currentAnimKey}`, true);
       } else {
-        this.player?.setVelocityX(0);
+        this.player?.setVelocityX(0).setFlipX(this.player.getData('isFlipped'));
         this.player?.anims.play(`turn_${this.currentAnimKey}`, true);
       }
       if (this.cursors?.up.isDown && this.player?.body?.touching.down) {
@@ -640,6 +733,7 @@ var config = {
   type: Phaser.AUTO,
   width: 800,
   height: 600,
+  parent: 'yourgame',
   physics: {
     default: 'arcade',
     arcade: {
@@ -649,7 +743,7 @@ var config = {
   },
   scale: {
     mode: Phaser.Scale.FIT,
-    parent: 'phaser-game',
+    parent: 'yourgame',
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: 800,
     height: 600,

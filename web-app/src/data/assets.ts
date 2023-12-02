@@ -197,6 +197,7 @@ export const data: Map = {
     spotlight: {
       img: '/workshop/light.png',
       title: 'spotlight',
+      file: ''
     },
   },
   audio: {

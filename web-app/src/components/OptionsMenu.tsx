@@ -5,7 +5,13 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { dialogOpened, entityById, store, useAppDispatch } from '@/store';
+import {
+  dialogOpened,
+  dialogState,
+  entityById,
+  store,
+  useAppDispatch,
+} from '@/store';
 import { useState } from 'react';
 import { Box, Grid, Skeleton } from '@mui/material';
 
@@ -23,7 +29,11 @@ export const OptionsMenu = () => {
   const dispatch = useAppDispatch();
 
   const onDelete = () => {
-    dispatch(dialogOpened(true));
+    dispatch(dialogOpened(dialogState.Delete));
+  };
+
+  const onDuplicate = () => {
+    dispatch(dialogOpened(dialogState.Duplicate));
   };
 
   const rows: { prop: string; value: any }[] = [
@@ -62,6 +72,10 @@ export const OptionsMenu = () => {
     {
       prop: 'Sprite',
       value: selectedEntity?.spriteUrl,
+    },
+    {
+      prop: 'FlipX',
+      value: selectedEntity?.flipX.toString(),
     },
     {
       prop: 'Orientation',
@@ -146,9 +160,16 @@ export const OptionsMenu = () => {
         >
           Delete
         </Button>
+        <Button
+          size="small"
+          onClick={onDuplicate}
+          disabled={selectedEntity === undefined}
+        >
+          Duplicate
+        </Button>
       </CardActions>
     </Card>
   );
-}
+};
 
 export default OptionsMenu;

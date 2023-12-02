@@ -6,12 +6,53 @@
     <script src="//cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.js"></script>
     <script type="module" src="gamedata.js"></script>
     <style type="text/css">
+      @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
       body {
         margin: 0;
+        background-color: black;
+        font-family: 'Roboto Mono', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      }
+
+      .wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        height: 100vh;
+      }
+
+      #yourgame {
+        display: inline-block;
+        height: 80vh;
+        order: 0;
+      }
+      footer {
+        display: flex;
+        justify-content: center;
+      }
+      .credits {
+        color: black;
+        width: fit-content;
+        background-color: white;
+        border-radius: 10px;
+        padding: 1rem;
+        order: 1;
+        text-align: center;
       }
     </style>
   </head>
   <body>
     <script type="module" src="game.js"></script>
+    <div class="wrapper">
+      <div id="yourgame"></div>
+      <footer>
+        <div class="credits">
+          Built with
+          <a href="https://gamebuilderworkshop.pages.dev/">
+            Game Builder Workshop</a
+          >
+          </footer>
+      </div>
+    </div>
   </body>
 </html>

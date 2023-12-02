@@ -11,7 +11,13 @@ import {
 } from '@mui/material';
 import { startData } from '@/data/startData';
 import { data as assets } from '@/data/assets.ts';
-import { entitiesAdded, reset, store, switchMode, useAppDispatch } from '@/store';
+import {
+  entitiesAdded,
+  reset,
+  store,
+  switchMode,
+  useAppDispatch,
+} from '@/store';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { useState } from 'react';
@@ -26,7 +32,7 @@ const ActionButtons = () => {
   const dispatch = useAppDispatch();
 
   const handleNewGame = async (event: React.MouseEvent<HTMLElement>) => {
-    dispatch(reset())
+    dispatch(reset());
     dispatch(entitiesAdded(startData));
     dialogOpened(false);
   };
@@ -47,6 +53,10 @@ const ActionButtons = () => {
         file: assets['audio'][state.canvas.audio]?.file ?? '',
         title: assets['audio'][state.canvas.audio]?.title ?? '',
       },
+      effect: {
+        file: assets['effects'][state.canvas.effect]?.file ?? '',
+        title: assets['effects'][state.canvas.effect]?.title ?? '',
+      },
       entities: state.entities.entities,
     };
 
@@ -61,6 +71,7 @@ const ActionButtons = () => {
     const subfolders = new Map<string, JSZip | null | undefined>([
       ['audio', assetsFolder?.folder('audio')],
       ['bg', assetsFolder?.folder('backgrounds')],
+      ['effect', assetsFolder?.folder('effect')],
       ['cursors', assetsFolder?.folder('cursors')],
       ['items', assetsFolder?.folder('items')],
       ['obstacles', assetsFolder?.folder('obstacles')],
@@ -76,6 +87,16 @@ const ActionButtons = () => {
         .then((res) => res.blob())
         .then((data) => {
           subfolders.get('audio')?.file(path, data, { compression: 'STORE' });
+        });
+    }
+
+    // Copy effect file
+    if (exportdata.effect.file) {
+      path = exportdata.effect.file.split('/').pop() ?? '';
+      await fetch(exportdata.effect.file)
+        .then((res) => res.blob())
+        .then((data) => {
+          subfolders.get('effect')?.file(path, data, { compression: 'STORE' });
         });
     }
 

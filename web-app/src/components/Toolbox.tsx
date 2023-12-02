@@ -88,10 +88,10 @@ const Toolbox = () => {
           <ToggleButton value={Tool.Rotate} aria-label="rotate" disabled>
             <RotateLeftOutlined />
           </ToggleButton>
-          <ToggleButton value={Tool.Flip} aria-label="flip" disabled>
+          <ToggleButton value={Tool.Flip} aria-label="flip">
             <FlipOutlined />
           </ToggleButton>
-          <ToggleButton value={Tool.Duplicate} aria-label="duplicate" disabled>
+          <ToggleButton value={Tool.Duplicate} aria-label="duplicate">
             <ContentCopyOutlined />
           </ToggleButton>
         </ToggleButtonGroup>
