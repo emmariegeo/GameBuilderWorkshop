@@ -18,7 +18,7 @@ const Motion = {
 export default class Play extends BaseScene {
   bg!: Phaser.GameObjects.Image;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
-  player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+  player!: Phaser.Physics.Arcade.Sprite;
   platforms!: Phaser.Physics.Arcade.StaticGroup;
   background: any;
   audio!: string;
@@ -142,32 +142,38 @@ export default class Play extends BaseScene {
    */
   loadPlayer(object: Entity) {
     // We only will have one player, so we will swap the sprite texture
-    let player = this.gameObjects.get('player') as Phaser.Physics.Arcade.Sprite;
+    this.player = this.gameObjects.get(
+      'player'
+    ) as Phaser.Physics.Arcade.Sprite;
 
     // We check if the texture has been previously loaded
     if (this.textures.exists(`PLAY_${object.title}`)) {
       if (this.gameObjects.has('player')) {
-        if (player.texture.key === `PLAY_${object.title}`) return;
-        player
+        if (this.player.texture.key === `PLAY_${object.title}`) return;
+        this.player
           .setTexture(`PLAY_${object.title}`)
-          .setScale(object.scaleX, object.scaleY);
+          .setScale(object.scaleX, object.scaleY)
+          .setFlipX(object.flipX);
       } else {
         this.gameObjects.set(
           'player',
           this.physics.add.sprite(object.x, object.y, `PLAY_${object.title}`)
         );
 
-        player = this.gameObjects.get('player') as Phaser.Physics.Arcade.Sprite;
-        player
+        this.player = this.gameObjects.get(
+          'player'
+        ) as Phaser.Physics.Arcade.Sprite;
+        this.player
           .setInteractive()
           .setCollideWorldBounds(true)
           .setBounce(0.2)
           .setScale(object.scaleX, object.scaleY)
-          .setData('id', 'player');
-        this.physics.add.collider(player, this.platforms);
+          .setData({ id: 'player', isFlipped: object.flipX })
+          .setFlipX(object.flipX);
+        this.physics.add.collider(this.player, this.platforms);
         // Checks to see if the player overlaps with any of the items, if player does, call the collectItem function
         this.physics.add.overlap(
-          player,
+          this.player,
           this.items,
           this.collectItem,
           undefined,
@@ -175,14 +181,14 @@ export default class Play extends BaseScene {
         );
         // Checks to see if the player overlaps with any of the obstacles, if player does, call the collectobstacles function
         this.physics.add.collider(
-          player,
+          this.player,
           this.obstacles,
           this.hitObstacle,
           undefined,
           this
         );
       }
-      player.refreshBody();
+      this.player.refreshBody();
       this.setAnimations(object.title);
     } else {
       // We wait to switch the player sprite texture
@@ -197,28 +203,30 @@ export default class Play extends BaseScene {
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
         if (this.gameObjects.has('player')) {
-          player
+          this.player
             .setTexture(`PLAY_${object.title}`)
-            .setScale(object.scaleX, object.scaleY);
+            .setScale(object.scaleX, object.scaleY)
+            .setFlipX(object.flipX);
         } else {
           this.gameObjects.set(
             'player',
             this.physics.add.sprite(object.x, object.y, `PLAY_${object.title}`)
           );
-          player = this.gameObjects.get(
+          this.player = this.gameObjects.get(
             'player'
           ) as Phaser.Physics.Arcade.Sprite;
-          player
+          this.player
             .setInteractive()
             .setCollideWorldBounds(true)
             .setBounce(0.2)
             .setScale(object.scaleX, object.scaleY)
-            .setData('id', 'player');
+            .setData({ id: 'player', isFlipped: object.flipX })
+            .setFlipX(object.flipX);
 
-          this.physics.add.collider(player, this.platforms);
+          this.physics.add.collider(this.player, this.platforms);
           // Checks to see if the player overlaps with any of the items, if player does, call the collectItem function
           this.physics.add.overlap(
-            player,
+            this.player,
             this.items,
             this.collectItem,
             undefined,
@@ -226,7 +234,7 @@ export default class Play extends BaseScene {
           );
           // Checks to see if the player overlaps with any of the obstacles, if player does, call the collectobstacles function
           this.physics.add.collider(
-            player,
+            this.player,
             this.obstacles,
             this.hitObstacle,
             undefined,
@@ -234,7 +242,7 @@ export default class Play extends BaseScene {
           );
         }
         this.setAnimations(object.title);
-        player.refreshBody();
+        this.player.refreshBody();
       });
       loader.start();
     }
@@ -255,7 +263,8 @@ export default class Play extends BaseScene {
         this.platforms.remove(platform, true);
         platform
           ?.setTexture(`PLAY_${object.title}`)
-          .setScale(object.scaleX, object.scaleY);
+          .setScale(object.scaleX, object.scaleY)
+          .setFlipX(object.flipX);
       } else {
         this.gameObjects.set(
           object.id,
@@ -267,7 +276,10 @@ export default class Play extends BaseScene {
           object.id
         ) as Phaser.Physics.Arcade.Sprite;
       }
-      platform.setData('id', object.id).refreshBody();
+      platform
+        .setData({ id: object.id, isFlipped: object.flipX })
+        .setFlipX(object.flipX)
+        .refreshBody();
       this.platforms.add(platform);
       this.platforms.refresh();
     } else {
@@ -292,7 +304,10 @@ export default class Play extends BaseScene {
             object.id
           ) as Phaser.Physics.Arcade.Sprite;
         }
-        platform.setData('id', object.id).refreshBody();
+        platform
+          .setData({ id: object.id, isFlipped: object.flipX })
+          .setFlipX(object.flipX)
+          .refreshBody();
         this.platforms.add(platform);
         this.platforms.refresh();
       });
@@ -316,7 +331,8 @@ export default class Play extends BaseScene {
         this.items.remove(item, true);
         item
           .setTexture(`PLAY_${object.title}`)
-          .setScale(object.scaleX, object.scaleY);
+          .setScale(object.scaleX, object.scaleY)
+          .setFlipX(object.flipX);
       } else if (!this.gameObjects.has(object.id)) {
         this.gameObjects.set(
           object.id,
@@ -326,7 +342,10 @@ export default class Play extends BaseScene {
         );
         item = this.getGameObject(object.id) as Phaser.Physics.Arcade.Sprite;
       }
-      item.setData('id', object.id).setCollideWorldBounds(true);
+      item
+        .setData({ id: object.id, isFlipped: object.flipX })
+        .setCollideWorldBounds(true)
+        .setFlipX(object.flipX);
       this.items.add(item);
     } else {
       // If texture does not exist, load before applying
@@ -337,7 +356,8 @@ export default class Play extends BaseScene {
           this.items.remove(item, true);
           item
             .setTexture(`PLAY_${object.title}`)
-            .setScale(object.scaleX, object.scaleY);
+            .setScale(object.scaleX, object.scaleY)
+            .setFlipX(object.flipX);
         } else {
           this.gameObjects.set(
             object.id,
@@ -347,7 +367,10 @@ export default class Play extends BaseScene {
           );
           item = this.getGameObject(object.id) as Phaser.Physics.Arcade.Sprite;
         }
-        item.setData('id', object.id).setCollideWorldBounds(true);
+        item
+          .setData({ id: object.id, isFlipped: object.flipX })
+          .setCollideWorldBounds(true)
+          .setFlipX(object.flipX);
         this.items.add(item);
       });
       loader.start();
@@ -372,19 +395,25 @@ export default class Play extends BaseScene {
         this.obstacles.remove(obstacle, true);
         obstacle
           .setTexture(`PLAY_${object.title}`)
-          .setScale(object.scaleX, object.scaleY);
+          .setScale(object.scaleX, object.scaleY)
+          .setFlipX(object.flipX);
       } else if (!this.gameObjects.has(object.id)) {
         this.gameObjects.set(
           object.id,
           this.physics.add
             .sprite(object.x, object.y, `PLAY_${object.title}`)
             .setScale(object.scaleX, object.scaleY)
+            .setFlipX(object.flipX)
         );
         obstacle = this.getGameObject(
           object.id
         ) as Phaser.Physics.Arcade.Sprite;
       }
-      obstacle.setData('id', object.id).setData('physics', object.physics);
+      obstacle.setData({
+        id: object.id,
+        isFlipped: object.flipX,
+        physics: object.physics,
+      });
       this.obstacles.add(obstacle);
       switch (object.physics) {
         case 'BOUNCE':
@@ -436,7 +465,13 @@ export default class Play extends BaseScene {
             object.id
           ) as Phaser.Physics.Arcade.Sprite;
         }
-        obstacle.setData('id', object.id).setData('physics', object.physics);
+        obstacle
+          .setData({
+            id: object.id,
+            isFlipped: object.flipX,
+            physics: object.physics,
+          })
+          .setFlipX(object.flipX);
         this.obstacles.add(obstacle);
         // Obstacles can have different behaviors
         switch (object.physics) {
@@ -636,7 +671,8 @@ export default class Play extends BaseScene {
             : Phaser.Math.Between(0, 400);
         let clone = this.obstacles
           .create(obX, 0, obstacle.texture.key)
-          .setData('physics', obstacle.getData('physics'));
+          .setData('physics', obstacle.getData('physics'))
+          .setFlipX(obstacle.flipX);
         // Set the clone's motion
         switch (clone.getData('physics')) {
           case 'BOUNCE':
@@ -686,36 +722,22 @@ export default class Play extends BaseScene {
           );
       }
       if (this.cursors?.left.isDown) {
-        (
-          this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
-        ).setVelocityX(-160);
-        (
-          this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
-        ).anims.play(`left_${this.currentAnimKey}`, true);
+        this.player
+          .setVelocityX(-160)
+          .setFlipX(!this.player.getData('isFlipped'));
+        this.player.anims.play(`left_${this.currentAnimKey}`, true);
       } else if (this.cursors?.right.isDown) {
-        (
-          this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
-        ).setVelocityX(160);
-        (
-          this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
-        ).anims.play(`right_${this.currentAnimKey}`, true);
+        this.player
+          .setVelocityX(160)
+          .setFlipX(this.player.getData('isFlipped'));
+        this.player.anims.play(`right_${this.currentAnimKey}`, true);
       } else {
-        (
-          this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
-        ).setVelocityX(0);
-        (
-          this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
-        ).anims.play(`turn_${this.currentAnimKey}`, true);
+        this.player.setVelocityX(0).setFlipX(this.player.getData('isFlipped'));
+        this.player.anims.play(`turn_${this.currentAnimKey}`, true);
       }
     }
-    if (
-      this.cursors?.up.isDown &&
-      (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).body
-        ?.touching.down
-    ) {
-      (
-        this.getGameObject('player') as Phaser.Physics.Arcade.Sprite
-      )?.setVelocityY(-830);
+    if (this.cursors?.up.isDown && this.player.body?.touching.down) {
+      this.player?.setVelocityY(-830);
     }
   }
 }

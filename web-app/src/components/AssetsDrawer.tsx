@@ -50,7 +50,7 @@ const AssetsDrawer = () => {
     state.canvas.background,
     state.canvas.audio,
     state.canvas.mode,
-    state.canvas.effect
+    state.canvas.effect,
   ]);
 
   // Dispatch to store
@@ -125,6 +125,7 @@ const AssetsDrawer = () => {
             scaleX: 1,
             scaleY: 1,
             scale: 1,
+            flipX: false,
             orientation: 0,
             spriteUrl: data[assetType][itemKey].img,
             spriteWidth: data[assetType][itemKey].width ?? 100,
@@ -150,6 +151,7 @@ const AssetsDrawer = () => {
             scaleX: player?.scaleX ?? 1,
             scaleY: player?.scaleY ?? 1,
             scale: player?.scale ?? 1,
+            flipX: false,
             orientation: player?.orientation ?? 0,
             spriteUrl: data['sprites'][itemKey].img,
             spriteWidth: data['sprites'][itemKey].width ?? 32,
@@ -173,6 +175,7 @@ const AssetsDrawer = () => {
             scaleX: 1,
             scaleY: 1,
             scale: 1,
+            flipX: false,
             orientation: 0,
             spriteUrl: data['items'][itemKey].img,
             spriteWidth: data['items'][itemKey].width ?? 32,
@@ -196,6 +199,7 @@ const AssetsDrawer = () => {
             scaleX: 1,
             scaleY: 1,
             scale: 1,
+            flipX: false,
             orientation: 0,
             spriteUrl: data['obstacles'][itemKey].img,
             spriteWidth: data['obstacles'][itemKey].width ?? 14,
@@ -251,7 +255,9 @@ const AssetsDrawer = () => {
               width: 164,
               height: 164,
               border:
-                item[0] === audio || item[0] === background || item[0] === effect
+                item[0] === audio ||
+                item[0] === background ||
+                item[0] === effect
                   ? '5px solid blue'
                   : '0',
             }}

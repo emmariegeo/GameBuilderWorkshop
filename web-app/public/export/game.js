@@ -184,7 +184,8 @@ class YourGame extends Phaser.Scene {
           .setCollideWorldBounds(true)
           .setBounce(0.2)
           .setScale(object.scaleX, object.scaleY)
-          .setData('id', 'player');
+          .setData({ id: 'player', isFlipped: object.flipX })
+          .setFlipX(object.flipX);
         this.physics.add.collider(this.player, this.platforms);
         // Checks to see if the player overlaps with any of the this.items, if player does, call the collectItem function
         this.physics.add.overlap(
@@ -232,7 +233,8 @@ class YourGame extends Phaser.Scene {
             .setCollideWorldBounds(true)
             .setBounce(0.2)
             .setScale(object.scaleX, object.scaleY)
-            .setData('id', 'player');
+            .setData({ id: 'player', isFlipped: object.flipX })
+            .setFlipX(object.flipX);
 
           this.physics.add.collider(this.player, this.platforms);
           // Checks to see if the player overlaps with any of the this.items, if player does, call the collectItem function
@@ -282,7 +284,10 @@ class YourGame extends Phaser.Scene {
         );
         platform = this.getGameObject(object.id);
       }
-      platform.setData('id', object.id).refreshBody();
+      platform
+        .setData({ id: object.id, isFlipped: object.flipX })
+        .setFlipX(object.flipX)
+        .refreshBody();
       this.platforms.add(platform);
       this.platforms.refresh();
     } else {
@@ -305,7 +310,10 @@ class YourGame extends Phaser.Scene {
           );
           platform = this.getGameObject(object.id);
         }
-        platform.setData('id', object.id).refreshBody();
+        platform
+          .setData({ id: object.id, isFlipped: object.flipX })
+          .setFlipX(object.flipX)
+          .refreshBody();
         this.platforms.add(platform);
         this.platforms.refresh();
       });
@@ -339,7 +347,9 @@ class YourGame extends Phaser.Scene {
         );
         item = this.getGameObject(object.id);
       }
-      item.setData('id', object.id);
+      item
+        .setData({ id: object.id, isFlipped: object.flipX })
+        .setFlipX(object.flipX);
       item.body.collidWorldBounds = true;
       this.items.add(item);
     } else {
@@ -361,7 +371,10 @@ class YourGame extends Phaser.Scene {
           );
           item = this.getGameObject(object.id);
         }
-        item.setData('id', object.id).setCollideWorldBounds(true);
+        item
+          .setData({ id: object.id, isFlipped: object.flipX })
+          .setFlipX(object.flipX)
+          .setCollideWorldBounds(true);
         item.body.collidWorldBounds = true;
         this.items.add(item);
       });
@@ -395,7 +408,13 @@ class YourGame extends Phaser.Scene {
         );
         obstacle = this.getGameObject(object.id);
       }
-      obstacle.setData('id', object.id).setData('physics', object.physics);
+      obstacle
+        .setData({
+          id: object.id,
+          physics: object.physics,
+          isFlipped: object.flipX,
+        })
+        .setFlipX(object.flipX);
       this.obstacles.add(obstacle);
       switch (object.physics) {
         case 'BOUNCE':
@@ -445,7 +464,13 @@ class YourGame extends Phaser.Scene {
           );
           obstacle = this.getGameObject(object.id);
         }
-        obstacle.setData('id', object.id).setData('physics', object.physics);
+        obstacle
+          .setData({
+            id: object.id,
+            physics: object.physics,
+            isFlipped: object.flipX,
+          })
+          .setFlipX(object.flipX);
         this.obstacles.add(obstacle);
         // Obstacles can have different behaviors
         switch (object.physics) {
@@ -620,9 +645,11 @@ class YourGame extends Phaser.Scene {
         );
         let newY = Phaser.Math.Between(
           child.displayHeight / 2,
-          this.scale.displaySize.height - child.displayHeight*2
+          this.scale.displaySize.height - child.displayHeight * 2
         );
-        child.enableBody(true, newX, newY, true, true).setCollideWorldBounds(true);
+        child
+          .enableBody(true, newX, newY, true, true)
+          .setCollideWorldBounds(true);
         return true;
       });
 
@@ -630,9 +657,8 @@ class YourGame extends Phaser.Scene {
       let movingObstacles = this.obstacles.getMatching('state', Motion.MOVING);
       // If we have moving obstacles in the obstacles group, randomly choose one and clone it.
       if (movingObstacles.length > 0) {
-        let obstacle = movingObstacles[
-          Phaser.Math.Between(0, movingObstacles.length - 1)
-        ];
+        let obstacle =
+          movingObstacles[Phaser.Math.Between(0, movingObstacles.length - 1)];
         let obX =
           player.x < 400
             ? Phaser.Math.Between(400, 800)
@@ -684,13 +710,13 @@ class YourGame extends Phaser.Scene {
         this.effect.setX(this.player.x).setY(this.player.y);
       }
       if (this.cursors?.left.isDown) {
-        this.player?.setVelocityX(-160);
+        this.player?.setVelocityX(-160).setFlipX(!this.player.getData('isFlipped'));
         this.player?.anims.play(`left_${this.currentAnimKey}`, true);
       } else if (this.cursors?.right.isDown) {
-        this.player?.setVelocityX(160);
+        this.player?.setVelocityX(160).setFlipX(this.player.getData('isFlipped'));;
         this.player?.anims.play(`right_${this.currentAnimKey}`, true);
       } else {
-        this.player?.setVelocityX(0);
+        this.player?.setVelocityX(0).setFlipX(this.player.getData('isFlipped'));;
         this.player?.anims.play(`turn_${this.currentAnimKey}`, true);
       }
       if (this.cursors?.up.isDown && this.player?.body?.touching.down) {

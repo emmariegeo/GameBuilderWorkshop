@@ -5,7 +5,13 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { dialogOpened, dialogState, entityById, store, useAppDispatch } from '@/store';
+import {
+  dialogOpened,
+  dialogState,
+  entityById,
+  store,
+  useAppDispatch,
+} from '@/store';
 import { useState } from 'react';
 import { Box, Grid, Skeleton } from '@mui/material';
 
@@ -66,6 +72,10 @@ export const OptionsMenu = () => {
     {
       prop: 'Sprite',
       value: selectedEntity?.spriteUrl,
+    },
+    {
+      prop: 'FlipX',
+      value: selectedEntity?.flipX.toString(),
     },
     {
       prop: 'Orientation',
@@ -160,6 +170,6 @@ export const OptionsMenu = () => {
       </CardActions>
     </Card>
   );
-}
+};
 
 export default OptionsMenu;

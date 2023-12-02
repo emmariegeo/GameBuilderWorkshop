@@ -10,6 +10,7 @@ import {
   deleteSuccess,
   entityUpdateScale,
   dialogState,
+  entityFlipX,
 } from '../../../store';
 import { data as assets } from '../../../data/assets.ts';
 import { Entity, Tool } from '@/data/types.ts';
@@ -322,7 +323,9 @@ export default class Edit extends BaseScene {
       }
       // Check for change in selected object
       if (state.canvas.selected !== this.selected?.getData('id')) {
-        this.selected = this.getGameObject(state.canvas.selected) as Phaser.GameObjects.Image;
+        this.selected = this.getGameObject(
+          state.canvas.selected
+        ) as Phaser.GameObjects.Image;
       }
     }
   }
@@ -363,6 +366,19 @@ export default class Edit extends BaseScene {
     ) {
       store.dispatch(select(object.getData('id')));
       store.dispatch(dialogOpened(dialogState.Duplicate));
+    }
+  }
+
+  /**
+   * Flip a game object horizontally
+   * @param object Phaser.GameObjects.Image
+   */
+  flipXGameObject(object: Phaser.GameObjects.Image) {
+    // Check for update delay between this.tool and store tool
+    if (store.getState().canvas.tool == Tool.Flip) {
+      store.dispatch(select(object.getData('id')));
+      object.toggleFlipX();
+      this.updateGameObjectFlipX(object.getData('id'), object.flipX);
     }
   }
 
@@ -409,6 +425,15 @@ export default class Edit extends BaseScene {
         },
       })
     );
+  }
+
+  /**
+   * Update game object flipX in store for entity with corresponding id
+   * @param id string
+   * @param flipX boolean
+   */
+  updateGameObjectFlipX(id: string, flipX: boolean) {
+    store.dispatch(entityFlipX({ id: id, flipX: flipX }));
   }
 
   /**
@@ -483,7 +508,10 @@ export default class Edit extends BaseScene {
         player = this.gameObjects.get('player') as Phaser.Physics.Arcade.Sprite;
         player?.setInteractive();
       }
-      player?.setScale(object.scaleX, object.scaleY).setData('id', 'player');
+      player
+        ?.setScale(object.scaleX, object.scaleY)
+        .setData('id', 'player')
+        .setFlipX(object.flipX);
     } else {
       // We wait to switch the player sprite texture
       let loader = this.load.spritesheet(
@@ -510,7 +538,10 @@ export default class Edit extends BaseScene {
         if (player) {
           player.setInteractive();
           this.input?.setDraggable(player);
-          player.setScale(object.scaleX, object.scaleY).setData('id', 'player');
+          player
+            .setScale(object.scaleX, object.scaleY)
+            .setData('id', 'player')
+            .setFlipX(object.flipX);
         }
       });
       loader.start();
@@ -550,7 +581,8 @@ export default class Edit extends BaseScene {
         ?.setData('id', object.id)
         .setScale(object.scaleX, object.scaleY)
         .setBodySize(object.width, object.height, true)
-        .setInteractive();
+        .setInteractive()
+        .setFlipX(object.flipX);
       this.input.setDraggable(platform);
       this.platforms.add(platform);
       this.platforms.refresh();
@@ -583,7 +615,8 @@ export default class Edit extends BaseScene {
               .setData('id', object.id)
               .setScale(object.scaleX, object.scaleY)
               .setBodySize(object.width, object.height, true)
-              .setInteractive();
+              .setInteractive()
+              .setFlipX(object.flipX);
             this.input && this.input.setDraggable(platform);
             this.platforms.add(platform);
             this.platforms.refresh();
@@ -620,7 +653,7 @@ export default class Edit extends BaseScene {
         );
         item = this.getGameObject(object.id) as Phaser.Physics.Arcade.Sprite;
       }
-      item.setData('id', object.id).setInteractive();
+      item.setData('id', object.id).setInteractive().setFlipX(object.flipX);
       this.input?.setDraggable(item);
       this.items.add(item);
     } else {
@@ -643,7 +676,10 @@ export default class Edit extends BaseScene {
           item = this.getGameObject(object.id) as Phaser.Physics.Arcade.Sprite;
         }
         if (item) {
-          item?.setData('id', object.id).setInteractive();
+          item
+            ?.setData('id', object.id)
+            .setInteractive()
+            .setFlipX(object.flipX);
           item && this.input.setDraggable(item);
           this.items.add(item);
         }
@@ -681,7 +717,10 @@ export default class Edit extends BaseScene {
           object.id
         ) as Phaser.Physics.Arcade.Sprite;
       }
-      obstacle?.setData('id', object.id).setInteractive();
+      obstacle
+        ?.setData('id', object.id)
+        .setInteractive()
+        .setFlipX(object.flipX);
       this.input?.setDraggable(obstacle);
       this.obstacles.add(obstacle);
     } else {
@@ -706,7 +745,10 @@ export default class Edit extends BaseScene {
           ) as Phaser.Physics.Arcade.Sprite;
         }
         if (obstacle) {
-          obstacle.setData('id', object.id).setInteractive();
+          obstacle
+            .setData('id', object.id)
+            .setInteractive()
+            .setFlipX(object.flipX);
           this.input?.setDraggable(obstacle);
           this.obstacles.add(obstacle);
         }
@@ -752,6 +794,15 @@ export default class Edit extends BaseScene {
         'gameobjectup',
         (pointer: any, gameObject: Phaser.GameObjects.Image) => {
           this.deleteGameObject(gameObject);
+        }
+      );
+    }
+
+    if (this.tool == Tool.Flip) {
+      this.input.once(
+        'gameobjectup',
+        (pointer: any, gameObject: Phaser.GameObjects.Image) => {
+          this.flipXGameObject(gameObject);
         }
       );
     }

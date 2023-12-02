@@ -11,13 +11,13 @@ import { Entity, Tool } from './data/types';
 export enum dialogState {
   Closed = 'CLOSED',
   Delete = 'DELETE',
-  Duplicate = 'DUPLICATE'
+  Duplicate = 'DUPLICATE',
 }
 
 const initialState: {
   mode: string;
   background: string;
-  effect: '',
+  effect: '';
   audio: string;
   tool: Tool;
   selected: string;
@@ -74,6 +74,19 @@ const entitiesSlice = createSlice({
           changes: { loaded: false },
         });
       }
+    },
+    entityFlipX(
+      state,
+      action: {
+        payload: { id: string; flipX: boolean };
+      }
+    ) {
+      entitiesAdapter.updateOne(state, {
+        id: action.payload.id,
+        changes: {
+          flipX: action.payload.flipX,
+        },
+      });
     },
     entityUpdateXYZ(
       state,
@@ -211,6 +224,7 @@ export const {
   entityLoaded,
   entityUpdated,
   entityDeleted,
+  entityFlipX,
   entityUpdateXYZ,
   entityUpdateScale,
   deleteSuccess,
