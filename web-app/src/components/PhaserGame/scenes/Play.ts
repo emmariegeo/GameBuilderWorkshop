@@ -556,16 +556,15 @@ export default class Play extends BaseScene {
    */
   hitObstacle(player: any, obstacle: any) {
     obstacle = obstacle as Phaser.GameObjects.GameObject;
-    player = player as Phaser.Physics.Arcade.Sprite;
     this.physics.pause();
 
-    player.setTint(0xff0000);
-    player.anims.play(`turn_${this.currentAnimKey}`);
+    this.player.setTint(0xff0000);
+    this.player.anims.play(`turn_${this.currentAnimKey}`);
 
     let spotlight = this.add
       .graphics()
       .setAlpha(1)
-      .fillCircle(player.x, player.y, player.width * 2)
+      .fillCircle(this.player.x, this.player.y, this.player.width * 2)
       .createGeometryMask()
       .setInvertAlpha();
 
@@ -713,13 +712,7 @@ export default class Play extends BaseScene {
     // Player movement with arrow controls
     if (this.gameObjects.has('player')) {
       if (this.effectKey == 'spotlight' && this.effect) {
-        this.effect
-          .setX(
-            (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).x
-          )
-          .setY(
-            (this.getGameObject('player') as Phaser.Physics.Arcade.Sprite).y
-          );
+        this.effect.setX(this.player.x).setY(this.player.y);
       }
       if (this.cursors?.left.isDown) {
         this.player

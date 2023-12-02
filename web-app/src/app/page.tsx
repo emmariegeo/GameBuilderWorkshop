@@ -48,5 +48,5 @@ const Home = () => {
       </Provider>
     </Container>
   );
-}
+};
 export default Home;

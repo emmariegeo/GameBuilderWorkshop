@@ -2,7 +2,6 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import dynamic from 'next/dynamic';
 import { v4 as uuid } from 'uuid';
-
 import {
   switchMode,
   useAppSelector,
@@ -68,13 +67,19 @@ const Canvas = () => {
     dispatch(dialogOpened(dialogState.Closed));
   };
 
+  /**
+   * Delete an entity from the store.
+   */
   const handleDeleteObject = () => {
     dispatch(dialogOpened(dialogState.Closed));
     dispatch(entityDeleted(selected));
   };
 
+  /**
+   * Create a duplicate entity and update the store.
+   */
   const handleDuplicateObject = () => {
-    let clone = {...entityById(selected)};
+    let clone = { ...entityById(selected) };
     // Duplicated player sprites become an obstacle
     if (clone?.type == EntityType.Player) {
       clone.type = EntityType.Obstacle;
@@ -84,13 +89,14 @@ const Canvas = () => {
     dispatch(dialogOpened(dialogState.Closed));
     if (clone?.id !== undefined) {
       clone.id = uuid();
-      clone.x = clone.x ? clone.x + 20 : 20
-      clone.y = clone.y ? clone.y + 20 : 20
+      clone.x = clone.x ? clone.x + 20 : 20;
+      clone.y = clone.y ? clone.y + 20 : 20;
       dispatch(entityAdded(clone as Entity));
       dispatch(select(clone.id));
     }
   };
 
+  // Content for Delete dialog
   const deleteContent = (
     <>
       <DialogTitle id="alert-dialog-title">{'Delete game object?'}</DialogTitle>
@@ -103,6 +109,7 @@ const Canvas = () => {
     </>
   );
 
+  // Content for Duplicate dialog
   const duplicateContent = (
     <>
       <DialogTitle id="alert-dialog-title">

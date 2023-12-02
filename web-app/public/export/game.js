@@ -710,13 +710,17 @@ class YourGame extends Phaser.Scene {
         this.effect.setX(this.player.x).setY(this.player.y);
       }
       if (this.cursors?.left.isDown) {
-        this.player?.setVelocityX(-160).setFlipX(!this.player.getData('isFlipped'));
+        this.player
+          ?.setVelocityX(-160)
+          .setFlipX(!this.player.getData('isFlipped'));
         this.player?.anims.play(`left_${this.currentAnimKey}`, true);
       } else if (this.cursors?.right.isDown) {
-        this.player?.setVelocityX(160).setFlipX(this.player.getData('isFlipped'));;
+        this.player
+          ?.setVelocityX(160)
+          .setFlipX(this.player.getData('isFlipped'));
         this.player?.anims.play(`right_${this.currentAnimKey}`, true);
       } else {
-        this.player?.setVelocityX(0).setFlipX(this.player.getData('isFlipped'));;
+        this.player?.setVelocityX(0).setFlipX(this.player.getData('isFlipped'));
         this.player?.anims.play(`turn_${this.currentAnimKey}`, true);
       }
       if (this.cursors?.up.isDown && this.player?.body?.touching.down) {

@@ -11,7 +11,13 @@ import {
 } from '@mui/material';
 import { startData } from '@/data/startData';
 import { data as assets } from '@/data/assets.ts';
-import { entitiesAdded, reset, store, switchMode, useAppDispatch } from '@/store';
+import {
+  entitiesAdded,
+  reset,
+  store,
+  switchMode,
+  useAppDispatch,
+} from '@/store';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { useState } from 'react';
@@ -26,7 +32,7 @@ const ActionButtons = () => {
   const dispatch = useAppDispatch();
 
   const handleNewGame = async (event: React.MouseEvent<HTMLElement>) => {
-    dispatch(reset())
+    dispatch(reset());
     dispatch(entitiesAdded(startData));
     dialogOpened(false);
   };
