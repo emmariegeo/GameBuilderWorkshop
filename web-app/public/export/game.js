@@ -71,9 +71,10 @@ class YourGame extends Phaser.Scene {
   }
   preload() {
     this.load.image('bg', data.background.img);
-    this.load.audio(data.audio.title, data.audio.file, {
-      stream: true,
-    });
+    data.audio.file &&
+      this.load.audio(data.audio.title, data.audio.file, {
+        stream: true,
+      });
   }
 
   create() {
@@ -97,14 +98,18 @@ class YourGame extends Phaser.Scene {
       this.bg.setPipeline('Light2D');
     }
 
-    this.audio = this.sound.add(data.audio.title, { loop: true });
-    if (!this.sound.locked && !this.audio?.isPlaying) {
-      this.audio.play();
-    } else {
-      // wait for 'unlocked' to fire and then play
-      this.sound.once(Phaser.Sound.Events.UNLOCKED, () => {
+    this.audio = data.audio.file
+      ? this.sound.add(data.audio.title, { loop: true })
+      : undefined;
+    if (this.audio !== undefined) {
+      if (!this.sound.locked && !this.audio?.isPlaying) {
         this.audio.play();
-      });
+      } else {
+        // wait for 'unlocked' to fire and then play
+        this.sound.once(Phaser.Sound.Events.UNLOCKED, () => {
+          this.audio.play();
+        });
+      }
     }
     this.cursors = this.input.keyboard?.createCursorKeys();
     // The platforms group contains objects the player can jump on/collide with
