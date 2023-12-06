@@ -10,6 +10,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
+  Typography,
 } from '@mui/material';
 import { data } from '../data/assets.ts';
 import {
@@ -25,6 +26,17 @@ import {
 import { Entity, EntityType } from '@/data/types.ts';
 
 type Anchor = 'bottom';
+
+const descriptions: { [index: string]: string } = {
+  backgrounds: 'Switch between game backgrounds by clicking on an asset below.',
+  platforms: 'Click on a platform to add it to the canvas.',
+  sprites: "Click on a sprite asset to switch the current player's look.",
+  items:
+    'Click an item to add it to the canvas. Items can be collected by the player.',
+  obstacles: 'Click on an obstacle to add it to the canvas.',
+  effects: 'Switch between game effects.',
+  audio: "Switch the game's audio.",
+};
 
 const AssetsDrawer = () => {
   // Drawer state
@@ -236,6 +248,9 @@ const AssetsDrawer = () => {
         <ToggleButton value="audio">Audio</ToggleButton>
       </ToggleButtonGroup>
       <Divider />
+      <Typography variant="subtitle2">
+        {descriptions[assetType] ?? ''}
+      </Typography>
       <Box
         display={'grid'}
         gridTemplateColumns="repeat(auto-fill, 164px)"
