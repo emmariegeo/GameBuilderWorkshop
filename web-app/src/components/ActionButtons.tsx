@@ -15,7 +15,6 @@ import {
   entitiesAdded,
   reset,
   store,
-  switchMode,
   useAppDispatch,
 } from '@/store';
 import JSZip from 'jszip';
