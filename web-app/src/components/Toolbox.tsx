@@ -3,9 +3,7 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import NearMeOutlined from '@mui/icons-material/NearMeOutlined';
 import DeleteOutlined from '@mui/icons-material/DeleteOutlined';
-import FormatColorFillOutlined from '@mui/icons-material/FormatColorFillOutlined';
 import AspectRatioOutlined from '@mui/icons-material/AspectRatioOutlined';
-import RotateLeftOutlined from '@mui/icons-material/RotateLeftOutlined';
 import FlipOutlined from '@mui/icons-material/FlipOutlined';
 import ContentCopyOutlined from '@mui/icons-material/ContentCopyOutlined';
 import { Tool } from '@/data/types';
@@ -77,22 +75,20 @@ const Toolbox = () => {
               <DeleteOutlined />
             </Tooltip>
           </ToggleButton>
-          <ToggleButton value={Tool.Fill} aria-label="fill" disabled>
-            <FormatColorFillOutlined />
-          </ToggleButton>
           <ToggleButton value={Tool.Resize} aria-label="resize">
             <Tooltip title="Resize tool" placement="right">
               <AspectRatioOutlined />
             </Tooltip>
           </ToggleButton>
-          <ToggleButton value={Tool.Rotate} aria-label="rotate" disabled>
-            <RotateLeftOutlined />
-          </ToggleButton>
           <ToggleButton value={Tool.Flip} aria-label="flip">
-            <FlipOutlined />
+            <Tooltip title="Flip tool" placement="right">
+              <FlipOutlined />
+            </Tooltip>
           </ToggleButton>
           <ToggleButton value={Tool.Duplicate} aria-label="duplicate">
-            <ContentCopyOutlined />
+            <Tooltip title="Duplicate tool" placement="right">
+              <ContentCopyOutlined />
+            </Tooltip>
           </ToggleButton>
         </ToggleButtonGroup>
         {matches && (

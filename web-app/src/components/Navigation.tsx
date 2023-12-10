@@ -154,13 +154,9 @@ const Navigation = (props: { children: ReactNode }) => {
               <Link href="https://phaser.io/Phaser">Phaser</Link> HTML5 game
               engine.
             </Typography>
+            <Tutorial />
           </DialogContent>
-          <Tutorial />
-          <DialogActions>
-            <Button autoFocus onClick={handleClose}>
-              Learn More
-            </Button>
-          </DialogActions>
+          <DialogActions></DialogActions>
         </Dialog>
       </Box>
     </Box>
