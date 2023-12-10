@@ -13,48 +13,48 @@ import { useState } from 'react';
 const steps = [
   {
     label: 'Create a New Game',
-    imgPath: '/workshop/newgame.gif',
+    imgPath: '/workshop/tutorials/newgame.gif',
     description: `Start a new game with the new game button.`,
   },
   {
     label: 'Switch between Edit and Play mode',
-    imgPath: '',
+    imgPath: '/workshop/tutorials/mode.gif',
     description:
       'Edit mode will allow you to make changes to your game, while play mode will let you test the game out.',
   },
   {
     label: 'Selection tool',
-    imgPath: '',
+    imgPath: '/workshop/tutorials/select.gif',
     description:
       'Click on the selection tool, then drag and drop objects on your canvas to change their position.',
   },
   {
     label: 'Delete tool',
-    imgPath: '',
+    imgPath: '/workshop/tutorials/delete.gif',
     description:
       'Click on the delete tool, then click on an object you wish to delete. You will be given the option to delete the object from your game, or cancel.',
   },
   {
     label: 'Resize tool',
-    imgPath: '',
+    imgPath: '/workshop/tutorials/resize.gif',
     description:
       'Click on the resize tool, then click on an object. Drag the corners of the selected object to change its scale.',
   },
   {
     label: 'Adding assets to your game',
-    imgPath: '',
+    imgPath: '/workshop/tutorials/addassets.gif',
     description:
       'Click to open the assets drawer. Clicking on an asset will add it to your game. Some asset types, like backgrounds, player sprites, and audio, can only exist once in your game. Selecting one of these objects will replace the existing background, player sprite, or audio in your game.',
   },
   {
     label: 'Exporting your game',
-    imgPath: '',
+    imgPath: '/workshop/tutorials/export.gif',
     description:
       'To download your game files, click the export button. A dialog will appear, prompting you to confirm you wish to download your game files as a ZIP file.',
   },
   {
     label: 'Running your game',
-    imgPath: '',
+    imgPath: '/workshop/tutorials/launch.gif',
     description:
       'To run your game locally, extract the ZIP file you have downloaded, then run the launchgame.exe file.',
   },
