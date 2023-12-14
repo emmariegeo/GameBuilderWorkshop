@@ -1,6 +1,6 @@
 # Game Builder Workshop
-### Hosted at [gamebuilderworkshop.com](https://gamebuilderworkshop.com/). ###
-[Alternative Link](https://gamebuilderworkshop.pages.dev/)
+### Visit at [gamebuilderworkshop.com](https://gamebuilderworkshop.com/) ###
+([ALTERNATIVE LINK](https://gamebuilderworkshop.pages.dev/))
 
 ## Overview ##
 My capstone project, Game Builder Workshop, is a web application that guides the user through creating their own HTML5 game and allows the user to share their game creation with friends.
@@ -63,5 +63,5 @@ My capstone project, Game Builder Workshop, is a web application that guides the
 │   ├── package-lock.json
 │   ├── package.json
 │   └── tsconfig.json
-└── README.md (this)  
+└── README.md (you are here!)  
 ```
