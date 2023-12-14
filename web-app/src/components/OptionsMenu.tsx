@@ -15,6 +15,9 @@ import {
 import { useState } from 'react';
 import { Box, Grid, Skeleton } from '@mui/material';
 
+/**
+ * OptionsMenu component shows data about the currently selected object
+ */
 export const OptionsMenu = () => {
   // Get the selected entity by its id using the currently selected from store
   let [selectedEntity, setSelectedEntity] = useState(entityById(''));
@@ -28,14 +31,17 @@ export const OptionsMenu = () => {
   // dispatch to store
   const dispatch = useAppDispatch();
 
+  // Tell store that delete dialog should be open
   const onDelete = () => {
     dispatch(dialogOpened(dialogState.Delete));
   };
 
+  // Tell store that duplicate dialog should be open
   const onDuplicate = () => {
     dispatch(dialogOpened(dialogState.Duplicate));
   };
 
+  // Row data for menu
   const rows: { prop: string; value: any }[] = [
     {
       prop: 'x',

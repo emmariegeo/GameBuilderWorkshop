@@ -1,18 +1,25 @@
+// Exported game script
 import { data } from './gamedata.js';
-var game;
+
+let game;
 // Used to differentiate between moving and still game objects.
 const Motion = {
   STILL: 0,
   MOVING: 1,
 };
 
+/**
+ * Launch scene for the game displays a start game button
+ */
 class LaunchScene extends Phaser.Scene {
   constructor() {
     super('LaunchScene');
   }
+
   preload() {
     this.load.image('bg', data.background.img);
   }
+
   create() {
     this.bg = this.add
       .image(this.scale.width / 2, this.scale.height / 2, 'bg')
@@ -53,6 +60,10 @@ class LaunchScene extends Phaser.Scene {
     });
   }
 }
+
+/**
+ * Scene for playing the game
+ */
 class YourGame extends Phaser.Scene {
   player;
   bg;
@@ -69,6 +80,7 @@ class YourGame extends Phaser.Scene {
   constructor() {
     super('YourGame');
   }
+
   preload() {
     this.load.image('bg', data.background.img);
     data.audio.file &&
@@ -78,6 +90,7 @@ class YourGame extends Phaser.Scene {
   }
 
   create() {
+    // Destroy any existing audio
     this.audio && this.audio.destroy();
     this.gameObjects = new Map();
     this.gameEntities = data.entities;
@@ -160,6 +173,10 @@ class YourGame extends Phaser.Scene {
     }
   }
 
+  /**
+   * Select a game object by its key
+   * @param key string
+   */
   getGameObject(key) {
     let object = this.gameObjects.get(key);
     return object;
@@ -395,20 +412,20 @@ class YourGame extends Phaser.Scene {
   loadObstacle(object) {
     let obstacle = this.getGameObject(object.id);
     // If texture exists, apply
-    if (this.textures.exists(`PLAY_${object.title}`)) {
+    if (this.textures.exists( `PLAY_OB_${object.title}`)) {
       if (
         this.gameObjects.has(object.id) &&
-        obstacle.texture.key !== `PLAY_${object.title}`
+        obstacle.texture.key !== `PLAY_OB_${object.title}`
       ) {
         this.obstacles.remove(obstacle, true);
         obstacle
-          .setTexture(`PLAY_${object.title}`)
+          .setTexture(`PLAY_OB_${object.title}`, 'obstacle')
           .setScale(object.scaleX, object.scaleY);
       } else if (!this.gameObjects.has(object.id)) {
         this.gameObjects.set(
           object.id,
           this.physics.add
-            .sprite(object.x, object.y, `PLAY_${object.title}`)
+            .sprite(object.x, object.y, `PLAY_OB_${object.title}`, 'obstacle')
             .setScale(object.scaleX, object.scaleY)
         );
         obstacle = this.getGameObject(object.id);
@@ -452,19 +469,22 @@ class YourGame extends Phaser.Scene {
       }
     } else {
       // If texture does not exist, load before applying
-      let loader = this.load.image(`PLAY_${object.title}`, object.spriteUrl);
+      let loader = this.load.image(`PLAY_OB_${object.title}`, object.spriteUrl);
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
+        this.textures
+          .get(`PLAY_OB_${object.title}`)
+          .add('obstacle', 0, 0, 0, object.spriteWidth, object.spriteHeight);
         if (this.gameObjects.has(object.id)) {
           this.obstacles.remove(obstacle, true);
           obstacle
-            .setTexture(`PLAY_${object.title}`)
+            .setTexture(`PLAY_OB_${object.title}`, 'obstacle')
             .setScale(object.scaleX, object.scaleY);
         } else {
           this.gameObjects.set(
             object.id,
             this.physics.add
-              .sprite(object.x, object.y, `PLAY_${object.title}`)
+              .sprite(object.x, object.y, `PLAY_OB_${object.title}`, 'obstacle')
               .setScale(object.scaleX, object.scaleY)
           );
           obstacle = this.getGameObject(object.id);
@@ -734,6 +754,8 @@ class YourGame extends Phaser.Scene {
     }
   }
 }
+
+// Phaser game config
 var config = {
   type: Phaser.AUTO,
   width: 800,

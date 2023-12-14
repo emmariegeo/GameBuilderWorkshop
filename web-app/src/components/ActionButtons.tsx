@@ -11,16 +11,15 @@ import {
 } from '@mui/material';
 import { startData } from '@/data/startData';
 import { data as assets } from '@/data/assets.ts';
-import {
-  entitiesAdded,
-  reset,
-  store,
-  useAppDispatch,
-} from '@/store';
+import { entitiesAdded, reset, store, useAppDispatch } from '@/store';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { useState } from 'react';
 
+/**
+ * ActionButtons component stores Export and New Game buttons
+ * Handles export feature and starting a new game
+ */
 const ActionButtons = () => {
   // dispatch to store
   const [dialogOpen, dialogOpened] = useState(false);
@@ -28,22 +27,27 @@ const ActionButtons = () => {
   const [exportError, setExportError] = useState(undefined);
   const [dialogType, setDialogType] = useState('export');
 
+  // dispatch connection to Redux store
   const dispatch = useAppDispatch();
 
+  // Reset the Redux store when the new game button is clicked
   const handleNewGame = async (event: React.MouseEvent<HTMLElement>) => {
     dispatch(reset());
     dispatch(entitiesAdded(startData));
     dialogOpened(false);
   };
 
+  // Close the dialog
   const handleClose = () => {
     dialogOpened(false);
   };
 
+  // Compile and save a ZIP file of exported game
   const handleDownload = async () => {
     const zip = new JSZip();
     let state = store.getState();
 
+    // Build a JSON string with store data
     let exportdata = {
       background: {
         img: assets['backgrounds'][state.canvas.background]['img'] ?? '',
@@ -66,6 +70,7 @@ const ActionButtons = () => {
     // Generate file with game data from store
     zip.file('gamedata.js', exportblob, { binary: true });
 
+    // Generate subfolders of assets
     const assetsFolder = zip.folder('assets');
     const subfolders = new Map<string, JSZip | null | undefined>([
       ['audio', assetsFolder?.folder('audio')],
@@ -167,6 +172,7 @@ const ActionButtons = () => {
     dialogOpened(false);
   };
 
+  // Content for export dialog
   const exportContent = (
     <>
       <DialogTitle id="alert-dialog-title">{'Export your game.'}</DialogTitle>
@@ -189,6 +195,8 @@ const ActionButtons = () => {
       </DialogActions>
     </>
   );
+
+  // Content for new game dialog
   const newGameContent = (
     <>
       <DialogTitle id="alert-dialog-title">{'Create a new game?'}</DialogTitle>
@@ -206,6 +214,7 @@ const ActionButtons = () => {
       </DialogActions>
     </>
   );
+
   return (
     <>
       <Dialog

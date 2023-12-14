@@ -12,6 +12,7 @@ interface Map {
   };
 }
 
+// Data for base asset packs
 export const data: Map = {
   backgrounds: {
     bg1: {
@@ -197,7 +198,7 @@ export const data: Map = {
     spotlight: {
       img: '/workshop/light.png',
       title: 'spotlight',
-      file: ''
+      file: '',
     },
   },
   audio: {

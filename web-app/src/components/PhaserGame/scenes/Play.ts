@@ -74,6 +74,7 @@ export default class Play extends BaseScene {
     // Making shallow copy of entities dictionary from the store
     this.gameEntities = { ...initialState.entities.entities };
 
+    // Set background, effect, and audio
     this.bg = this.add.image(this.scale.width / 2, this.scale.height / 2, 'bg');
     this.setBackground(this.background);
     this.effectKey && this.setEffect(this.effectKey);
@@ -387,21 +388,21 @@ export default class Play extends BaseScene {
       object.id
     ) as Phaser.Physics.Arcade.Sprite;
     // If texture exists, apply
-    if (this.textures.exists(`PLAY_${object.title}`)) {
+    if (this.textures.exists(`PLAY_OB_${object.title}`)) {
       if (
         this.gameObjects.has(object.id) &&
-        obstacle.texture.key !== `PLAY_${object.title}`
+        obstacle.texture.key !== `PLAY_OB_${object.title}`
       ) {
         this.obstacles.remove(obstacle, true);
         obstacle
-          .setTexture(`PLAY_${object.title}`)
+          .setTexture(`PLAY_OB_${object.title}`, 'obstacle')
           .setScale(object.scaleX, object.scaleY)
           .setFlipX(object.flipX);
       } else if (!this.gameObjects.has(object.id)) {
         this.gameObjects.set(
           object.id,
           this.physics.add
-            .sprite(object.x, object.y, `PLAY_${object.title}`)
+            .sprite(object.x, object.y, `PLAY_OB_${object.title}`, 'obstacle')
             .setScale(object.scaleX, object.scaleY)
             .setFlipX(object.flipX)
         );
@@ -446,19 +447,22 @@ export default class Play extends BaseScene {
       }
     } else {
       // If texture does not exist, load before applying
-      let loader = this.load.image(`PLAY_${object.title}`, object.spriteUrl);
+      let loader = this.load.image(`PLAY_OB_${object.title}`, object.spriteUrl);
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
+        this.textures
+          .get(`PLAY_OB_${object.title}`)
+          .add('obstacle', 0, 0, 0, object.spriteWidth, object.spriteHeight);
         if (this.gameObjects.has(object.id)) {
           this.obstacles.remove(obstacle, true);
           obstacle
-            .setTexture(`PLAY_${object.title}`)
+            .setTexture(`PLAY_OB_${object.title}`, 'obstacle')
             .setScale(object.scaleX, object.scaleY);
         } else {
           this.gameObjects.set(
             object.id,
             this.physics.add
-              .sprite(object.x, object.y, `PLAY_${object.title}`)
+              .sprite(object.x, object.y, `PLAY_OB_${object.title}`, 'obstacle')
               .setScale(object.scaleX, object.scaleY)
           );
           obstacle = this.getGameObject(

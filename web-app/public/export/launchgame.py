@@ -1,10 +1,10 @@
+# This file has been bundled into launchgame.exe executable
 import sys
 import time
 import http.server
 import threading
 import webbrowser
 import tkinter as tk
-
 
 if getattr(sys,'frozen', False):
     # pyinstaller splash screen
@@ -25,23 +25,28 @@ HandlerClass.extensions_map[".js"] = "text/javascript"
 HandlerClass.extensions_map[".mjs"] = "text/javascript"
 httpd = ServerClass(server_address, HandlerClass)
 
+# Start http server
 def start_server():
     sa = httpd.socket.getsockname()
     print("Serving HTTP on", sa[0], "port", sa[1], "...")
     print("Your game is now accessible at url", url)
     httpd.serve_forever()
 
+# Launch browser
 def launch(event):
     webbrowser.open_new(url)
 
+# Stop server when button clicked
 def stop_server(event):
     httpd.shutdown()
     sys.exit('Shutting down server. Thanks for playing!')
 
+# Stop server when window closed
 def close_window():
     httpd.shutdown()
     sys.exit('Shutting down server. Thanks for playing!')
 
+# UI window
 window = tk.Tk()
 window.title('Your Game - Game Builder Workshop')
 
