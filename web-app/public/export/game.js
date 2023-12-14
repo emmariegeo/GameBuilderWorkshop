@@ -412,20 +412,20 @@ class YourGame extends Phaser.Scene {
   loadObstacle(object) {
     let obstacle = this.getGameObject(object.id);
     // If texture exists, apply
-    if (this.textures.exists(`PLAY_${object.title}`)) {
+    if (this.textures.exists( `PLAY_OB_${object.title}`)) {
       if (
         this.gameObjects.has(object.id) &&
-        obstacle.texture.key !== `PLAY_${object.title}`
+        obstacle.texture.key !== `PLAY_OB_${object.title}`
       ) {
         this.obstacles.remove(obstacle, true);
         obstacle
-          .setTexture(`PLAY_${object.title}`)
+          .setTexture(`PLAY_OB_${object.title}`, 'obstacle')
           .setScale(object.scaleX, object.scaleY);
       } else if (!this.gameObjects.has(object.id)) {
         this.gameObjects.set(
           object.id,
           this.physics.add
-            .sprite(object.x, object.y, `PLAY_${object.title}`)
+            .sprite(object.x, object.y, `PLAY_OB_${object.title}`, 'obstacle')
             .setScale(object.scaleX, object.scaleY)
         );
         obstacle = this.getGameObject(object.id);
@@ -469,19 +469,22 @@ class YourGame extends Phaser.Scene {
       }
     } else {
       // If texture does not exist, load before applying
-      let loader = this.load.image(`PLAY_${object.title}`, object.spriteUrl);
+      let loader = this.load.image(`PLAY_OB_${object.title}`, object.spriteUrl);
       loader.once(Phaser.Loader.Events.COMPLETE, () => {
         // texture loaded, so replace
+        this.textures
+          .get(`PLAY_OB_${object.title}`)
+          .add('obstacle', 0, 0, 0, object.spriteWidth, object.spriteHeight);
         if (this.gameObjects.has(object.id)) {
           this.obstacles.remove(obstacle, true);
           obstacle
-            .setTexture(`PLAY_${object.title}`)
+            .setTexture(`PLAY_OB_${object.title}`, 'obstacle')
             .setScale(object.scaleX, object.scaleY);
         } else {
           this.gameObjects.set(
             object.id,
             this.physics.add
-              .sprite(object.x, object.y, `PLAY_${object.title}`)
+              .sprite(object.x, object.y, `PLAY_OB_${object.title}`, 'obstacle')
               .setScale(object.scaleX, object.scaleY)
           );
           obstacle = this.getGameObject(object.id);
