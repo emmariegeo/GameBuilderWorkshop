@@ -12,6 +12,9 @@ type Props = {
   mode: string;
 };
 
+/**
+ * PhaserGame manages scenes and stores config
+ */
 export default class PhaserGame extends Component<{}, Props> {
   constructor(props: any) {
     super(props);

@@ -74,6 +74,7 @@ export default class Play extends BaseScene {
     // Making shallow copy of entities dictionary from the store
     this.gameEntities = { ...initialState.entities.entities };
 
+    // Set background, effect, and audio
     this.bg = this.add.image(this.scale.width / 2, this.scale.height / 2, 'bg');
     this.setBackground(this.background);
     this.effectKey && this.setEffect(this.effectKey);

@@ -5,7 +5,9 @@ import { Dictionary } from '@reduxjs/toolkit';
 import { Entity, EntityType } from '@/data/types.ts';
 import { modeSwitched, store } from '@/store.ts';
 
-// Provides methods shared between Edit and Play Scenes
+/**
+ * Provides methods shared between Edit and Play Scenes
+ * */
 export default class BaseScene extends Phaser.Scene {
   gameEntities!: Dictionary<Entity>;
   background: any;
@@ -37,6 +39,7 @@ export default class BaseScene extends Phaser.Scene {
     this.load.image('bg', this.background['img']);
     this.load.image('bomb', '../assets/obstacles/bomb.png');
   }
+
   /**
    * Load a given entity into a game object
    * @param object Entity
@@ -73,6 +76,10 @@ export default class BaseScene extends Phaser.Scene {
     throw new Error('Method not implemented.');
   }
 
+  /**
+   * Select a game object by its key
+   * @param key string
+   */
   getGameObject(key: string) {
     let object = this.gameObjects.get(key);
     return object;

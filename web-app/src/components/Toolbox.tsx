@@ -12,16 +12,24 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { Box, Stack, Tooltip, Typography } from '@mui/material';
 
+/**
+ * Toolbox provides a toggle menu of tools to edit the game
+ */
 const Toolbox = () => {
   const theme = useTheme();
+  // Breakpoint for switching to vertical/horizontal toggle buttons
   const matches = useMediaQuery(theme.breakpoints.down('md'));
 
+  // Get current tool and canvas mode from store
   const [tool, mode] = useAppSelector((state) => [
     state.canvas.tool,
     state.canvas.mode,
   ]);
+
+  // Dispatch connection to store
   const dispatch = useAppDispatch();
 
+  // Handle changing tools
   const handleChangeTool = async (
     event: React.MouseEvent<HTMLElement>,
     newTool: Tool | null

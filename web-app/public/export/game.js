@@ -1,18 +1,25 @@
+// Exported game script
 import { data } from './gamedata.js';
-var game;
+
+let game;
 // Used to differentiate between moving and still game objects.
 const Motion = {
   STILL: 0,
   MOVING: 1,
 };
 
+/**
+ * Launch scene for the game displays a start game button
+ */
 class LaunchScene extends Phaser.Scene {
   constructor() {
     super('LaunchScene');
   }
+
   preload() {
     this.load.image('bg', data.background.img);
   }
+
   create() {
     this.bg = this.add
       .image(this.scale.width / 2, this.scale.height / 2, 'bg')
@@ -53,6 +60,10 @@ class LaunchScene extends Phaser.Scene {
     });
   }
 }
+
+/**
+ * Scene for playing the game
+ */
 class YourGame extends Phaser.Scene {
   player;
   bg;
@@ -69,6 +80,7 @@ class YourGame extends Phaser.Scene {
   constructor() {
     super('YourGame');
   }
+
   preload() {
     this.load.image('bg', data.background.img);
     data.audio.file &&
@@ -78,6 +90,7 @@ class YourGame extends Phaser.Scene {
   }
 
   create() {
+    // Destroy any existing audio
     this.audio && this.audio.destroy();
     this.gameObjects = new Map();
     this.gameEntities = data.entities;
@@ -160,6 +173,10 @@ class YourGame extends Phaser.Scene {
     }
   }
 
+  /**
+   * Select a game object by its key
+   * @param key string
+   */
   getGameObject(key) {
     let object = this.gameObjects.get(key);
     return object;
@@ -734,6 +751,8 @@ class YourGame extends Phaser.Scene {
     }
   }
 }
+
+// Phaser game config
 var config = {
   type: Phaser.AUTO,
   width: 800,

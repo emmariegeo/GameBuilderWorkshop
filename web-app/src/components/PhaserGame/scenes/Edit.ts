@@ -827,6 +827,7 @@ export default class Edit extends BaseScene {
         ) => {
           if (store.getState().canvas.tool == Tool.Resize) {
             switch (gameObject.name) {
+              // When top left selector is moved
               case 'TL':
                 if (this.selected) {
                   this.selected.displayWidth = this.selected.width - dragX;
@@ -843,6 +844,7 @@ export default class Edit extends BaseScene {
                     this.selected.displayWidth / 2;
                 }
                 break;
+              // When top right selector is moved
               case 'TR':
                 if (this.selected) {
                   this.selected.displayWidth = this.selected.width + dragX;
@@ -855,6 +857,7 @@ export default class Edit extends BaseScene {
                     this.selected.displayHeight / 2;
                 }
                 break;
+              // When bottom right selector is moved
               case 'BR':
                 if (this.selected) {
                   this.selected.displayWidth = this.selected.width + dragX;
@@ -863,6 +866,7 @@ export default class Edit extends BaseScene {
                   gameObject.x = 0;
                 }
                 break;
+              // When bottom left selector is moved
               case 'BL':
                 if (this.selected) {
                   this.selected.displayWidth = this.selected.width - dragX;
@@ -917,6 +921,7 @@ export default class Edit extends BaseScene {
       }
     );
 
+    // Show bounds on a selected object
     this.selected && this.showBounds(this.selected);
   }
 }

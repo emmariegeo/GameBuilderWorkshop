@@ -27,6 +27,7 @@ import { Entity, EntityType } from '@/data/types.ts';
 
 type Anchor = 'bottom';
 
+// Descriptions for each asset type
 const descriptions: { [index: string]: string } = {
   backgrounds: 'Switch between game backgrounds by clicking on an asset below.',
   platforms: 'Click on a platform to add it to the canvas.',
@@ -38,6 +39,9 @@ const descriptions: { [index: string]: string } = {
   audio: "Switch the game's audio.",
 };
 
+/**
+ * AssetsDrawer component provides assets for the user to click on and add to the game.
+ */
 const AssetsDrawer = () => {
   // Drawer state
   const [state, setState] = React.useState({

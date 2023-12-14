@@ -9,6 +9,10 @@ import { Provider } from 'react-redux';
 import { store } from '@/store';
 import ActionButtons from '@/components/ActionButtons';
 
+/**
+ * Home page contains Navigation, Toolbox, Game Canvas, Options Menu, Action Buttons, and Assets Drawer components.
+ * These components are wrapped by the Redux store provider.
+ */
 const Home = () => {
   return (
     <Container>

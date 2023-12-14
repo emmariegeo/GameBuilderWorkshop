@@ -1,3 +1,4 @@
+// Entity types
 export enum EntityType {
   Player = 'PLAYER',
   Enemy = 'ENEMY',

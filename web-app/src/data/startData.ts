@@ -1,6 +1,7 @@
 import { Entity, EntityType } from './types';
 import { data } from './assets';
 
+// Start data for a new game
 export const startData: Entity[] = [
   {
     id: 'player',

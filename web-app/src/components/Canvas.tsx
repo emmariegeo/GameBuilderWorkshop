@@ -26,6 +26,7 @@ import {
 } from '@mui/material';
 import { Entity, EntityType } from '@/data/types';
 
+// Dynamically importing PhaserGame, showing loading indicator
 const PhaserGame = dynamic(
   () => import('./PhaserGame').then((m) => m.default),
   {
@@ -44,6 +45,9 @@ const PhaserGame = dynamic(
   }
 );
 
+/**
+ * Canvas component contains the game
+ */
 const Canvas = () => {
   // canvas mode and dialog state from store
   const mode = useAppSelector((state) => state.canvas.mode);
